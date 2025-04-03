@@ -1,0 +1,13 @@
+# Arquivos gerados pelo Flex
+lex.yy.c
+
+# Executáveis
+scanner
+a.out
+
+# Arquivos de objeto
+*.o
+
+# Arquivos temporários
+*~
+*.swp
