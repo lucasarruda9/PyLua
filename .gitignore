@@ -11,3 +11,6 @@ a.out
 # Arquivos temporários
 *~
 *.swp
+
+# Arquivos txt
+*.txt

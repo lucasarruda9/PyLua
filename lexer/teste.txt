@@ -1,8 +1,0 @@
-if (x > 10) {
-    y = x + 20;
-} while (y > 0) {
-    y = y - 1;
-}
-// Este é um comentário
-/* Este é um
-   comentário de bloco */
