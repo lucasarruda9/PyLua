@@ -7,7 +7,25 @@
 /* Definição de tokens */
 
 /* Palavras-chave do Python */
-KEYWORD     and|as|assert|break|class|continue|def|del|elif|else|except|False|finally|for|from|global|if|import|in|is|lambda|None|nonlocal|not|or|pass|raise|return|True|try|while|with|yield
+KEYWORD     and|as|assert|break|class|continue|def|del|except|False|finally|from|global|import|in|is|lambda|None|nonlocal|not|or|pass|raise|return|True|try|with|yield
+
+
+UNDERLINE   "_"
+ASYNC       "async"
+AWAIT       "await"
+
+/* Condicionais */
+
+IF         "if"
+ELIF       "elif"
+ELSE       "else"
+MATCH      "match"
+CASE       "case"
+
+/* Loop */
+
+FOR        "for"
+WHILE      "while"
 
 /* Operadores */
 PLUS        "+"
@@ -55,7 +73,7 @@ COMMA       ","
 COLON       ":"
 DOT         "."
 SEMICOLON   ";"
-AT          "@"
+DECORATOR          "@"
 ARROW       "->"
 
 /* Identificadores */
@@ -83,6 +101,14 @@ INDENT      ^[ \t]+
 
 {KEYWORD}   { printf("KEYWORD: %s\n", yytext); }
 
+{UNDERLINE}  { printf("UNDERLINE: %s\n", yytext); }
+{ASYNC}  { printf("ASYNC: %s\n", yytext); }
+{AWAIT} { printf("AWAIT: %s\n", yytext); }
+{MATCH} { printf("MATCH: %s\n", yytext); }
+{CASE} { printf("CASE: %s\n", yytext); }
+{IF} { printf("Condicional IF: %s\n", yytext); }
+{ELIF} { printf("Condicional ELIF: %s\n", yytext); }
+{ELSE} { printf("Condicional ELSE: %s\n", yytext); }
 {PLUS}      { printf("PLUS: %s\n", yytext); }
 {MINUS}     { printf("MINUS: %s\n", yytext); }
 {MULTIPLY}  { printf("MULTIPLY: %s\n", yytext); }
@@ -127,7 +153,7 @@ INDENT      ^[ \t]+
 {COLON}     { printf("COLON: %s\n", yytext); }
 {DOT}       { printf("DOT: %s\n", yytext); }
 {SEMICOLON} { printf("SEMICOLON: %s\n", yytext); }
-{AT}        { printf("AT: %s\n", yytext); }
+{DECORATOR}        { printf("DECORATOR: %s\n", yytext); }
 {ARROW}     { printf("ARROW: %s\n", yytext); }
 
 {IDENTIFIER} { printf("IDENTIFIER: %s\n", yytext); }
