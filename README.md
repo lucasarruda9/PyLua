@@ -107,35 +107,11 @@ Veja o arquivo [LICENSE](LICENSE) para detalhes.
 
 Grupo 8 - PyLua
 
-<div align="center" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px;">
-  <div align="center" style="margin: 10px;">
-    <img src="https://github.com/ArtyMend07.png" width="100" style="border-radius: 50%"><br>
-    <strong>Artur Mendonça</strong><br>
-    <a href="https://github.com/ArtyMend07">ArtyMend07</a>
-  </div>
-  <div align="center" style="margin: 10px;">
-    <img src="https://github.com/BrzGab.png" width="100" style="border-radius: 50%"><br>
-    <strong>Gabriel Lopes</strong><br>
-    <a href="https://github.com/BrzGab">BrzGab</a>
-  </div>
-  <div align="center" style="margin: 10px;">
-    <img src="https://github.com/gmeister18.png" width="100" style="border-radius: 50%"><br>
-    <strong>Guilherme Meister</strong><br>
-    <a href="https://github.com/gmeister18">gmeister18</a>
-  </div>
-  <div align="center" style="margin: 10px;">
-    <img src="https://github.com/lucasarruda9.png" width="100" style="border-radius: 50%"><br>
-    <strong>Lucas Mendonça</strong><br>
-    <a href="https://github.com/lucasarruda9">lucasarruda9</a>
-  </div>
-  <div align="center" style="margin: 10px;">
-    <img src="https://github.com/matferreira1.png" width="100" style="border-radius: 50%"><br>
-    <strong>Matheus Ferreira</strong><br>
-    <a href="https://github.com/matferreira1">matferreira1</a>
-  </div>
-  <div align="center" style="margin: 10px;">
-    <img src="https://github.com/samuelalvess.png" width="100" style="border-radius: 50%"><br>
-    <strong>Samuel Alves</strong><br>
-    <a href="https://github.com/samuelalvess">samuelalvess</a>
-  </div>
-</div>
+| Foto | Nome | GitHub |
+|------|------|--------|
+| ![Artur Mendonça](https://github.com/ArtyMend07.png?size=100) | Artur Mendonça | [ArtyMend07](https://github.com/ArtyMend07) |
+| ![Gabriel Lopes](https://github.com/BrzGab.png?size=100) | Gabriel Lopes | [BrzGab](https://github.com/BrzGab) |
+| ![Guilherme Meister](https://github.com/gmeister18.png?size=100) | Guilherme Meister | [gmeister18](https://github.com/gmeister18) |
+| ![Lucas Mendonça](https://github.com/lucasarruda9.png?size=100) | Lucas Mendonça | [lucasarruda9](https://github.com/lucasarruda9) |
+| ![Matheus Ferreira](https://github.com/matferreira1.png?size=100) | Matheus Ferreira | [matferreira1](https://github.com/matferreira1) |
+| ![Samuel Alves](https://github.com/samuelalvess.png?size=100) | Samuel Alves | [samuelalvess](https://github.com/samuelalvess) |
