@@ -1,8 +1,16 @@
 %{
 #include <stdio.h>
+#include <stdlib.h>
+#include "../src/parser.tab.h"  /* Caminho ajustado para o novo local do arquivo gerado */
+
+
+int convert_to_int(char *text) {
+    return atoi(text);
+}
 %}
 
-%option noyywrap
+
+%option noyywrap noinput nounput nomain
 
 /* Definição de tokens */
 
@@ -99,101 +107,81 @@ INDENT      ^[ \t]+
 /* Regras */
 %%
 
-{KEYWORD}   { printf("KEYWORD: %s\n", yytext); }
+{KEYWORD}   { /* Palavra-chave reconhecida */ }
 
-{UNDERLINE}  { printf("UNDERLINE: %s\n", yytext); }
-{ASYNC}  { printf("ASYNC: %s\n", yytext); }
-{AWAIT} { printf("AWAIT: %s\n", yytext); }
-{MATCH} { printf("MATCH: %s\n", yytext); }
-{CASE} { printf("CASE: %s\n", yytext); }
-{IF} { printf("Condicional IF: %s\n", yytext); }
-{ELIF} { printf("Condicional ELIF: %s\n", yytext); }
-{ELSE} { printf("Condicional ELSE: %s\n", yytext); }
-{PLUS}      { printf("PLUS: %s\n", yytext); }
-{MINUS}     { printf("MINUS: %s\n", yytext); }
-{MULTIPLY}  { printf("MULTIPLY: %s\n", yytext); }
-{DIVIDE}    { printf("DIVIDE: %s\n", yytext); }
-{MODULO}    { printf("MODULO: %s\n", yytext); }
-{POWER}     { printf("POWER: %s\n", yytext); }
-{FLOOR_DIV} { printf("FLOOR_DIV: %s\n", yytext); }
-{LT}        { printf("LT: %s\n", yytext); }
-{GT}        { printf("GT: %s\n", yytext); }
-{LE}        { printf("LE: %s\n", yytext); }
-{GE}        { printf("GE: %s\n", yytext); }
-{EQ}        { printf("EQ: %s\n", yytext); }
-{NE}        { printf("NE: %s\n", yytext); }
-{NE2}       { printf("NE2: %s\n", yytext); }
-{ASSIGN}    { printf("ASSIGN: %s\n", yytext); }
-{PLUS_EQ}   { printf("PLUS_EQ: %s\n", yytext); }
-{MINUS_EQ}  { printf("MINUS_EQ: %s\n", yytext); }
-{MULT_EQ}   { printf("MULT_EQ: %s\n", yytext); }
-{DIV_EQ}    { printf("DIV_EQ: %s\n", yytext); }
-{MOD_EQ}    { printf("MOD_EQ: %s\n", yytext); }
-{FLOOR_EQ}  { printf("FLOOR_EQ: %s\n", yytext); }
-{POW_EQ}    { printf("POW_EQ: %s\n", yytext); }
-{BITAND}    { printf("BITAND: %s\n", yytext); }
-{BITOR}     { printf("BITOR: %s\n", yytext); }
-{BITXOR}    { printf("BITXOR: %s\n", yytext); }
-{BITNOT}    { printf("BITNOT: %s\n", yytext); }
-{SHIFTL}    { printf("SHIFTL: %s\n", yytext); }
-{SHIFTR}    { printf("SHIFTR: %s\n", yytext); }
-{AND_EQ}    { printf("AND_EQ: %s\n", yytext); }
-{OR_EQ}     { printf("OR_EQ: %s\n", yytext); }
-{XOR_EQ}    { printf("XOR_EQ: %s\n", yytext); }
-{SHIFTR_EQ} { printf("SHIFTR_EQ: %s\n", yytext); }
-{SHIFTL_EQ} { printf("SHIFTL_EQ: %s\n", yytext); }
+{UNDERLINE}  { /* UNDERLINE reconhecido */ }
+{ASYNC}  { /* ASYNC reconhecido */ }
+{AWAIT} { /* AWAIT reconhecido */ }
+{MATCH} { /* MATCH reconhecido */ }
+{CASE} { /* CASE reconhecido */ }
+{IF} { /* IF reconhecido */ }
+{ELIF} { /* ELIF reconhecido */ }
+{ELSE} { /* ELSE reconhecido */ }
+{PLUS}      { return PLUS; }
+{MINUS}     { return MINUS; }
+{MULTIPLY}  { return MULTIPLY; }
+{DIVIDE}    { return DIVIDE; }
+{MODULO}    { /* MODULO reconhecido */ }
+{POWER}     { /* POWER reconhecido */ }
+{FLOOR_DIV} { /* FLOOR_DIV reconhecido */ }
+{LT}        { /* LT reconhecido */ }
+{GT}        { /* GT reconhecido */ }
+{LE}        { /* LE reconhecido */ }
+{GE}        { /* GE reconhecido */ }
+{EQ}        { /* EQ reconhecido */ }
+{NE}        { /* NE reconhecido */ }
+{NE2}       { /* NE2 reconhecido */ }
+{ASSIGN}    { /* ASSIGN reconhecido */ }
+{PLUS_EQ}   { /* PLUS_EQ reconhecido */ }
+{MINUS_EQ}  { /* MINUS_EQ reconhecido */ }
+{MULT_EQ}   { /* MULT_EQ reconhecido */ }
+{DIV_EQ}    { /* DIV_EQ reconhecido */ }
+{MOD_EQ}    { /* MOD_EQ reconhecido */ }
+{FLOOR_EQ}  { /* FLOOR_EQ reconhecido */ }
+{POW_EQ}    { /* POW_EQ reconhecido */ }
+{BITAND}    { /* BITAND reconhecido */ }
+{BITOR}     { /* BITOR reconhecido */ }
+{BITXOR}    { /* BITXOR reconhecido */ }
+{BITNOT}    { /* BITNOT reconhecido */ }
+{SHIFTL}    { /* SHIFTL reconhecido */ }
+{SHIFTR}    { /* SHIFTR reconhecido */ }
+{AND_EQ}    { /* AND_EQ reconhecido */ }
+{OR_EQ}     { /* OR_EQ reconhecido */ }
+{XOR_EQ}    { /* XOR_EQ reconhecido */ }
+{SHIFTR_EQ} { /* SHIFTR_EQ reconhecido */ }
+{SHIFTL_EQ} { /* SHIFTL_EQ reconhecido */ }
 
-{LPAREN}    { printf("LPAREN: %s\n", yytext); }
-{RPAREN}    { printf("RPAREN: %s\n", yytext); }
-{LBRACKET}  { printf("LBRACKET: %s\n", yytext); }
-{RBRACKET}  { printf("RBRACKET: %s\n", yytext); }
-{LBRACE}    { printf("LBRACE: %s\n", yytext); }
-{RBRACE}    { printf("RBRACE: %s\n", yytext); }
-{COMMA}     { printf("COMMA: %s\n", yytext); }
-{COLON}     { printf("COLON: %s\n", yytext); }
-{DOT}       { printf("DOT: %s\n", yytext); }
-{SEMICOLON} { printf("SEMICOLON: %s\n", yytext); }
-{DECORATOR}        { printf("DECORATOR: %s\n", yytext); }
-{ARROW}     { printf("ARROW: %s\n", yytext); }
+{LPAREN}    { return LPAREN; }
+{RPAREN}    { return RPAREN; }
+{LBRACKET}  { /* LBRACKET reconhecido */ }
+{RBRACKET}  { /* RBRACKET reconhecido */ }
+{LBRACE}    { /* LBRACE reconhecido */ }
+{RBRACE}    { /* RBRACE reconhecido */ }
+{COMMA}     { /* COMMA reconhecido */ }
+{COLON}     { /* COLON reconhecido */ }
+{DOT}       { /* DOT reconhecido */ }
+{SEMICOLON} { return SEMICOLON; }
+{DECORATOR}        { /* DECORATOR reconhecido */ }
+{ARROW}     { /* ARROW reconhecido */ }
 
-{IDENTIFIER} { printf("IDENTIFIER: %s\n", yytext); }
+{IDENTIFIER} { /* IDENTIFIER reconhecido */ }
 
-{INTEGER}   { printf("INTEGER: %s\n", yytext); }
-{FLOAT}     { printf("FLOAT: %s\n", yytext); }
-{HEX}       { printf("HEX: %s\n", yytext); }
-{OCT}       { printf("OCT: %s\n", yytext); }
-{BIN}       { printf("BIN: %s\n", yytext); }
+{INTEGER}   { yylval.intval = convert_to_int(yytext); return INTEGER; }
+{FLOAT}     { /* FLOAT reconhecido */ }
+{HEX}       { /* HEX reconhecido */ }
+{OCT}       { /* OCT reconhecido */ }
+{BIN}       { /* BIN reconhecido */ }
 
-{STRING_DQ} { printf("STRING_DQ: %s\n", yytext); }
-{STRING_SQ} { printf("STRING_SQ: %s\n", yytext); }
-{TRIPLE_DQ} { printf("TRIPLE_DQ: %s\n", yytext); }
-{TRIPLE_SQ} { printf("TRIPLE_SQ: %s\n", yytext); }
+{STRING_DQ} { /* STRING_DQ reconhecido */ }
+{STRING_SQ} { /* STRING_SQ reconhecido */ }
+{TRIPLE_DQ} { /* TRIPLE_DQ reconhecido */ }
+{TRIPLE_SQ} { /* TRIPLE_SQ reconhecido */ }
 
-{COMMENT}   { printf("COMMENT: %s\n", yytext); }
-{INDENT}    { printf("INDENT: %s\n", yytext); }
+{COMMENT}   { /* COMMENT reconhecido */ }
+{INDENT}    { /* INDENT reconhecido */ }
 
-[ \t\r\n]+  { /* ignore whitespace */ }
-.           { printf("UNKNOWN: %s\n", yytext); }
+[ \t\r\n]+  { /* ignora espaços em branco */ }
+.           { printf("ERRO: Caractere desconhecido: %s\n", yytext); return ERROR; }
 
 %%
-
-int main(int argc, char **argv) {
-    if (argc > 1) {
-        yyin = fopen(argv[1], "r");
-        if (yyin == NULL) {
-            printf("Erro ao abrir arquivo %s\n", argv[1]);
-            return 1;
-        }
-    } else {
-        yyin = stdin;
-    }
-    
-    yylex();
-    
-    if (argc > 1) {
-        fclose(yyin);
-    }
-    
-    return 0;
-}
 
