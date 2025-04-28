@@ -4,17 +4,19 @@ PyLua é um compilador que traduz código Python para Lua. Este projeto está se
 
 ## Visão Geral do Projeto
 
-O PyLua está atualmente em estágios iniciais de desenvolvimento. No momento, ele pode reconhecer expressões regulares e realizar análise léxica básica.
+O PyLua está atualmente em estágios iniciais de desenvolvimento. Ele possui um analisador léxico (scanner) para reconhecer tokens Python e um analisador sintático (parser) que pode processar expressões aritméticas básicas.
 
 ## Estrutura do Repositório
 
 ```
-COMPILADORES1-GP-8/
-├── lexer/              # Componentes de análise léxica
-│   ├── scanner.l       # Definição do scanner Flex
-│   └── teste.txt       # Arquivo de entrada para testes
-├── parser/             # Componentes de análise sintática
-├── src/                # Código fonte
+PyLua/
+├── lexer/              # Analisador léxico
+│   └── scanner.l       # Definição do scanner Flex
+├── parser/             # Analisador sintático
+│   └── parser.y        # Definição do parser Bison
+├── src/                # Código fonte gerado automaticamente
+├── build/              # Diretório para arquivos de compilação
+├── Makefile            # Script de construção
 ├── .gitignore          # Arquivo Git ignore
 ├── LICENSE             # Arquivo de licença
 └── README.md           # Este arquivo
@@ -23,56 +25,79 @@ COMPILADORES1-GP-8/
 ## Versões de Ferramentas Utilizadas
 
 Este projeto foi construído e testado utilizando as seguintes versões de ferramentas:
-* **Clang**: 16.0.0 (clang-1600.0.26.6) ou **GCC**
+* **GCC**: Versão compatível com C11
 * **Flex**: 2.6.4
-* **Bison**: 2.3
+* **Bison**: 3.0 ou superior
+* **Make**: 4.2 ou superior
 
 ## Pré-requisitos
 
 Para compilar e executar o PyLua, você precisa ter o seguinte instalado:
-- Compilador C/C++ (Clang 16.0.0 ou GCC)
-- Flex 2.6.4
-- Bison 2.3
-- Make (opcional, mas recomendado)
+- Compilador GCC
+- Flex
+- Bison
+- Make
 
 ## Compilando o Projeto
 
-1. Clone o repositório:
-```
-git clone https://github.com/lucasarruda9/Compiladores1-gp-8
-cd Compiladores1-gp-8
+Para compilar o projeto completo:
+```bash
+make
 ```
 
-2. Compile o scanner:
-```
-cd lexer
-flex scanner.l
-cc lex.yy.c -o scanner -ll
+Para limpar os arquivos gerados:
+```bash
+make clean
 ```
 
 ## Executando o Compilador
 
-Atualmente, você pode testar o analisador léxico com:
+### Analisador de Expressões Aritméticas
+
+O projeto atual implementa um analisador de expressões aritméticas:
+```bash
+./expr_parser
 ```
-cd lexer
-./scanner < teste.txt
+
+Este analisador permite digitar expressões matemáticas terminadas com ponto e vírgula (;) e exibe o resultado:
+```
+Digite expressoes, terminadas com ';'. Pressione Ctrl+D para encerrar.
+3+4*2;
+Resultado: 11
+(3+5)*2;
+Resultado: 16
+3++2;
+[ERRO SINTATICO] Erro recuperado ate ';'
 ```
 
 ## Funcionalidades Atuais
 
-- Reconhecimento de expressões regulares
-- Análise léxica básica
+- **Análise Léxica**: 
+  - Reconhecimento de tokens Python
+  - Identificação de operadores, identificadores, números e símbolos
+
+- **Análise Sintática**:
+  - Parser para expressões aritméticas básicas
+  - Suporte a operadores +, -, *, / e parênteses
+  - Cálculo de resultados das expressões
+  - Recuperação de erros sintáticos
 
 ## Em Desenvolvimento
 
-- Análise léxica completa
-- Análise sintática
-- Geração de código
+- Análise léxica completa para Python
+- Análise sintática para estruturas Python
+- Geração de código intermediário
 - Tradução de Python para Lua
 
-## Contribuindo
+## Como Contribuir
 
-Este projeto está sendo desenvolvido. As contribuições dos membros da equipe devem seguir os padrões de codificação e o fluxo de trabalho de desenvolvimento acordados.
+Para contribuir com o projeto:
+
+1. Clone o repositório
+2. Crie uma branch para sua feature (`git checkout -b feature/nova-funcionalidade`)
+3. Faça commit das suas mudanças (`git commit -m 'Adiciona nova funcionalidade'`)
+4. Faça push para a branch (`git push origin feature/nova-funcionalidade`)
+5. Abra um Pull Request
 
 ## Licença
 
@@ -81,3 +106,12 @@ Veja o arquivo [LICENSE](LICENSE) para detalhes.
 ## Equipe
 
 Grupo 8 - PyLua
+
+| Foto | Nome | GitHub |
+|------|------|--------|
+| ![Artur Mendonça](https://github.com/ArtyMend07.png?size=100) | Artur Mendonça | [ArtyMend07](https://github.com/ArtyMend07) |
+| ![Gabriel Lopes](https://github.com/BrzGab.png?size=100) | Gabriel Lopes | [BrzGab](https://github.com/BrzGab) |
+| ![Guilherme Meister](https://github.com/gmeister18.png?size=100) | Guilherme Meister | [gmeister18](https://github.com/gmeister18) |
+| ![Lucas Mendonça](https://github.com/lucasarruda9.png?size=100) | Lucas Mendonça | [lucasarruda9](https://github.com/lucasarruda9) |
+| ![Matheus Ferreira](https://github.com/matferreira1.png?size=100) | Matheus Ferreira | [matferreira1](https://github.com/matferreira1) |
+| ![Samuel Alves](https://github.com/samuelalvess.png?size=100) | Samuel Alves | [samuelalvess](https://github.com/samuelalvess) |
