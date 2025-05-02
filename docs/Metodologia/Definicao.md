@@ -1,4 +1,4 @@
-# Definição do Projeto: Compilador Python para Lua
+# Definição do Projeto: Pylua
 
 ## Introdução
 
@@ -28,6 +28,14 @@ O compilador Python para Lua implementará as seguintes funcionalidades:
 - O código Python deve ser analisado sintaticamente para garantir sua validade.
 - O compilador deve gerar código Lua equivalente que seja executável.
 - O compilador deve exibir os resultados da execução ou mensagens de erro conforme o código fornecido.
+
+## Requisitos Não-Funcionais
+
+- O compilador deve ser desenvolvido em C usando Flex 2.6.4 e Bison 3.0
+- O código gerado deve ser compatível com Lua 5.4
+- O compilador deve suportar Python 3.8
+- Deve ser possível compilar o projeto usando Make
+- Deve incluir testes automatizados
 
 ## Arquitetura
 
@@ -100,14 +108,6 @@ O compilador Python para Lua implementará as seguintes funcionalidades:
 
 5. **Execução**: O código Lua gerado é executado e imprime `7`.
 
-## Histórico de Versão
-
-| Versão | Data       | Descrição                       |
-|--------|------------|---------------------------------|
-| 1.0    | 03/04/2025 | Versão inicial com análise léxica e sintática implementadas.|
-| 1.1    | 05/04/2025 | Adicionada a geração de código Lua e a execução.|
-| 1.2    | 10/04/2025 | Melhorias no tratamento de erros e otimização da execução. |
-
 ## Etapas para Implementação
 
 1. **Desenvolvimento do Scanner (Analisador Léxico)**:
@@ -125,6 +125,20 @@ O compilador Python para Lua implementará as seguintes funcionalidades:
 5. **Tratamento de Erros**:
     - Implementar um sistema de tratamento de erros para capturar erros léxicos, sintáticos e semânticos durante a análise e execução.
 
-## Conclusão
+## Referências Bibliográficas
 
-Este projeto de compilador Python para Lua segue a abordagem clássica de um compilador, com fases de análise léxica, sintática e execução, e inclui um tratamento robusto de erros. Ele visa proporcionar uma ferramenta eficaz para traduzir código Python para Lua e executar o código gerado, mantendo a semelhança funcional entre as duas linguagens.
+- Aho, A. V.; Lam, M. S.; Sethi, R.; Ullman, J. D. *Compilers: Principles, Techniques, and Tools*. 2nd Edition. Pearson, 2006.
+- Appel, A. W. *Modern Compiler Implementation in C*. Cambridge University Press, 1998.
+- Ierusalimschy, R. *Programming in Lua*. 4th Edition. Lua.org, 2016.
+- Van Rossum, G.; Drake, F. L. *Python 3 Reference Manual*. Python Software Foundation, 2023.
+- IEEE. *IEEE Std 830-1998 - IEEE Recommended Practice for Software Requirements Specifications*. IEEE, 1998.
+- Wiegers, K.; Beatty, J. *Software Requirements*. 3rd Edition. Microsoft Press, 2013.
+- Sommerville, I. *Software Engineering*. 10th Edition. Pearson, 2015.
+- Pressman, R. S. *Software Engineering: A Practitioner's Approach*. 8th Edition. McGraw-Hill, 2014.
+
+## Histórico de Versões
+
+| Versão | Descrição | Autor(es) | Data | Revisor(es) | Data de Revisão |
+|--------|-----------|-----------|------|-------------|-----------------|
+| 1.0 | Criação inicial do documento de definição | [Guilherme Meister](https://github.com/gmeister18) | 28/04/2025 |  |  |
+| 1.1 | Atualização do documento da definição | [Artur Mendonça](https://github.com/ArtyMend07) | 02/05/2025 | [Gabriel Lopes](https://github.com/BrzGab) | 03/05/2025 |
