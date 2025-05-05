@@ -1,6 +1,6 @@
 name: Issue Template
 description: Template padrão para issues
-title: ""
+title: "[Issue]: "
 labels: []
 body:
   - type: markdown
