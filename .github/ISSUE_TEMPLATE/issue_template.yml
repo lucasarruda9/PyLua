@@ -1,0 +1,94 @@
+name: Issue Template
+description: Template padrão para issues
+title: ""
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # Descrição do Problema/Feature
+        
+        [Descreva aqui o problema ou feature request de forma clara e detalhada]
+
+  - type: checkboxes
+    id: type
+    attributes:
+      label: Tipo de Issue
+      options:
+        - label: Bug Report
+        - label: Feature Request
+        - label: Melhoria
+        - label: Documentação
+        - label: Outro (especifique)
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Ambiente
+
+  - type: input
+    id: compiler-version
+    attributes:
+      label: Versão do Compilador
+      placeholder: especifique a versão
+
+  - type: input
+    id: os-version
+    attributes:
+      label: Sistema Operacional
+      placeholder: especifique o SO
+
+  - type: input
+    id: python-version
+    attributes:
+      label: Versão do Python
+      placeholder: especifique a versão
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportamento Esperado
+      placeholder: Descreva o comportamento esperado
+
+  - type: textarea
+    id: current
+    attributes:
+      label: Comportamento Atual
+      placeholder: Descreva o comportamento atual
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Passos para Reproduzir
+      placeholder: |
+        1. Primeiro passo
+        2. Segundo passo
+        3. E assim por diante...
+
+  - type: checkboxes
+    id: impact
+    attributes:
+      label: Impacto no Compilador
+      options:
+        - label: Afeta o Parser
+        - label: Afeta o Analisador Léxico
+        - label: Afeta o Compilador
+        - label: Não afeta nenhum componente
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots (se aplicável)
+      placeholder: Adicione screenshots se o problema for visual
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs e Mensagens de Erro
+      placeholder: Adicione logs ou mensagens de erro relevantes
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Informações Adicionais
+      placeholder: Adicione qualquer informação adicional que seja relevante 

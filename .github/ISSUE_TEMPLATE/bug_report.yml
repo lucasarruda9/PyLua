@@ -1,0 +1,80 @@
+name: 🐛 Bug Report
+description: Crie um relatório para nos ajudar a melhorar
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por reportar um bug! Por favor, preencha as informações abaixo.
+        
+  - type: textarea
+    id: description
+    attributes:
+      label: Descrição do Bug
+      description: Uma descrição clara e concisa do bug
+      placeholder: O que aconteceu?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: version
+    attributes:
+      label: Versão do Compilador
+      description: Qual versão do compilador você está usando?
+      options:
+        - 1.0.0
+        - 1.1.0
+        - desenvolvimento
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Componente Afetado
+      description: Qual componente do compilador é afetado?
+      options:
+        - Parser
+        - Analisador Léxico
+        - Compilador
+        - Outro
+      multiple: true
+    validations:
+      required: true
+
+  - type: input
+    id: python-version
+    attributes:
+      label: Versão do Python
+      description: Qual versão do Python você está usando?
+      placeholder: ex. 3.9.0
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Passos para Reproduzir
+      description: Como reproduzir este comportamento?
+      placeholder: |
+        1. Vá para '...'
+        2. Execute '...'
+        3. Veja o erro
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportamento Esperado
+      description: O que deveria acontecer?
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs e Mensagens de Erro
+      description: Cole quaisquer logs ou mensagens de erro relevantes
+      render: shell 
