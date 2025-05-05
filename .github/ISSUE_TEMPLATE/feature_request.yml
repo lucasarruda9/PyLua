@@ -1,0 +1,55 @@
+name: 🚀 Feature Request
+description: Sugira uma ideia para este projeto
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por sugerir uma nova feature! Por favor, preencha as informações abaixo.
+        
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema Relacionado
+      description: Sua sugestão está relacionada a algum problema? Por favor, descreva.
+      placeholder: Ex. Sempre fico frustrado quando [...]
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Solução Desejada
+      description: Descreva a solução que você gostaria
+      placeholder: O que você gostaria que acontecesse?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Impacto no Compilador
+      description: Qual componente seria afetado por esta feature?
+      options:
+        - Parser
+        - Analisador Léxico
+        - Compilador
+        - Documentação
+        - Outro
+      multiple: true
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativas Consideradas
+      description: Descreva alternativas que você considerou
+      placeholder: Que outras abordagens você pensou?
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Informações Adicionais
+      description: Adicione qualquer outro contexto ou screenshots sobre a feature request aqui 
