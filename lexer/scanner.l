@@ -1,7 +1,8 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
-#include "../src/parser.tab.h"  /* Caminho ajustado para o novo local do arquivo gerado */
+#include "../parser/parser.tab.h"  // Corrigido o caminho para o parser.tab.h
+#include "../ast/ast.h"  // Inclusão do arquivo da AST
 
 
 int convert_to_int(char *text) {

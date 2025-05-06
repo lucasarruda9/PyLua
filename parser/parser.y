@@ -1,6 +1,11 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include "../ast/ast.h"  // Caminho relativo para o arquivo AST
+ASTNode* create_unary_op_node(char op, ASTNode* expr);
+ASTNode* create_binary_op_node(char op, ASTNode* left, ASTNode* right);
+
+
 
 int yylex();  // Declaração da função yylex que será chamada pelo parser
 void yyerror(const char *s);  // Função de erro para lidar com erros sintáticos
@@ -9,11 +14,12 @@ extern FILE *yyin;  // Arquivo de entrada (pode ser stdin ou um arquivo)
 
 /* Declaração de tipos para os valores */
 %union {
-    int intval;
+    int intval;      // Para valores inteiros
+    ASTNode* node;   // Para armazenar nós da AST
 }
 
 /* Declaração de tokens */
-%token <intval> INTEGER  // O token INTEGER irá carregar um valor inteiro
+%token <intval> INTEGER
 %token PLUS MINUS MULTIPLY DIVIDE
 %token SEMICOLON LPAREN RPAREN
 %token ERROR  // Token de erro
@@ -24,7 +30,7 @@ extern FILE *yyin;  // Arquivo de entrada (pode ser stdin ou um arquivo)
 %precedence NEG   /* Operador de menos unário */
 
 /* Tipo de valor para o não-terminal "expr" */
-%type <intval> expr
+%type <node> expr
 
 %%
 
@@ -34,7 +40,7 @@ input:   /* Produção vazia */
        ;
 
 line:    expr SEMICOLON { 
-                    printf("Resultado: %d\n", $1); 
+                    printf("Resultado: %d\n", $1->value); 
                 }
        | error SEMICOLON { 
                     printf("[ERRO SINTATICO] Erro recuperado até ';'\n"); 
@@ -42,48 +48,44 @@ line:    expr SEMICOLON {
                 }
        ;
 
-expr:    INTEGER               { $$ = $1; }  // Se for um número inteiro, atribui seu valor
-       | LPAREN expr RPAREN    { $$ = $2; }  // Se for uma expressão entre parênteses, atribui o valor interno
-       | expr PLUS expr        { $$ = $1 + $3; }  // Se for uma soma
-       | expr MINUS expr       { $$ = $1 - $3; }  // Se for uma subtração
-       | expr MULTIPLY expr    { $$ = $1 * $3; }  // Se for uma multiplicação
+expr:    INTEGER               { $$ = create_literal_node($1); }  // Se for um número inteiro, cria um nó de literal
+       | LPAREN expr RPAREN    { $$ = $2; }  // Se for uma expressão entre parênteses, retorna a subexpressão
+       | expr PLUS expr        { $$ = create_binary_op_node('+', $1, $3); }  // Se for uma soma, cria um nó binário
+       | expr MINUS expr       { $$ = create_binary_op_node('-', $1, $3); }  // Se for uma subtração, cria um nó binário
+       | expr MULTIPLY expr    { $$ = create_binary_op_node('*', $1, $3); }  // Se for uma multiplicação, cria um nó binário
        | expr DIVIDE expr      { 
                                 if ($3 == 0) {  // Verifica se a divisão é por zero
                                     yyerror("Divisão por zero");
-                                    $$ = 0;  // Retorna 0 em caso de erro
+                                    $$ = create_literal_node(0);  // Retorna 0 em caso de erro
                                 } else {
-                                    $$ = $1 / $3;  // Realiza a divisão
+                                    $$ = create_binary_op_node('/', $1, $3);  // Realiza a divisão
                                 }
                               }
-       | MINUS expr %prec NEG  { $$ = -$2; }  // Se for um número negativo (operador unário)
+       | MINUS expr %prec NEG  { $$ = create_unary_op_node('-', $2); }  // Se for um número negativo (operador unário)
        ;
 
 %%
 
 /* Função para exibir erros */
 void yyerror(const char *s) {
-    /* Usando o parâmetro para evitar o warning */
     fprintf(stderr, "%s\n", s);
 }
 
 /* Função principal para executar o parser */
 int main(int argc, char **argv) {
-    /* Configura o arquivo de entrada ou usa stdin */
     if (argc > 1) {
-        yyin = fopen(argv[1], "r");  // Abre o arquivo de entrada
+        yyin = fopen(argv[1], "r");
         if (yyin == NULL) {
             printf("Erro ao abrir arquivo %s\n", argv[1]);
             return 1;
         }
     } else {
-        yyin = stdin;  // Se não passar argumento, usa a entrada padrão
+        yyin = stdin;
         printf("Digite expressões, terminadas com ';'. Pressione Ctrl+D para encerrar.\n");
     }
     
-    /* Executa o parser */
-    yyparse();  // Chama o parser para começar a análise
+    yyparse();  // Inicia o parser
     
-    /* Fecha o arquivo se necessário */
     if (argc > 1) {
         fclose(yyin);
     }
