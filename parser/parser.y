@@ -5,6 +5,7 @@
 int yylex();  // Declaração da função yylex que será chamada pelo parser
 void yyerror(const char *s);  // Função de erro para lidar com erros sintáticos
 extern FILE *yyin;  // Arquivo de entrada (pode ser stdin ou um arquivo)
+int line_num = 1;
 %}
 
 /* Declaração de tipos para os valores */
@@ -16,7 +17,7 @@ extern FILE *yyin;  // Arquivo de entrada (pode ser stdin ou um arquivo)
 %token <intval> INTEGER  // O token INTEGER irá carregar um valor inteiro
 %token PLUS MINUS MULTIPLY DIVIDE
 %token SEMICOLON LPAREN RPAREN
-%token ERROR  // Token de erro
+%token ERROR  // Token de erro léxico
 
 /* Precedência de operadores */
 %left PLUS MINUS
@@ -31,32 +32,69 @@ extern FILE *yyin;  // Arquivo de entrada (pode ser stdin ou um arquivo)
 /* Regras de análise sintática */
 input:   /* Produção vazia */
        | input line  // Pode ter várias linhas de expressão
-       ;
+    ;
 
-line:    expr SEMICOLON { 
-                    printf("Resultado: %d\n", $1); 
-                }
-       | error SEMICOLON { 
-                    printf("[ERRO SINTATICO] Erro recuperado até ';'\n"); 
-                    yyerrok; 
-                }
-       ;
+line:
+      expr SEMICOLON {
+            printf("Resultado: %d\n", $1);
+        }
+    | expr error {
+            yyerror("[ERRO SINTÁTICO] Faltando ponto e vírgula ao final da expressão");
+            yyerrok;
+        }
+    | error SEMICOLON {
+            yyerror("[ERRO SINTÁTICO] Expressão inválida antes do ';'");
+            yyerrok;
+        }
+    | error {
+            yyerror("[ERRO SINTÁTICO] Expressão inválida sem ponto e vírgula");
+            yyerrok;
+        }
+    ;
 
-expr:    INTEGER               { $$ = $1; }  // Se for um número inteiro, atribui seu valor
-       | LPAREN expr RPAREN    { $$ = $2; }  // Se for uma expressão entre parênteses, atribui o valor interno
-       | expr PLUS expr        { $$ = $1 + $3; }  // Se for uma soma
-       | expr MINUS expr       { $$ = $1 - $3; }  // Se for uma subtração
-       | expr MULTIPLY expr    { $$ = $1 * $3; }  // Se for uma multiplicação
-       | expr DIVIDE expr      { 
-                                if ($3 == 0) {  // Verifica se a divisão é por zero
-                                    yyerror("Divisão por zero");
-                                    $$ = 0;  // Retorna 0 em caso de erro
-                                } else {
-                                    $$ = $1 / $3;  // Realiza a divisão
-                                }
-                              }
-       | MINUS expr %prec NEG  { $$ = -$2; }  // Se for um número negativo (operador unário)
-       ;
+expr:
+      INTEGER {
+            $$ = $1;
+        }
+    | LPAREN expr RPAREN {
+            $$ = $2;
+        }
+    | LPAREN error RPAREN {
+            yyerror("[ERRO SINTÁTICO] Expressão inválida dentro de parênteses");
+            $$ = 0;
+            yyerrok;
+        }
+    | LPAREN expr error {
+            yyerror("[ERRO SINTÁTICO] Parêntese direito ')' esperado");
+            $$ = $2;
+            yyerrok;
+        }
+    | expr PLUS expr {
+            $$ = $1 + $3;
+        }
+    | expr MINUS expr {
+            $$ = $1 - $3;
+        }
+    | expr MULTIPLY expr {
+            $$ = $1 * $3;
+        }
+    | expr DIVIDE expr {
+            if ($3 == 0) {
+                yyerror("[ERRO SEMÂNTICO] Divisão por zero");
+                $$ = 0;
+            } else {
+                $$ = $1 / $3;
+            }
+        }
+    | expr error expr {
+            yyerror("[ERRO SINTÁTICO] Operador inválido ou faltando entre operandos");
+            $$ = 0;
+            yyerrok;
+        }
+    | MINUS expr %prec NEG {
+            $$ = -$2;
+        }
+    ;
 
 %%
 
@@ -79,14 +117,14 @@ int main(int argc, char **argv) {
         yyin = stdin;  // Se não passar argumento, usa a entrada padrão
         printf("Digite expressões, terminadas com ';'. Pressione Ctrl+D para encerrar.\n");
     }
-    
+
     /* Executa o parser */
     yyparse();  // Chama o parser para começar a análise
-    
+
     /* Fecha o arquivo se necessário */
     if (argc > 1) {
         fclose(yyin);
     }
-    
+
     return 0;
 }
