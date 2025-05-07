@@ -27,7 +27,7 @@
 |--------|-------------|--------|-------------|
 | Definição da Gramática | [Gabriel Lopes](https://github.com/BrzGab) | ✅ Concluída | Gramática definida e documentada |
 | Implementação do Parser | [Gabriel Lopes](https://github.com/BrzGab) | ✅ Concluída | Parser implementado |
-| Tratamento de Erros | - | ❌ Não iniciada | Não implementada |
+| Tratamento de Erros | [Matheus Ferreira](https://github.com/matferreira1) | ✅ Concluída | Tratamento de erros implementado |
 | Integração Léxico-Sintático | - | ❌ Não iniciada | Não implementada |
 | Preparação para P1 | [Artur Mendonça](https://github.com/ArtyMend07), [Gabriel Lopes](https://github.com/BrzGab), [Guilherme Meister](https://github.com/gmeister18), [Lucas Mendonça](https://github.com/lucasarruda9), [Matheus Ferreira](https://github.com/matferreira1), [Samuel Alves](https://github.com/samuelalvess) | ✅ Concluída | Documentação e slides preparados |
 | Apresentação P1 | [Artur Mendonça](https://github.com/ArtyMend07), [Gabriel Lopes](https://github.com/BrzGab), [Guilherme Meister](https://github.com/gmeister18), [Lucas Mendonça](https://github.com/lucasarruda9), [Matheus Ferreira](https://github.com/matferreira1), [Samuel Alves](https://github.com/samuelalvess) | ✅ Concluída | Apresentação realizada |
@@ -36,19 +36,19 @@
 - ✅ Parser implementado
 - ✅ Gramática definida
 - ✅ Apresentação P1 realizada
+- ✅ Tratamento de erros implementado
 
 ## Status Geral do Projeto
 
 ### Componentes Implementados
 - ✅ Scanner (Analisador Léxico)
 - ✅ Parser (Analisador Sintático)
+- ✅ Tratamento de Erros
 - ❌ Integração entre Scanner e Parser
-- ❌ Tratamento de Erros
 
 ### Próximos Passos
 1. Implementar integração entre Scanner e Parser
-2. Desenvolver sistema de tratamento de erros
-3. Iniciar implementação da AST
+2. Iniciar implementação da AST
 
 ## Observações
 - A Sprint 1 foi concluída com sucesso, com a implementação do scanner funcional
@@ -72,3 +72,4 @@
 | Versão | Descrição | Autor(es) | Data | Revisor(es) | Data de Revisão |
 |--------|-----------|-----------|------|-------------|-----------------|
 | 1.0 | Criação inicial da documentação das sprints realizadas | [Artur Mendonça](https://github.com/ArtyMend07) | 02/05/2025 | [Lucas Mendonça](https://github.com/lucasarruda9) | 02/05/2025 |
+| 1.1 | Atualização das sprints realizadas | [Matheus Ferreira](https://github.com/matferreira1) | 07/05/2025 | [Lucas Mendonça](https://github.com/lucasarruda9) | 07/05/2025 |
