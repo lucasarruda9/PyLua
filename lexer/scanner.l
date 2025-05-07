@@ -7,6 +7,8 @@
 int convert_to_int(char *text) {
     return atoi(text);
 }
+
+int line_num = 1; // linha atual
 %}
 
 
@@ -81,7 +83,7 @@ COMMA       ","
 COLON       ":"
 DOT         "."
 SEMICOLON   ";"
-DECORATOR          "@"
+DECORATOR   "@"
 ARROW       "->"
 
 /* Identificadores */
@@ -101,29 +103,74 @@ TRIPLE_DQ   \"\"\"[^\"]*\"\"\"
 TRIPLE_SQ   \'\'\'[^\']*\'\'\'
 
 /* Comentários */
-COMMENT     #.*
+COMMENT     \#.*
+
 INDENT      ^[ \t]+
 
-/* Regras */
 %%
 
-{KEYWORD}   { /* Palavra-chave reconhecida */ }
+\n              { line_num++; }
+[ \t\r]+        { /* ignora espaços e tabulações */ }
 
-{UNDERLINE}  { /* UNDERLINE reconhecido */ }
-{ASYNC}  { /* ASYNC reconhecido */ }
-{AWAIT} { /* AWAIT reconhecido */ }
-{MATCH} { /* MATCH reconhecido */ }
-{CASE} { /* CASE reconhecido */ }
-{IF} { /* IF reconhecido */ }
-{ELIF} { /* ELIF reconhecido */ }
-{ELSE} { /* ELSE reconhecido */ }
+/* ===== TRATAMENTO DE ERROS LÉXICOS ===== */
+
+/* Identificadores inválidos (ex: 123abc) */
+[0-9]+[a-zA-Z_][a-zA-Z0-9_]* {
+    fprintf(stderr, "ERRO LÉXICO na linha %d: Identificador não pode começar com número: '%s'\n", line_num, yytext);
+    return ERROR;
+}
+
+/* Números malformados */
+0[xX][^0-9a-fA-F]+ {
+    fprintf(stderr, "ERRO LÉXICO na linha %d: Número hexadecimal inválido: '%s'\n", line_num, yytext);
+    return ERROR;
+}
+0[bB][^01]+ {
+    fprintf(stderr, "ERRO LÉXICO na linha %d: Número binário inválido: '%s'\n", line_num, yytext);
+    return ERROR;
+}
+0[oO][^0-7]+ {
+    fprintf(stderr, "ERRO LÉXICO na linha %d: Número octal inválido: '%s'\n", line_num, yytext);
+    return ERROR;
+}
+
+/* String mal terminada com escape no final */
+\"([^\"\n\\]|\\.)*\\$ {
+    fprintf(stderr, "ERRO LÉXICO na linha %d: String dupla com escape malformado no final\n", line_num);
+    return ERROR;
+}
+\'([^\'\n\\]|\\.)*\\$ {
+    fprintf(stderr, "ERRO LÉXICO na linha %d: String simples com escape malformado no final\n", line_num);
+    return ERROR;
+}
+
+/* Caracteres de controle inválidos */
+[\x01-\x08\x0B\x0C\x0E-\x1F] {
+    fprintf(stderr, "ERRO LÉXICO na linha %d: Caractere de controle não permitido: código 0x%02X\n", line_num, yytext[0]);
+    return ERROR;
+}
+
+/* ===== TOKENS ===== */
+
+{KEYWORD}       { /* Palavra-chave reconhecida */ }
+{UNDERLINE}     { /* UNDERLINE reconhecido */ }
+{ASYNC}         { /* ASYNC reconhecido */ }
+{AWAIT}         { /* AWAIT reconhecido */ }
+{MATCH}         { /* MATCH reconhecido */ }
+{CASE}          { /* CASE reconhecido */ }
+{IF}            { /* IF reconhecido */ }
+{ELIF}          { /* ELIF reconhecido */ }
+{ELSE}          { /* ELSE reconhecido */ }
+
 {PLUS}      { return PLUS; }
 {MINUS}     { return MINUS; }
 {MULTIPLY}  { return MULTIPLY; }
 {DIVIDE}    { return DIVIDE; }
+
 {MODULO}    { /* MODULO reconhecido */ }
 {POWER}     { /* POWER reconhecido */ }
 {FLOOR_DIV} { /* FLOOR_DIV reconhecido */ }
+
 {LT}        { /* LT reconhecido */ }
 {GT}        { /* GT reconhecido */ }
 {LE}        { /* LE reconhecido */ }
@@ -131,6 +178,7 @@ INDENT      ^[ \t]+
 {EQ}        { /* EQ reconhecido */ }
 {NE}        { /* NE reconhecido */ }
 {NE2}       { /* NE2 reconhecido */ }
+
 {ASSIGN}    { /* ASSIGN reconhecido */ }
 {PLUS_EQ}   { /* PLUS_EQ reconhecido */ }
 {MINUS_EQ}  { /* MINUS_EQ reconhecido */ }
@@ -139,6 +187,7 @@ INDENT      ^[ \t]+
 {MOD_EQ}    { /* MOD_EQ reconhecido */ }
 {FLOOR_EQ}  { /* FLOOR_EQ reconhecido */ }
 {POW_EQ}    { /* POW_EQ reconhecido */ }
+
 {BITAND}    { /* BITAND reconhecido */ }
 {BITOR}     { /* BITOR reconhecido */ }
 {BITXOR}    { /* BITXOR reconhecido */ }
@@ -161,27 +210,29 @@ INDENT      ^[ \t]+
 {COLON}     { /* COLON reconhecido */ }
 {DOT}       { /* DOT reconhecido */ }
 {SEMICOLON} { return SEMICOLON; }
-{DECORATOR}        { /* DECORATOR reconhecido */ }
+{DECORATOR} { /* DECORATOR reconhecido */ }
 {ARROW}     { /* ARROW reconhecido */ }
 
-{IDENTIFIER} { /* IDENTIFIER reconhecido */ }
+{IDENTIFIER}    { /* IDENTIFIER reconhecido */ }
 
-{INTEGER}   { yylval.intval = convert_to_int(yytext); return INTEGER; }
-{FLOAT}     { /* FLOAT reconhecido */ }
-{HEX}       { /* HEX reconhecido */ }
-{OCT}       { /* OCT reconhecido */ }
-{BIN}       { /* BIN reconhecido */ }
+{INTEGER}       { yylval.intval = convert_to_int(yytext); return INTEGER; }
+{FLOAT}         { /* FLOAT reconhecido */ }
+{HEX}           { /* HEX reconhecido */ }
+{OCT}           { /* OCT reconhecido */ }
+{BIN}           { /* BIN reconhecido */ }
 
-{STRING_DQ} { /* STRING_DQ reconhecido */ }
-{STRING_SQ} { /* STRING_SQ reconhecido */ }
-{TRIPLE_DQ} { /* TRIPLE_DQ reconhecido */ }
-{TRIPLE_SQ} { /* TRIPLE_SQ reconhecido */ }
+{STRING_DQ}     { /* STRING_DQ reconhecido */ }
+{STRING_SQ}     { /* STRING_SQ reconhecido */ }
+{TRIPLE_DQ}     { /* TRIPLE_DQ reconhecido */ }
+{TRIPLE_SQ}     { /* TRIPLE_SQ reconhecido */ }
 
-{COMMENT}   { /* COMMENT reconhecido */ }
-{INDENT}    { /* INDENT reconhecido */ }
+{COMMENT}       { /* COMMENT reconhecido */ }
+{INDENT}        { /* INDENT reconhecido */ }
 
-[ \t\r\n]+  { /* ignora espaços em branco */ }
-.           { printf("ERRO: Caractere desconhecido: %s\n", yytext); return ERROR; }
+/* Caractere inválido genérico */
+. {
+    fprintf(stderr, "ERRO LÉXICO na linha %d: Caractere desconhecido: '%s'\n", line_num, yytext);
+    return ERROR;
+}
 
 %%
-
