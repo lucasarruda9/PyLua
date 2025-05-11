@@ -77,4 +77,4 @@ Este diagrama de classes representa uma implementação orientada a objetos para
 
 O diagrama de classes apresentado fornece uma visão abrangente da estrutura da AST, mostrando claramente os diferentes tipos de nós, seus atributos, métodos e relacionamentos. Esta documentação serve como referência para entender a arquitetura do sistema e pode ser usada como base para futuras implementações ou modificações.
 
-![Diagrama de Classes AST](./assets/Diagrama%20de%20classe%20-%20Pylua.png)
+![Diagrama de Classes AST](./assets/diagrama.png)
