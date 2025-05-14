@@ -1,5 +1,4 @@
 # Plano de Sprints para Compilador Python-Lua
-
 ## Informações Gerais
 
 **Disciplina:** FGA0003 - Compiladores 1  
@@ -28,8 +27,8 @@
 | Sprint | Período | Foco | Entregas | Status |
 |--------|---------|------|----------|--------|
 | 1 | 24/03 - 09/04 | Preparação e Análise Léxica | Analisador Léxico Funcional | ✅ Finalizada |
-| 2 | 10/04 - 28/04 | Análise Sintática | Parser e P1 | 🔄 Iniciada |
-| 3 | 01/05 - 14/05 | Representação Interna | AST e Tabela de Símbolos | 🟡 Não iniciado |
+| 2 | 10/04 - 28/04 | Análise Sintática | Parser e P1 | ✅ Finalizada |
+| 3 | 01/05 - 14/05 | Representação Interna | AST e Tabela de Símbolos | 🔄 Iniciada |
 | 4 | 15/05 - 02/06 | Análise Semântica | Verificador Semântico e P2 | 🟡 Não iniciado |
 | 5 | 05/06 - 18/06 | Geração de Código | Gerador de Código Lua | 🟡 Não iniciado |
 | 6 | 19/06 - 27/06 | Refinamento e Testes | Compilador Completo | 🟡 Não iniciado |
@@ -57,12 +56,12 @@
 
 | Tarefa | Descrição | Responsável | Prazo | Status |
 |--------|-----------|-------------|-------|--------|
-| Definição da Gramática | Criar gramática para subset Python | [Gabriel Lopes](https://github.com/BrzGab), [Artur Mendonça](https://github.com/ArtyMend07) | 14/04 | 🔄 |
-| Implementação do Parser | Desenvolvimento do analisador sintático | [Lucas Mendonça](https://github.com/lucasarruda9), [Samuel Alves](https://github.com/samuelalvess) | 21/04 | 🔄 |
-| Tratamento de Erros | Sistema de mensagens de erro sintático | [Matheus Ferreira](https://github.com/matferreira1) | 23/04 | 🔄 |
-| Integração Léxico-Sintático | Conectar os dois módulos | [Guilherme Meister](https://github.com/gmeister18) | 25/04 | 🔄 |
-| Preparação para P1 | Documentação e slides | [Artur Mendonça](https://github.com/ArtyMend07), [Gabriel Lopes](https://github.com/BrzGab), [Guilherme Meister](https://github.com/gmeister18), [Lucas Mendonça](https://github.com/lucasarruda9), [Matheus Ferreira](https://github.com/matferreira1), [Samuel Alves](https://github.com/samuelalvess) | 28/04 | 🔄 |
-| Apresentação P1 | Apresentação para o professor | [Artur Mendonça](https://github.com/ArtyMend07), [Gabriel Lopes](https://github.com/BrzGab), [Guilherme Meister](https://github.com/gmeister18), [Lucas Mendonça](https://github.com/lucasarruda9), [Matheus Ferreira](https://github.com/matferreira1), [Samuel Alves](https://github.com/samuelalvess) | 30/04 | 🔄 |
+| Definição da Gramática | Criar gramática para subset Python | [Gabriel Lopes](https://github.com/BrzGab), [Artur Mendonça](https://github.com/ArtyMend07) | 14/04 | ✅  |
+| Implementação do Parser | Desenvolvimento do analisador sintático | [Lucas Mendonça](https://github.com/lucasarruda9), [Samuel Alves](https://github.com/samuelalvess) | 21/04 | ✅  |
+| Tratamento de Erros | Sistema de mensagens de erro sintático | [Matheus Ferreira](https://github.com/matferreira1) | 23/04 | ✅  |
+| Integração Léxico-Sintático | Conectar os dois módulos | [Guilherme Meister](https://github.com/gmeister18) | 25/04 | ✅  |
+| Preparação para P1 | Documentação e slides | [Artur Mendonça](https://github.com/ArtyMend07), [Gabriel Lopes](https://github.com/BrzGab), [Guilherme Meister](https://github.com/gmeister18), [Lucas Mendonça](https://github.com/lucasarruda9), [Matheus Ferreira](https://github.com/matferreira1), [Samuel Alves](https://github.com/samuelalvess) | 28/04 | ✅  |
+| Apresentação P1 | Apresentação para o professor | [Artur Mendonça](https://github.com/ArtyMend07), [Gabriel Lopes](https://github.com/BrzGab), [Guilherme Meister](https://github.com/gmeister18), [Lucas Mendonça](https://github.com/lucasarruda9), [Matheus Ferreira](https://github.com/matferreira1), [Samuel Alves](https://github.com/samuelalvess) | 30/04 | ✅  |
 
 **Entregável:** Parser funcional e apresentação do Ponto de Controle 1  
 **Critério de Aceitação:** 
@@ -76,12 +75,12 @@
 
 | Tarefa | Descrição | Responsável | Prazo | Status |
 |--------|-----------|-------------|-------|--------|
-| Design da AST | Estruturar classes para AST | [Gabriel Lopes](https://github.com/BrzGab), [Guilherme Meister](https://github.com/gmeister18) | 05/05 | 🟡 |
-| Implementação da AST | Código para construção da AST | [Artur Mendonça](https://github.com/ArtyMend07), [Lucas Mendonça](https://github.com/lucasarruda9) | 09/05 | 🟡 |
-| Tabela de Símbolos | Implementação da tabela de símbolos | [Samuel Alves](https://github.com/samuelalvess) | 09/05 | 🟡 |
-| Visualização da AST | Ferramenta para visualizar a AST gerada | [Matheus Ferreira](https://github.com/matferreira1) | 12/05 | 🟡 |
-| Integração Parser-AST | Conectar parser à geração de AST | [Guilherme Meister](https://github.com/gmeister18) | 14/05 | 🟡 |
-| Documentação | Documentar estruturas de dados | [Artur Mendonça](https://github.com/ArtyMend07) | 14/05 | 🟡 |
+| Design da AST | Estruturar classes para AST | [Gabriel Lopes](https://github.com/BrzGab), [Guilherme Meister](https://github.com/gmeister18), [Matheus Ferreira](https://github.com/matferreira1) | 05/05 | 🔄  |
+| Implementação da AST | Código para construção da AST | [Artur Mendonça](https://github.com/ArtyMend07), [Lucas Mendonça](https://github.com/lucasarruda9), [Samuel Alves](https://github.com/samuelalvess) | 09/05 | 🔄  |
+| Tabela de Símbolos | Implementação da tabela de símbolos | [Samuel Alves](https://github.com/samuelalvess), [Gabriel Lopes](https://github.com/BrzGab), [Matheus Ferreira](https://github.com/matferreira1) | 09/05 | 🔄  |
+| Visualização da AST | Ferramenta para visualizar a AST gerada | [Matheus Ferreira](https://github.com/matferreira1), [Artur Mendonça](https://github.com/ArtyMend07), [Guilherme Meister](https://github.com/gmeister18) | 12/05 | 🔄  |
+| Integração Parser-AST | Conectar parser à geração de AST | [Gabriel Lopes](https://github.com/BrzGab), [Guilherme Meister](https://github.com/gmeister18), [Lucas Mendonça](https://github.com/lucasarruda9) | 14/05 | 🔄  |
+| Documentação | Documentar estruturas de dados | [Artur Mendonça](https://github.com/ArtyMend07), [Samuel Alves](https://github.com/samuelalvess), [Lucas Mendonça](https://github.com/lucasarruda9) | 14/05 | 🔄  |
 
 **Entregável:** Representação interna (AST) e tabela de símbolos funcionais  
 **Critério de Aceitação:**
@@ -94,11 +93,11 @@
 
 | Tarefa | Descrição | Responsável | Prazo | Status |
 |--------|-----------|-------------|-------|--------|
-| Verificação de Tipos | Sistema de verificação de tipos | [Gabriel Lopes](https://github.com/BrzGab), [Lucas Mendonça](https://github.com/lucasarruda9) | 19/05 | 🟡 |
-| Verificação de Escopo | Validação de escopo de variáveis | [Artur Mendonça](https://github.com/ArtyMend07) | 21/05 | 🟡 |
-| Verificação Semântica | Outras regras semânticas de Python | [Guilherme Meister](https://github.com/gmeister18), [Matheus Ferreira](https://github.com/matferreira1) | 26/05 | 🟡 |
-| Código Intermediário | Estruturas para representação intermediária | [Lucas Mendonça](https://github.com/lucasarruda9), [Samuel Alves](https://github.com/samuelalvess) | 28/05 | 🟡 |
-| Preparação para P2 | Documentação e slides | [Artur Mendonça](https://github.com/ArtyMend07), [Gabriel Lopes](https://github.com/BrzGab), [Guilherme Meister](https://github.com/gmeister18), [Lucas Mendonça](https://github.com/lucasarruda9), [Matheus Ferreira](https://github.com/matferreira1), [Samuel Alves](https://github.com/samuelalvess) | 02/06 | 🟡 |
+| Verificação de Tipos | Sistema de verificação de tipos | [Gabriel Lopes](https://github.com/BrzGab), [Lucas Mendonça](https://github.com/lucasarruda9), [Matheus Ferreira](https://github.com/matferreira1) | 19/05 | 🟡 |
+| Verificação de Escopo | Validação de escopo de variáveis | [Artur Mendonça](https://github.com/ArtyMend07), [Samuel Alves](https://github.com/samuelalvess), [Guilherme Meister](https://github.com/gmeister18) | 21/05 | 🟡 |
+| Verificação Semântica | Outras regras semânticas de Python | [Guilherme Meister](https://github.com/gmeister18), [Matheus Ferreira](https://github.com/matferreira1), [Lucas Mendonça](https://github.com/lucasarruda9) | 26/05 | 🟡 |
+| Código Intermediário | Estruturas para representação intermediária | [Lucas Mendonça](https://github.com/lucasarruda9), [Samuel Alves](https://github.com/samuelalvess), [Gabriel Lopes](https://github.com/BrzGab) | 28/05 | 🟡 |
+| Preparação para P2 | Documentação e slides | [Artur Mendonça](https://github.com/ArtyMend07), [Guilherme Meister](https://github.com/gmeister18), [Matheus Ferreira](https://github.com/matferreira1) | 02/06 | 🟡 |
 | Apresentação P2 | Apresentação para o professor | [Artur Mendonça](https://github.com/ArtyMend07), [Gabriel Lopes](https://github.com/BrzGab), [Guilherme Meister](https://github.com/gmeister18), [Lucas Mendonça](https://github.com/lucasarruda9), [Matheus Ferreira](https://github.com/matferreira1), [Samuel Alves](https://github.com/samuelalvess) | 04/06 | 🟡 |
 
 **Entregável:** Analisador semântico e representação intermediária  
@@ -112,12 +111,12 @@
 
 | Tarefa | Descrição | Responsável | Prazo | Status |
 |--------|-----------|-------------|-------|--------|
-| Mapeamento Python-Lua | Definir equivalências entre linguagens | [Artur Mendonça](https://github.com/ArtyMend07), [Lucas Mendonça](https://github.com/lucasarruda9) | 09/06 | 🟡 |
-| Gerador de Código | Implementação do gerador de código Lua | [Gabriel Lopes](https://github.com/BrzGab), [Matheus Ferreira](https://github.com/matferreira1) | 12/06 | 🟡 |
-| Biblioteca de Runtime | Funções auxiliares para executar código gerado | [Samuel Alves](https://github.com/samuelalvess) | 12/06 | 🟡 |
-| Disponibilização GitHub | Garantir acesso ao professor | [Lucas Mendonça](https://github.com/lucasarruda9) | 11/06 | 🟡 |
-| Otimizações Básicas | Implementação de otimizações simples | [Artur Mendonça](https://github.com/ArtyMend07), [Guilherme Meister](https://github.com/gmeister18) | 16/06 | 🟡 |
-| Testes de Integração | Testes end-to-end do compilador | [Matheus Ferreira](https://github.com/matferreira1), [Samuel Alves](https://github.com/samuelalvess) | 18/06 | 🟡 |
+| Mapeamento Python-Lua | Definir equivalências entre linguagens | [Artur Mendonça](https://github.com/ArtyMend07), [Lucas Mendonça](https://github.com/lucasarruda9), [Samuel Alves](https://github.com/samuelalvess) | 09/06 | 🟡 |
+| Gerador de Código | Implementação do gerador de código Lua | [Gabriel Lopes](https://github.com/BrzGab), [Matheus Ferreira](https://github.com/matferreira1), [Guilherme Meister](https://github.com/gmeister18) | 12/06 | 🟡 |
+| Biblioteca de Runtime | Funções auxiliares para executar código gerado | [Samuel Alves](https://github.com/samuelalvess), [Artur Mendonça](https://github.com/ArtyMend07), [Gabriel Lopes](https://github.com/BrzGab) | 12/06 | 🟡 |
+| Disponibilização GitHub | Garantir acesso ao professor | [Lucas Mendonça](https://github.com/lucasarruda9), [Matheus Ferreira](https://github.com/matferreira1), [Guilherme Meister](https://github.com/gmeister18) | 11/06 | 🟡 |
+| Otimizações Básicas | Implementação de otimizações simples | [Artur Mendonça](https://github.com/ArtyMend07), [Guilherme Meister](https://github.com/gmeister18), [Samuel Alves](https://github.com/samuelalvess) | 16/06 | 🟡 |
+| Testes de Integração | Testes end-to-end do compilador | [Matheus Ferreira](https://github.com/matferreira1), [Lucas Mendonça](https://github.com/lucasarruda9), [Gabriel Lopes](https://github.com/BrzGab) | 18/06 | 🟡 |
 
 **Entregável:** Gerador de código Lua funcional  
 **Critério de Aceitação:**
@@ -130,12 +129,12 @@
 
 | Tarefa | Descrição | Responsável | Prazo | Status |
 |--------|-----------|-------------|-------|--------|
-| Mensagens de Erro | Melhoria nas mensagens de erro | [Gabriel Lopes](https://github.com/BrzGab) | 21/06 | 🟡 |
-| Testes Avançados | Testes com programas complexos | [Artur Mendonça](https://github.com/ArtyMend07), [Guilherme Meister](https://github.com/gmeister18) | 23/06 | 🟡 |
-| Otimizações Avançadas | Refinamento do código gerado | [Matheus Ferreira](https://github.com/matferreira1) | 25/06 | 🟡 |
-| Documentação Final | Manual do usuário e técnico | [Samuel Alves](https://github.com/samuelalvess) | 25/06 | 🟡 |
-| Preparação da Entrega | Empacotamento final | [Lucas Mendonça](https://github.com/lucasarruda9) | 27/06 | 🟡 |
-| Entrega Final | Submissão via Teams | [Lucas Mendonça](https://github.com/lucasarruda9) | 27/06 | 🟡 |
+| Mensagens de Erro | Melhoria nas mensagens de erro | [Gabriel Lopes](https://github.com/BrzGab), [Matheus Ferreira](https://github.com/matferreira1), [Samuel Alves](https://github.com/samuelalvess) | 21/06 | 🟡 |
+| Testes Avançados | Testes com programas complexos | [Artur Mendonça](https://github.com/ArtyMend07), [Guilherme Meister](https://github.com/gmeister18), [Lucas Mendonça](https://github.com/lucasarruda9) | 23/06 | 🟡 |
+| Otimizações Avançadas | Refinamento do código gerado | [Matheus Ferreira](https://github.com/matferreira1), [Artur Mendonça](https://github.com/ArtyMend07), [Samuel Alves](https://github.com/samuelalvess) | 25/06 | 🟡 |
+| Documentação Final | Manual do usuário e técnico | [Samuel Alves](https://github.com/samuelalvess), [Gabriel Lopes](https://github.com/BrzGab), [Guilherme Meister](https://github.com/gmeister18) | 25/06 | 🟡 |
+| Preparação da Entrega | Empacotamento final | [Lucas Mendonça](https://github.com/lucasarruda9), [Matheus Ferreira](https://github.com/matferreira1), [Artur Mendonça](https://github.com/ArtyMend07) | 27/06 | 🟡 |
+| Entrega Final | Submissão via Teams | [Lucas Mendonça](https://github.com/lucasarruda9), [Guilherme Meister](https://github.com/gmeister18), [Gabriel Lopes](https://github.com/BrzGab) | 27/06 | 🟡 |
 
 **Entregável:** Compilador completo e documentação  
 **Critério de Aceitação:**
@@ -148,10 +147,10 @@
 
 | Tarefa | Descrição | Responsável | Prazo | Status |
 |--------|-----------|-------------|-------|--------|
-| Preparação para Entrevista | Revisão do código e slides | [Artur Mendonça](https://github.com/ArtyMend07), [Gabriel Lopes](https://github.com/BrzGab), [Guilherme Meister](https://github.com/gmeister18), [Lucas Mendonça](https://github.com/lucasarruda9), [Matheus Ferreira](https://github.com/matferreira1), [Samuel Alves](https://github.com/samuelalvess) | 29/06 | 🟡 |
+| Preparação para Entrevista | Revisão do código e slides | [Artur Mendonça](https://github.com/ArtyMend07), [Gabriel Lopes](https://github.com/BrzGab), [Lucas Mendonça](https://github.com/lucasarruda9) | 29/06 | 🟡 |
 | Entrevista Técnica | Apresentação para o professor | [Artur Mendonça](https://github.com/ArtyMend07), [Gabriel Lopes](https://github.com/BrzGab), [Guilherme Meister](https://github.com/gmeister18), [Lucas Mendonça](https://github.com/lucasarruda9), [Matheus Ferreira](https://github.com/matferreira1), [Samuel Alves](https://github.com/samuelalvess) | 30/06 ou 02/07 | 🟡 |
-| Correções Pós-feedback | Ajustes baseados no feedback | [Gabriel Lopes](https://github.com/BrzGab), [Lucas Mendonça](https://github.com/lucasarruda9) | 07/07 | 🟡 |
-| Fechamento | Documentação de lições aprendidas | [Artur Mendonça](https://github.com/ArtyMend07), [Guilherme Meister](https://github.com/gmeister18), [Matheus Ferreira](https://github.com/matferreira1) | 09/07 | 🟡 |
+| Correções Pós-feedback | Ajustes baseados no feedback | [Gabriel Lopes](https://github.com/BrzGab), [Lucas Mendonça](https://github.com/lucasarruda9), [Matheus Ferreira](https://github.com/matferreira1) | 07/07 | 🟡 |
+| Fechamento | Documentação de lições aprendidas | [Artur Mendonça](https://github.com/ArtyMend07), [Guilherme Meister](https://github.com/gmeister18), [Samuel Alves](https://github.com/samuelalvess) | 09/07 | 🟡 |
 
 **Entregável:** Apresentação final e fechamento do projeto  
 **Critério de Aceitação:**
@@ -163,21 +162,21 @@
 
 | Categoria | Funcionalidade | Prioridade | Responsável | Status |
 |-----------|---------------|------------|-------------|--------|
-| **Estruturas Básicas** | Variáveis e atribuições | Alta | [Lucas Mendonça](https://github.com/lucasarruda9) | 🟡 |
-| | Operadores aritméticos e lógicos | Alta | [Artur Mendonça](https://github.com/ArtyMend07) | 🟡 |
-| | Estruturas condicionais (if/else) | Alta | [Gabriel Lopes](https://github.com/BrzGab) | 🟡 |
-| | Loops (while, for) | Alta | [Guilherme Meister](https://github.com/gmeister18) | 🟡 |
-| | Funções e procedimentos | Alta | [Matheus Ferreira](https://github.com/matferreira1) | 🟡 |
-| **Estruturas de Dados** | Listas | Alta | [Samuel Alves](https://github.com/samuelalvess) | 🟡 |
-| | Dicionários | Média | [Lucas Mendonça](https://github.com/lucasarruda9) | 🟡 |
-| | Tuplas | Média | [Artur Mendonça](https://github.com/ArtyMend07) | 🟡 |
-| **Recursos Python** | Indentação para blocos | Alta | [Gabriel Lopes](https://github.com/BrzGab) | 🟡 |
-| | List comprehensions | Média | [Guilherme Meister](https://github.com/gmeister18) | 🟡 |
-| | Funções lambda | Baixa | [Matheus Ferreira](https://github.com/matferreira1) | 🟡 |
-| | Imports de módulos | Média | [Samuel Alves](https://github.com/samuelalvess) | 🟡 |
-| **Recursos Avançados** | Classes e métodos | Baixa | [Lucas Mendonça](https://github.com/lucasarruda9) | 🟡 |
-| | Tratamento de exceções | Baixa | [Artur Mendonça](https://github.com/ArtyMend07) | 🟡 |
-| | Geradores | Baixa | [Gabriel Lopes](https://github.com/BrzGab) | 🟡 |
+| **Estruturas Básicas** | Variáveis e atribuições | Alta | [Lucas Mendonça](https://github.com/lucasarruda9), [Guilherme Meister](https://github.com/gmeister18), [Matheus Ferreira](https://github.com/matferreira1) | 🟡 |
+| | Operadores aritméticos e lógicos | Alta | [Artur Mendonça](https://github.com/ArtyMend07), [Gabriel Lopes](https://github.com/BrzGab), [Samuel Alves](https://github.com/samuelalvess) | 🟡 |
+| | Estruturas condicionais (if/else) | Alta | [Gabriel Lopes](https://github.com/BrzGab), [Lucas Mendonça](https://github.com/lucasarruda9), [Matheus Ferreira](https://github.com/matferreira1) | 🟡 |
+| | Loops (while, for) | Alta | [Guilherme Meister](https://github.com/gmeister18), [Artur Mendonça](https://github.com/ArtyMend07), [Samuel Alves](https://github.com/samuelalvess) | 🟡 |
+| | Funções e procedimentos | Alta | [Matheus Ferreira](https://github.com/matferreira1), [Gabriel Lopes](https://github.com/BrzGab), [Lucas Mendonça](https://github.com/lucasarruda9) | 🟡 |
+| **Estruturas de Dados** | Listas | Alta | [Samuel Alves](https://github.com/samuelalvess), [Guilherme Meister](https://github.com/gmeister18), [Artur Mendonça](https://github.com/ArtyMend07) | 🟡 |
+| | Dicionários | Média | [Lucas Mendonça](https://github.com/lucasarruda9), [Matheus Ferreira](https://github.com/matferreira1), [Gabriel Lopes](https://github.com/BrzGab) | 🟡 |
+| | Tuplas | Média | [Artur Mendonça](https://github.com/ArtyMend07), [Samuel Alves](https://github.com/samuelalvess), [Guilherme Meister](https://github.com/gmeister18) | 🟡 |
+| **Recursos Python** | Indentação para blocos | Alta | [Gabriel Lopes](https://github.com/BrzGab), [Lucas Mendonça](https://github.com/lucasarruda9), [Matheus Ferreira](https://github.com/matferreira1) | 🟡 |
+| | List comprehensions | Média | [Guilherme Meister](https://github.com/gmeister18), [Artur Mendonça](https://github.com/ArtyMend07), [Samuel Alves](https://github.com/samuelalvess) | 🟡 |
+| | Funções lambda | Baixa | [Matheus Ferreira](https://github.com/matferreira1), [Gabriel Lopes](https://github.com/BrzGab), [Lucas Mendonça](https://github.com/lucasarruda9) | 🟡 |
+| | Imports de módulos | Média | [Samuel Alves](https://github.com/samuelalvess), [Guilherme Meister](https://github.com/gmeister18), [Artur Mendonça](https://github.com/ArtyMend07) | 🟡 |
+| **Recursos Avançados** | Classes e métodos | Baixa | [Lucas Mendonça](https://github.com/lucasarruda9), [Matheus Ferreira](https://github.com/matferreira1), [Gabriel Lopes](https://github.com/BrzGab) | 🟡 |
+| | Tratamento de exceções | Baixa | [Artur Mendonça](https://github.com/ArtyMend07), [Samuel Alves](https://github.com/samuelalvess), [Guilherme Meister](https://github.com/gmeister18) | 🟡 |
+| | Geradores | Baixa | [Gabriel Lopes](https://github.com/BrzGab), [Lucas Mendonça](https://github.com/lucasarruda9), [Matheus Ferreira](https://github.com/matferreira1) | 🟡 |
 
 ## Métricas e Acompanhamento
 
@@ -198,11 +197,11 @@
 
 | Risco | Probabilidade | Impacto | Estratégia de Mitigação | Responsável |
 |-------|--------------|---------|-------------------------|-------------|
-| Atraso em entregas | Média | Alto | Priorização das funcionalidades essenciais | [Lucas Mendonça](https://github.com/lucasarruda9) |
-| Complexidade subestimada | Alta | Alto | Começar com subset mínimo de Python | [Artur Mendonça](https://github.com/ArtyMend07) |
-| Problemas técnicos | Média | Médio | Manter ambiente alternativo e backups | [Gabriel Lopes](https://github.com/BrzGab) |
-| Dificuldades de integração | Alta | Médio | Testes de integração contínuos | [Guilherme Meister](https://github.com/gmeister18) |
-| Sobrecarga acadêmica | Alta | Médio | Distribuição balanceada de tarefas | [Matheus Ferreira](https://github.com/matferreira1) |
+| Atraso em entregas | Média | Alto | Priorização das funcionalidades essenciais | [Lucas Mendonça](https://github.com/lucasarruda9), [Gabriel Lopes](https://github.com/BrzGab), [Guilherme Meister](https://github.com/gmeister18) |
+| Complexidade subestimada | Alta | Alto | Começar com subset mínimo de Python | [Artur Mendonça](https://github.com/ArtyMend07), [Matheus Ferreira](https://github.com/matferreira1), [Samuel Alves](https://github.com/samuelalvess) |
+| Problemas técnicos | Média | Médio | Manter ambiente alternativo e backups | [Gabriel Lopes](https://github.com/BrzGab), [Lucas Mendonça](https://github.com/lucasarruda9), [Matheus Ferreira](https://github.com/matferreira1) |
+| Dificuldades de integração | Alta | Médio | Testes de integração contínuos | [Guilherme Meister](https://github.com/gmeister18), [Artur Mendonça](https://github.com/ArtyMend07), [Samuel Alves](https://github.com/samuelalvess) |
+| Sobrecarga acadêmica | Alta | Médio | Distribuição balanceada de tarefas | [Matheus Ferreira](https://github.com/matferreira1), [Gabriel Lopes](https://github.com/BrzGab), [Lucas Mendonça](https://github.com/lucasarruda9) |
 
 ## Ferramentas e Tecnologias
 
@@ -221,5 +220,6 @@
 
 | Versão | Descrição | Autor(es) | Data | Revisor(es) | Data de Revisão |
 | :----: | --------- | --------- | ---- | ----------- | :-------------: |
-| 1.0 | Criação da documentação das sprints | [Lucas Mendonça](https://github.com/lucasarruda9) | 20/04/2025 | [Gabriel Lopes](https://github.com/BrzGab) | 20/04/2025 |
+| 1.0 | Criação da documentação das sprints | [Gabriel Lopes](https://github.com/BrzGab) | 20/04/2025 | [Lucas Mendonça](https://github.com/lucasarruda9) | 20/04/2025 |
 | 2.0 | Atualização do status das sprints e responsáveis | [Gabriel Lopes](https://github.com/BrzGab) | 22/04/2025 | [Lucas Mendonça](https://github.com/lucasarruda9) | 22/04/2025 |
+| 3.0 | Redistribuição de responsabilidades para incluir 3 membros por tarefa | [Gabriel Lopes](https://github.com/BrzGab) | 07/05/2025 |  [Lucas Mendonça](https://github.com/lucasarruda9) | 07/05/2025 |
