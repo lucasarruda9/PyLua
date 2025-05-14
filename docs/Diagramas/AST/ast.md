@@ -78,3 +78,9 @@ Este diagrama de classes representa uma implementação orientada a objetos para
 O diagrama de classes apresentado fornece uma visão abrangente da estrutura da AST, mostrando claramente os diferentes tipos de nós, seus atributos, métodos e relacionamentos. Esta documentação serve como referência para entender a arquitetura do sistema e pode ser usada como base para futuras implementações ou modificações.
 
 ![Diagrama de Classes AST](./assets/diagrama.png)
+
+## Histórico de Versões
+
+| Versão | Data       | Descrição                                       | Autor(es)                                    | Revisor(es)                                       |
+|--------|------------|--------------------------------------------------|----------------------------------------------|--------------------------------------------------|
+| 1.0    | 10/05/2025 | Criação do diagrama e da documentação da AST | [Gabriel Lopes](https://github.com/BrzGab) | [Artur Mendonça](https://github.com/ArtyMend07) |
