@@ -1,11 +1,11 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
-#include "../ast/ast.h"  // Caminho relativo para o arquivo AST
+#include "../ast/ast.h"  // Caminho correto para o arquivo AST
+
+// Funções de criação de nós da AST
 ASTNode* create_unary_op_node(char op, ASTNode* expr);
 ASTNode* create_binary_op_node(char op, ASTNode* left, ASTNode* right);
-
-
 
 int yylex();  // Declaração da função yylex que será chamada pelo parser
 void yyerror(const char *s);  // Função de erro para lidar com erros sintáticos

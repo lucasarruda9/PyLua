@@ -45,3 +45,13 @@ ASTNode* create_assignment_node(ASTNode* var, ASTNode* expr) {
     node->op = 0;  // Sem operador
     return node;
 }
+
+// Função para criar um nó de operação unária (menos unário)
+ASTNode* create_unary_op_node(char op, ASTNode* expr) {
+    ASTNode* node = (ASTNode*)malloc(sizeof(ASTNode));
+    node->type = NODE_BINARY_OP;  // Tipo de nó: Operação binária (pode ser unário)
+    node->left = expr;
+    node->right = NULL;
+    node->op = op;  // Armazena o operador
+    return node;
+}
