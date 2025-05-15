@@ -1,23 +1,28 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include "../ast/ast.h" 
+#include <string.h>
 
 int yylex();  // Declaração da função yylex que será chamada pelo parser
 void yyerror(const char *s);  // Função de erro para lidar com erros sintáticos
 extern FILE *yyin;  // Arquivo de entrada (pode ser stdin ou um arquivo)
-int line_num = 1;
 %}
 
 /* Declaração de tipos para os valores */
 %union {
     int intval;
+    struct Arvore *no;
+    char *string;
 }
 
 /* Declaração de tokens */
 %token <intval> INTEGER  // O token INTEGER irá carregar um valor inteiro
 %token PLUS MINUS MULTIPLY DIVIDE
 %token SEMICOLON LPAREN RPAREN
-%token ERROR  // Token de erro léxico
+%token <string> IDENTIFIER
+%token ASSIGN PLUS_EQ MINUS_EQ MULT_EQ DIV_EQ FLOOR_EQ POW_EQ MOD_EQ
+%token ERROR  // Token de erro
 
 /* Precedência de operadores */
 %left PLUS MINUS
@@ -25,77 +30,71 @@ int line_num = 1;
 %precedence NEG   /* Operador de menos unário */
 
 /* Tipo de valor para o não-terminal "expr" */
-%type <intval> expr
+%type <no> expr
+%type <no> declaracao
 
 %%
 
 /* Regras de análise sintática */
 input:   /* Produção vazia */
        | input line  // Pode ter várias linhas de expressão
-    ;
+       ;
 
-line:
-      expr SEMICOLON {
-            printf("Resultado: %d\n", $1);
-        }
-    | expr error {
-            yyerror("[ERRO SINTÁTICO] Faltando ponto e vírgula ao final da expressão");
-            yyerrok;
-        }
-    | error SEMICOLON {
-            yyerror("[ERRO SINTÁTICO] Expressão inválida antes do ';'");
-            yyerrok;
-        }
-    | error {
-            yyerror("[ERRO SINTÁTICO] Expressão inválida sem ponto e vírgula");
-            yyerrok;
-        }
-    ;
+line:    expr SEMICOLON { 
+        imprimeArvore($1, 0);
+        DesalocarArvore($1);
+}
+       | declaracao SEMICOLON { 
+        imprimeArvore($1, 0);
+        DesalocarArvore($1);
+}
+       | error SEMICOLON { 
+                    printf("[ERRO SINTATICO] Erro recuperado até ';'\n"); 
+                    yyerrok; 
+                }
+       ;
 
-expr:
-      INTEGER {
-            $$ = $1;
-        }
-    | LPAREN expr RPAREN {
-            $$ = $2;
-        }
-    | LPAREN error RPAREN {
-            yyerror("[ERRO SINTÁTICO] Expressão inválida dentro de parênteses");
-            $$ = 0;
-            yyerrok;
-        }
-    | LPAREN expr error {
-            yyerror("[ERRO SINTÁTICO] Parêntese direito ')' esperado");
-            $$ = $2;
-            yyerrok;
-        }
-    | expr PLUS expr {
-            $$ = $1 + $3;
-        }
-    | expr MINUS expr {
-            $$ = $1 - $3;
-        }
-    | expr MULTIPLY expr {
-            $$ = $1 * $3;
-        }
-    | expr DIVIDE expr {
-            if ($3 == 0) {
-                yyerror("[ERRO SEMÂNTICO] Divisão por zero");
-                $$ = 0;
-            } else {
-                $$ = $1 / $3;
-            }
-        }
-    | expr error expr {
-            yyerror("[ERRO SINTÁTICO] Operador inválido ou faltando entre operandos");
-            $$ = 0;
-            yyerrok;
-        }
-    | MINUS expr %prec NEG {
-            $$ = -$2;
-        }
-    ;
+expr:    INTEGER               { $$ = CriarNoInteiro($1); }  // Cria um nó de inteiro
+       | LPAREN expr RPAREN    { $$ = $2; }  // Expressão entre parênteses
+       | expr PLUS expr        { $$ = CriarNoOperador($1, $3, '+'); }  // Cria nó de soma
+       | expr MINUS expr       { $$ = CriarNoOperador($1, $3, '-'); }  // Cria nó de subtração
+       | expr MULTIPLY expr    { $$ = CriarNoOperador($1, $3, '*'); }  // Cria nó de multiplicação
+       | expr DIVIDE expr      { 
+                                if ($3->valor == 0 && $3->tipo == NoLiteral) {  
+                                    yyerror("Divisão por zero");
+                                    $$ = CriarNoInteiro(0);  // Retorna 0 em caso de erro
+                                } else {
+                                    $$ = CriarNoOperador($1, $3, '/');
+                                }
+                              }
+       | MINUS expr %prec NEG  { $$ = CriarNoOperador($2, NULL, '-'); }  // Operador unário
+       ;
 
+declaracao:  IDENTIFIER ASSIGN expr { 
+            $$ = CriaNoAtribuicao(CriarNoVariavel($1), '=', $3);
+} 
+       | IDENTIFIER PLUS_EQ expr { 
+            $$ = CriaNoAtribuicao(CriarNoVariavel($1), '+', $3);
+} 
+       | IDENTIFIER MINUS_EQ expr { 
+            $$ = CriaNoAtribuicao(CriarNoVariavel($1), '-', $3);
+}  
+       | IDENTIFIER MULT_EQ expr { 
+            $$ = CriaNoAtribuicao(CriarNoVariavel($1), '*', $3);
+} 
+       | IDENTIFIER DIV_EQ expr { 
+            $$ = CriaNoAtribuicao(CriarNoVariavel($1), '/', $3);
+}  
+       | IDENTIFIER MOD_EQ expr { 
+            $$ = CriaNoAtribuicao(CriarNoVariavel($1), '%', $3);
+} 
+       | IDENTIFIER FLOOR_EQ expr { 
+            $$ = CriaNoAtribuicao(CriarNoVariavel($1), 'b', $3);
+}  
+       | IDENTIFIER POW_EQ expr { 
+            $$ = CriaNoAtribuicao(CriarNoVariavel($1), 'a', $3);
+} 
+       ;
 %%
 
 /* Função para exibir erros */
@@ -117,14 +116,14 @@ int main(int argc, char **argv) {
         yyin = stdin;  // Se não passar argumento, usa a entrada padrão
         printf("Digite expressões, terminadas com ';'. Pressione Ctrl+D para encerrar.\n");
     }
-
+    
     /* Executa o parser */
     yyparse();  // Chama o parser para começar a análise
-
+    
     /* Fecha o arquivo se necessário */
     if (argc > 1) {
         fclose(yyin);
     }
-
+    
     return 0;
 }
