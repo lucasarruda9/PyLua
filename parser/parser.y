@@ -71,28 +71,28 @@ expr:    INTEGER               { $$ = CriarNoInteiro($1); }  // Cria um nó de i
        ;
 
 declaracao:  IDENTIFIER ASSIGN expr { 
-            $$ = CriaNoAtribuicao(CriarNoVariavel($1), '=', $3);
+            $$ = CriaNoAtribuicao(CriarNoVariavel($1), $3);
 } 
        | IDENTIFIER PLUS_EQ expr { 
-            $$ = CriaNoAtribuicao(CriarNoVariavel($1), '+', $3);
+            $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, '+'));
 } 
        | IDENTIFIER MINUS_EQ expr { 
-            $$ = CriaNoAtribuicao(CriarNoVariavel($1), '-', $3);
+            $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, '-'));
 }  
        | IDENTIFIER MULT_EQ expr { 
-            $$ = CriaNoAtribuicao(CriarNoVariavel($1), '*', $3);
+            $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, '*'));
 } 
        | IDENTIFIER DIV_EQ expr { 
-            $$ = CriaNoAtribuicao(CriarNoVariavel($1), '/', $3);
+            $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, '/'));
 }  
        | IDENTIFIER MOD_EQ expr { 
-            $$ = CriaNoAtribuicao(CriarNoVariavel($1), '%', $3);
+            $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, '%'));
 } 
        | IDENTIFIER FLOOR_EQ expr { 
-            $$ = CriaNoAtribuicao(CriarNoVariavel($1), 'b', $3);
+            $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, 'b'));
 }  
        | IDENTIFIER POW_EQ expr { 
-            $$ = CriaNoAtribuicao(CriarNoVariavel($1), 'a', $3);
+            $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, 'a'));
 } 
        ;
 %%

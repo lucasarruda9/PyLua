@@ -21,5 +21,6 @@ No* CriarNoVariavel(char *var);
 No* CriarNoOperador(No *esquerda, No *direita, char op);
 No* CriaNoAtribuicao(No *var, No *exp);
 void DesalocarArvore(struct Arvore* no);
+void imprimeArvore(No *no, int nivel);
 
 #endif // AST_H

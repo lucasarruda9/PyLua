@@ -6,11 +6,13 @@ CFLAGS = -Wall -Wextra -I$(SRC_DIR)
 SRC_DIR = src
 LEXER_DIR = lexer
 PARSER_DIR = parser
+AST_DIR = ast
 BUILD_DIR = build
 
 # Arquivos fonte
 LEXER = $(LEXER_DIR)/scanner.l
 PARSER = $(PARSER_DIR)/parser.y
+AST = $(AST_DIR)/ast.c
 
 # Arquivos gerados (saída no diretório src)
 LEXER_C = $(SRC_DIR)/lex.yy.c
@@ -27,7 +29,7 @@ all: setup $(TARGET)
 setup:
 	@mkdir -p $(SRC_DIR) $(BUILD_DIR)
 
-$(TARGET): $(LEXER_C) $(PARSER_C)
+$(TARGET): $(LEXER_C) $(PARSER_C) $(AST)
 	$(CC) $(CFLAGS) -o $@ $^ -lfl
 
 # Gerar parser.tab.c e parser.tab.h usando bison

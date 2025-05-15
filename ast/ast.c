@@ -55,22 +55,36 @@ void DesalocarArvore(No *raiz){
     free(raiz);
 }
 
-void imprimeArvore(No *no) {
+void imprimeArvore(No *no, int nivel) {
+    int i;
+
     if (no == NULL) return;
 
-    if (no->tipo == NoLiteral) {
-        printf("%d", no->valor);
-    } else if (no->tipo == NoVariavel) {
-        printf("%s", no->var);
-    } else if (no->tipo == NoOperacaoBinaria) {
-        printf("(");
-        imprimeArvore(no->esquerdo);  // Imprime a subexpressão esquerda
-        printf(" %c ", no->op);       // Imprime o operador
-        imprimeArvore(no->direito);   // Imprime a subexpressão direita
-        printf(")");
-    } else if (no->tipo == NoAtribuicao) {
-        imprimeArvore(no->esquerdo);  // Imprime a variável
-        printf(" = ");
-        imprimeArvore(no->direito);   // Imprime a expressão do lado direito
+    // Imprime o nó atual
+    for (i = 0; i < nivel; i++) {
+        printf("    ");  // Indentação
+    }
+
+    switch (no->tipo) {
+        case NoLiteral:
+            printf("Literal: %d\n", no->valor);
+            break;
+        case NoVariavel:
+            printf("Variavel: %s\n", no->var);
+            break;
+        case NoOperacaoBinaria:
+            printf("Operacao: %c\n", no->op);
+            break;
+        case NoAtribuicao:
+            printf("Atribuicao\n");
+            break;
+    }
+
+    // Imprime os filhos com indentação
+    if (no->esquerdo != NULL) {
+        imprimeArvore(no->esquerdo, nivel + 1);
+    }
+    if (no->direito != NULL) {
+        imprimeArvore(no->direito, nivel + 1);
     }
 }
