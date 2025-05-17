@@ -1,6 +1,8 @@
 #ifndef AST_H
 #define AST_H
 
+#include "../tabela/tabela.h"  // Incluindo a tabela de símbolos
+
 typedef enum {
     NoLiteral,
     NoVariavel,
@@ -22,5 +24,8 @@ No* CriarNoOperador(No *esquerda, No *direita, char op);
 No* CriaNoAtribuicao(No *var, No *exp);
 void DesalocarArvore(struct Arvore* no);
 void imprimeArvore(No *no, int nivel);
+
+// Nova função para avaliação da AST
+int avaliarArvore(No* no);
 
 #endif // AST_H

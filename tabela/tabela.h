@@ -1,7 +1,7 @@
 #ifndef TABELA_H
 #define TABELA_H
 
-#include "../ast/ast.h"
+#include <stdbool.h>
 
 typedef enum {
     TIPO_INT,
@@ -27,5 +27,17 @@ void inserirSimbolo(char *nome, TipoSimbolo tipo);
 Simbolo *buscarSimbolo(char *nome);
 void imprimirTabela();
 void liberarTabela();
+
+// Novas funções para melhorar a funcionalidade
+bool existeSimbolo(char *nome);
+void definirValorInteiro(char *nome, int valor);
+void definirValorFloat(char *nome, float valor);
+void definirValorString(char *nome, char *valor);
+void definirValorBool(char *nome, bool valor);
+int obterValorInteiro(char *nome);
+float obterValorFloat(char *nome);
+char* obterValorString(char *nome);
+bool obterValorBool(char *nome);
+TipoSimbolo obterTipo(char *nome);
 
 #endif

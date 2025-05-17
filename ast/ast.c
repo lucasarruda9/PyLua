@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "../ast/ast.h"
+#include "../tabela/tabela.h"
 
 No *CriarNoInteiro(int valor){
     No *raiz = malloc(sizeof(No));
@@ -86,5 +88,97 @@ void imprimeArvore(No *no, int nivel) {
     }
     if (no->direito != NULL) {
         imprimeArvore(no->direito, nivel + 1);
+    }
+}
+
+// Nova função para avaliação da AST
+int avaliarArvore(No* no) {
+    if (no == NULL) return 0;
+    
+    int valorEsq, valorDir, resultado;
+    Simbolo* simbolo;
+    
+    switch (no->tipo) {
+        case NoLiteral:
+            return no->valor;
+            
+        case NoVariavel:
+            simbolo = buscarSimbolo(no->var);
+            if (simbolo == NULL) {
+                printf("[ERRO] Variável '%s' não encontrada\n", no->var);
+                return 0;
+            }
+            if (!simbolo->inicializada) {
+                printf("[AVISO] Variável '%s' usada sem inicialização\n", no->var);
+                return 0;
+            }
+            return simbolo->valor;
+            
+        case NoOperacaoBinaria:
+            valorEsq = avaliarArvore(no->esquerdo);
+            
+            // Operador unário (negação)
+            if (no->direito == NULL && no->op == '-') {
+                return -valorEsq;
+            }
+            
+            valorDir = avaliarArvore(no->direito);
+            
+            switch (no->op) {
+                case '+': resultado = valorEsq + valorDir; break;
+                case '-': resultado = valorEsq - valorDir; break;
+                case '*': resultado = valorEsq * valorDir; break;
+                case '/': 
+                    if (valorDir == 0) {
+                        printf("[ERRO] Divisão por zero\n");
+                        return 0;
+                    }
+                    resultado = valorEsq / valorDir; 
+                    break;
+                case '%': 
+                    if (valorDir == 0) {
+                        printf("[ERRO] Módulo por zero\n");
+                        return 0;
+                    }
+                    resultado = valorEsq % valorDir; 
+                    break;
+                case 'a': // Power **=
+                    resultado = (int)pow(valorEsq, valorDir);
+                    break;
+                case 'b': // Floor division //=
+                    if (valorDir == 0) {
+                        printf("[ERRO] Divisão por zero\n");
+                        return 0;
+                    }
+                    resultado = valorEsq / valorDir;
+                    break;
+                default:
+                    printf("[ERRO] Operador desconhecido: %c\n", no->op);
+                    resultado = 0;
+            }
+            return resultado;
+            
+        case NoAtribuicao:
+            if (no->esquerdo->tipo != NoVariavel) {
+                printf("[ERRO] Lado esquerdo da atribuição deve ser uma variável\n");
+                return 0;
+            }
+            
+            resultado = avaliarArvore(no->direito);
+            
+            simbolo = buscarSimbolo(no->esquerdo->var);
+            if (simbolo == NULL) {
+                inserirSimbolo(no->esquerdo->var, TIPO_INT);
+                simbolo = buscarSimbolo(no->esquerdo->var);
+            }
+            
+            simbolo->valor = resultado;
+            simbolo->inicializada = 1;
+            
+            return resultado;
+            
+        default:
+            printf("[ERRO] Tipo de nó desconhecido: %d\n", no->tipo);
+            return 0;
     }
 }

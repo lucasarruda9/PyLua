@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../ast/ast.h" 
+#include "../tabela/tabela.h"
 #include <string.h>
 
 int yylex();  // Declaração da função yylex que será chamada pelo parser
@@ -19,10 +20,11 @@ extern FILE *yyin;  // Arquivo de entrada (pode ser stdin ou um arquivo)
 /* Declaração de tokens */
 %token <intval> INTEGER  // O token INTEGER irá carregar um valor inteiro
 %token PLUS MINUS MULTIPLY DIVIDE
-%token SEMICOLON LPAREN RPAREN
+%token LPAREN RPAREN
 %token <string> IDENTIFIER
 %token ASSIGN PLUS_EQ MINUS_EQ MULT_EQ DIV_EQ FLOOR_EQ POW_EQ MOD_EQ
 %token ERROR  // Token de erro
+%token NEWLINE
 
 /* Precedência de operadores */
 %left PLUS MINUS
@@ -32,6 +34,7 @@ extern FILE *yyin;  // Arquivo de entrada (pode ser stdin ou um arquivo)
 /* Tipo de valor para o não-terminal "expr" */
 %type <no> expr
 %type <no> declaracao
+%type <no> line
 
 %%
 
@@ -40,21 +43,63 @@ input:   /* Produção vazia */
        | input line  // Pode ter várias linhas de expressão
        ;
 
-line:    expr SEMICOLON { 
+line:    expr NEWLINE { 
         imprimeArvore($1, 0);
+        // Avaliação da expressão vai aqui
+        int resultado = avaliarArvore($1);
+        printf("Resultado: %d\n", resultado);
         DesalocarArvore($1);
+        $$ = NULL;
 }
-       | declaracao SEMICOLON { 
+       | declaracao NEWLINE { 
         imprimeArvore($1, 0);
+        // Avalia e executa a atribuição na tabela de símbolos
+        if ($1->tipo == NoAtribuicao) {
+            if ($1->esquerdo->tipo == NoVariavel) {
+                int resultado = avaliarArvore($1);
+                printf("Resultado da atribuição: %d\n", resultado);
+            }
+        }
         DesalocarArvore($1);
+        $$ = NULL;
 }
-       | error SEMICOLON { 
-                    printf("[ERRO SINTATICO] Erro recuperado até ';'\n"); 
-                    yyerrok; 
+       | expr /* sem quebra de linha ao final */ { 
+        imprimeArvore($1, 0);
+        // Avaliação da expressão vai aqui
+        int resultado = avaliarArvore($1);
+        printf("Resultado: %d\n", resultado);
+        DesalocarArvore($1);
+        $$ = NULL;
+}
+       | declaracao /* sem quebra de linha ao final */ { 
+        imprimeArvore($1, 0);
+        // Avalia e executa a atribuição na tabela de símbolos
+        if ($1->tipo == NoAtribuicao) {
+            if ($1->esquerdo->tipo == NoVariavel) {
+                int resultado = avaliarArvore($1);
+                printf("Resultado da atribuição: %d\n", resultado);
+            }
+        }
+        DesalocarArvore($1);
+        $$ = NULL;
+}
+       | NEWLINE { $$ = NULL; } /* Aceitar linhas em branco */
+       | error NEWLINE { 
+                    printf("[ERRO SINTATICO] Erro recuperado até o final da linha\n"); 
+                    yyerrok;
+                    $$ = NULL;
                 }
        ;
 
 expr:    INTEGER               { $$ = CriarNoInteiro($1); }  // Cria um nó de inteiro
+       | IDENTIFIER            { 
+                               Simbolo *s = buscarSimbolo($1);
+                               if (s == NULL) {
+                                   printf("[AVISO] Variável '%s' não declarada\n", $1);
+                                   inserirSimbolo($1, TIPO_INT);
+                               }
+                               $$ = CriarNoVariavel($1); 
+                              }
        | LPAREN expr RPAREN    { $$ = $2; }  // Expressão entre parênteses
        | expr PLUS expr        { $$ = CriarNoOperador($1, $3, '+'); }  // Cria nó de soma
        | expr MINUS expr       { $$ = CriarNoOperador($1, $3, '-'); }  // Cria nó de subtração
@@ -105,6 +150,9 @@ void yyerror(const char *s) {
 
 /* Função principal para executar o parser */
 int main(int argc, char **argv) {
+    /* Inicializa a tabela de símbolos */
+    inicializarTabela();
+    
     /* Configura o arquivo de entrada ou usa stdin */
     if (argc > 1) {
         yyin = fopen(argv[1], "r");  // Abre o arquivo de entrada
@@ -114,11 +162,17 @@ int main(int argc, char **argv) {
         }
     } else {
         yyin = stdin;  // Se não passar argumento, usa a entrada padrão
-        printf("Digite expressões, terminadas com ';'. Pressione Ctrl+D para encerrar.\n");
+        printf("Digite expressões em Python. Pressione Ctrl+D (Linux/Mac) ou Ctrl+Z seguido de Enter (Windows) para encerrar.\n");
     }
     
     /* Executa o parser */
     yyparse();  // Chama o parser para começar a análise
+    
+    /* Imprime a tabela de símbolos */
+    imprimirTabela();
+    
+    /* Libera a tabela de símbolos */
+    liberarTabela();
     
     /* Fecha o arquivo se necessário */
     if (argc > 1) {

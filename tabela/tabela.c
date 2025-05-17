@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include "tabela.h"
 
 #define TAM 211
@@ -98,4 +99,215 @@ void liberarTabela() {
         }
         tabela[i] = NULL;
     }
+}
+
+// Verifica se um símbolo existe na tabela
+bool existeSimbolo(char *nome) {
+    return buscarSimbolo(nome) != NULL;
+}
+
+// Define um valor inteiro para um símbolo
+void definirValorInteiro(char *nome, int valor) {
+    Simbolo *s = buscarSimbolo(nome);
+    
+    if (s == NULL) {
+        inserirSimbolo(nome, TIPO_INT);
+        s = buscarSimbolo(nome);
+    } else if (s->tipo != TIPO_INT) {
+        printf("[AVISO] Conversão de tipo para '%s' (de %d para int)\n", nome, s->tipo);
+        s->tipo = TIPO_INT;
+    }
+    
+    s->valor = valor;
+    s->inicializada = 1;
+}
+
+// Define um valor float para um símbolo
+void definirValorFloat(char *nome, float valor) {
+    Simbolo *s = buscarSimbolo(nome);
+    
+    if (s == NULL) {
+        inserirSimbolo(nome, TIPO_FLOAT);
+        s = buscarSimbolo(nome);
+    } else if (s->tipo != TIPO_FLOAT) {
+        printf("[AVISO] Conversão de tipo para '%s' (de %d para float)\n", nome, s->tipo);
+        s->tipo = TIPO_FLOAT;
+    }
+    
+    s->valorFloat = valor;
+    s->inicializada = 1;
+}
+
+// Define um valor string para um símbolo
+void definirValorString(char *nome, char *valor) {
+    Simbolo *s = buscarSimbolo(nome);
+    
+    if (s == NULL) {
+        inserirSimbolo(nome, TIPO_STRING);
+        s = buscarSimbolo(nome);
+    } else if (s->tipo != TIPO_STRING) {
+        printf("[AVISO] Conversão de tipo para '%s' (de %d para string)\n", nome, s->tipo);
+        s->tipo = TIPO_STRING;
+        if (s->valorString != NULL) {
+            free(s->valorString);
+            s->valorString = NULL;
+        }
+    }
+    
+    // Libera a string anterior, se existir
+    if (s->valorString != NULL) {
+        free(s->valorString);
+    }
+    
+    // Aloca e copia a nova string
+    s->valorString = strdup(valor);
+    s->inicializada = 1;
+}
+
+// Define um valor booleano para um símbolo
+void definirValorBool(char *nome, bool valor) {
+    Simbolo *s = buscarSimbolo(nome);
+    
+    if (s == NULL) {
+        inserirSimbolo(nome, TIPO_BOOL);
+        s = buscarSimbolo(nome);
+    } else if (s->tipo != TIPO_BOOL) {
+        printf("[AVISO] Conversão de tipo para '%s' (de %d para bool)\n", nome, s->tipo);
+        s->tipo = TIPO_BOOL;
+    }
+    
+    s->valor = valor ? 1 : 0;
+    s->inicializada = 1;
+}
+
+// Obtém o valor inteiro de um símbolo
+int obterValorInteiro(char *nome) {
+    Simbolo *s = buscarSimbolo(nome);
+    
+    if (s == NULL) {
+        printf("[ERRO] Tentativa de acessar variável não declarada: '%s'\n", nome);
+        return 0;
+    }
+    
+    if (!s->inicializada) {
+        printf("[AVISO] Tentativa de acessar variável não inicializada: '%s'\n", nome);
+        return 0;
+    }
+    
+    if (s->tipo != TIPO_INT) {
+        printf("[AVISO] Conversão implícita de tipo ao acessar '%s'\n", nome);
+        
+        switch (s->tipo) {
+            case TIPO_FLOAT:
+                return (int)s->valorFloat;
+            case TIPO_BOOL:
+                return s->valor;
+            case TIPO_STRING:
+                printf("[ERRO] Não é possível converter string para int: '%s'\n", nome);
+                return 0;
+            default:
+                return 0;
+        }
+    }
+    
+    return s->valor;
+}
+
+// Obtém o valor float de um símbolo
+float obterValorFloat(char *nome) {
+    Simbolo *s = buscarSimbolo(nome);
+    
+    if (s == NULL) {
+        printf("[ERRO] Tentativa de acessar variável não declarada: '%s'\n", nome);
+        return 0.0;
+    }
+    
+    if (!s->inicializada) {
+        printf("[AVISO] Tentativa de acessar variável não inicializada: '%s'\n", nome);
+        return 0.0;
+    }
+    
+    if (s->tipo != TIPO_FLOAT) {
+        printf("[AVISO] Conversão implícita de tipo ao acessar '%s'\n", nome);
+        
+        switch (s->tipo) {
+            case TIPO_INT:
+                return (float)s->valor;
+            case TIPO_BOOL:
+                return (float)s->valor;
+            case TIPO_STRING:
+                printf("[ERRO] Não é possível converter string para float: '%s'\n", nome);
+                return 0.0;
+            default:
+                return 0.0;
+        }
+    }
+    
+    return s->valorFloat;
+}
+
+// Obtém o valor string de um símbolo
+char* obterValorString(char *nome) {
+    Simbolo *s = buscarSimbolo(nome);
+    
+    if (s == NULL) {
+        printf("[ERRO] Tentativa de acessar variável não declarada: '%s'\n", nome);
+        return NULL;
+    }
+    
+    if (!s->inicializada) {
+        printf("[AVISO] Tentativa de acessar variável não inicializada: '%s'\n", nome);
+        return NULL;
+    }
+    
+    if (s->tipo != TIPO_STRING) {
+        printf("[AVISO] Variável '%s' não é do tipo string\n", nome);
+        return NULL;
+    }
+    
+    return s->valorString;
+}
+
+// Obtém o valor booleano de um símbolo
+bool obterValorBool(char *nome) {
+    Simbolo *s = buscarSimbolo(nome);
+    
+    if (s == NULL) {
+        printf("[ERRO] Tentativa de acessar variável não declarada: '%s'\n", nome);
+        return false;
+    }
+    
+    if (!s->inicializada) {
+        printf("[AVISO] Tentativa de acessar variável não inicializada: '%s'\n", nome);
+        return false;
+    }
+    
+    if (s->tipo != TIPO_BOOL) {
+        printf("[AVISO] Conversão implícita de tipo ao acessar '%s'\n", nome);
+        
+        switch (s->tipo) {
+            case TIPO_INT:
+                return s->valor != 0;
+            case TIPO_FLOAT:
+                return s->valorFloat != 0.0;
+            case TIPO_STRING:
+                return s->valorString != NULL && s->valorString[0] != '\0';
+            default:
+                return false;
+        }
+    }
+    
+    return s->valor != 0;
+}
+
+// Obtém o tipo de um símbolo
+TipoSimbolo obterTipo(char *nome) {
+    Simbolo *s = buscarSimbolo(nome);
+    
+    if (s == NULL) {
+        printf("[ERRO] Tentativa de obter tipo de variável não declarada: '%s'\n", nome);
+        return TIPO_NONE;
+    }
+    
+    return s->tipo;
 }

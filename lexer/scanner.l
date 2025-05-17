@@ -78,7 +78,6 @@ RBRACE      "}"
 COMMA       ","
 COLON       ":"
 DOT         "."
-SEMICOLON   ";"
 DECORATOR          "@"
 ARROW       "->"
 
@@ -158,7 +157,6 @@ INDENT      ^[ \t]+
 {COMMA}     { /* COMMA reconhecido */ }
 {COLON}     { /* COLON reconhecido */ }
 {DOT}       { /* DOT reconhecido */ }
-{SEMICOLON} { return SEMICOLON; }
 {DECORATOR}        { /* DECORATOR reconhecido */ }
 {ARROW}     { /* ARROW reconhecido */ }
 
@@ -178,7 +176,8 @@ INDENT      ^[ \t]+
 {COMMENT}   { /* COMMENT reconhecido */ }
 {INDENT}    { /* INDENT reconhecido */ }
 
-[ \t\r\n]+  { /* ignora espaços em branco */ }
+\n          { line_num++; return NEWLINE; }
+[ \t\r]+    { /* ignora outros espaços em branco */ }
 .           { fprintf(stderr, "ERRO LÉXICO na linha %d: Caractere desconhecido: '%s'\n", line_num, yytext); return ERROR; }
 
 %%
