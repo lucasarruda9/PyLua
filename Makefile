@@ -22,7 +22,7 @@ PARSER_C = $(SRC_DIR)/parser.tab.c
 PARSER_H = $(SRC_DIR)/parser.tab.h
 
 # Nome do executável 
-TARGET = expr_parser
+TARGET = pylua
 
 # Regra principal
 all: setup $(TARGET)
@@ -49,5 +49,10 @@ clean:
 # Executar o programa
 run: all
 	./$(TARGET)
+
+# Regra para executar testess
+test: $(TARGET)
+	@chmod +x run_tests.sh
+	@./run_tests.sh
 
 .PHONY: all clean run setup 
