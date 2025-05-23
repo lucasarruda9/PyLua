@@ -1,4 +1,4 @@
 # Teste: atribuição e uso de variável
 x = 42
 y = x + 8
-y * 999
+y * 2
