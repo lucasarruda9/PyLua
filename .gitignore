@@ -14,3 +14,6 @@ a.out
 
 # Arquivos txt
 *.txt
+
+#Arquivo pylua gerado no makefile
+pylua
