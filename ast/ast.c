@@ -48,6 +48,187 @@ No *CriaNoAtribuicao(No *var, No *exp){
     return raiz;
 }
 
+No* CriarNoFloat(float valor) {
+    No* no = malloc(sizeof(No));
+    no->tipo = NoFloat;
+    no->valor_float = valor;
+    no->direito = no->esquerdo = NULL;
+    no->valor = 0;
+    no->valor_str = NULL;
+    no->valor_bool = 0;
+    no->var = NULL;
+    no->op = 0;
+    no->lista = NULL;
+    no->condicao = NULL;
+    no->corpo = NULL;
+    no->senao = NULL;
+    no->nome_funcao = NULL;
+    no->parametros = NULL;
+    no->argumentos = NULL;
+    return no;
+}
+
+No* CriarNoString(char* valor) {
+    No* no = malloc(sizeof(No));
+    no->tipo = NoString;
+    no->valor_str = valor;
+    no->direito = no->esquerdo = NULL;
+    no->valor = 0;
+    no->valor_float = 0.0;
+    no->valor_bool = 0;
+    no->var = NULL;
+    no->op = 0;
+    no->lista = NULL;
+    no->condicao = NULL;
+    no->corpo = NULL;
+    no->senao = NULL;
+    no->nome_funcao = NULL;
+    no->parametros = NULL;
+    no->argumentos = NULL;
+    return no;
+}
+
+No* CriarNoBool(int valor) {
+    No* no = malloc(sizeof(No));
+    no->tipo = NoBool;
+    no->valor_bool = valor;
+    no->direito = no->esquerdo = NULL;
+    no->valor = 0;
+    no->valor_float = 0.0;
+    no->valor_str = NULL;
+    no->var = NULL;
+    no->op = 0;
+    no->lista = NULL;
+    no->condicao = NULL;
+    no->corpo = NULL;
+    no->senao = NULL;
+    no->nome_funcao = NULL;
+    no->parametros = NULL;
+    no->argumentos = NULL;
+    return no;
+}
+
+No* CriarNoBloco(ListaNo* lista) {
+    No* no = malloc(sizeof(No));
+    no->tipo = NoBloco;
+    no->lista = lista;
+    no->direito = no->esquerdo = NULL;
+    no->valor = 0;
+    no->valor_float = 0.0;
+    no->valor_str = NULL;
+    no->valor_bool = 0;
+    no->var = NULL;
+    no->op = 0;
+    no->condicao = NULL;
+    no->corpo = NULL;
+    no->senao = NULL;
+    no->nome_funcao = NULL;
+    no->parametros = NULL;
+    no->argumentos = NULL;
+    return no;
+}
+
+No* CriarNoIf(No* condicao, No* corpo, No* senao) {
+    No* no = malloc(sizeof(No));
+    no->tipo = NoIf;
+    no->condicao = condicao;
+    no->corpo = corpo;
+    no->senao = senao;
+    no->direito = no->esquerdo = NULL;
+    no->valor = 0;
+    no->valor_float = 0.0;
+    no->valor_str = NULL;
+    no->valor_bool = 0;
+    no->var = NULL;
+    no->op = 0;
+    no->lista = NULL;
+    no->nome_funcao = NULL;
+    no->parametros = NULL;
+    no->argumentos = NULL;
+    return no;
+}
+
+No* CriarNoWhile(No* condicao, No* corpo) {
+    No* no = malloc(sizeof(No));
+    no->tipo = NoWhile;
+    no->condicao = condicao;
+    no->corpo = corpo;
+    no->direito = no->esquerdo = NULL;
+    no->valor = 0;
+    no->valor_float = 0.0;
+    no->valor_str = NULL;
+    no->valor_bool = 0;
+    no->var = NULL;
+    no->op = 0;
+    no->lista = NULL;
+    no->senao = NULL;
+    no->nome_funcao = NULL;
+    no->parametros = NULL;
+    no->argumentos = NULL;
+    return no;
+}
+
+No* CriarNoFor(No* var, No* inicio, No* fim, No* corpo) {
+    No* no = malloc(sizeof(No));
+    no->tipo = NoFor;
+    no->esquerdo = var;
+    no->direito = inicio;
+    no->valor = 0;
+    no->valor_float = 0.0;
+    no->valor_str = NULL;
+    no->valor_bool = 0;
+    no->var = NULL;
+    no->op = 0;
+    no->lista = NULL;
+    no->condicao = fim;
+    no->corpo = corpo;
+    no->senao = NULL;
+    no->nome_funcao = NULL;
+    no->parametros = NULL;
+    no->argumentos = NULL;
+    return no;
+}
+
+No* CriarNoFuncao(char* nome, ListaNo* parametros, No* corpo) {
+    No* no = malloc(sizeof(No));
+    no->tipo = NoFuncao;
+    no->nome_funcao = nome;
+    no->parametros = parametros;
+    no->corpo = corpo;
+    no->direito = no->esquerdo = NULL;
+    no->valor = 0;
+    no->valor_float = 0.0;
+    no->valor_str = NULL;
+    no->valor_bool = 0;
+    no->var = NULL;
+    no->op = 0;
+    no->lista = NULL;
+    no->condicao = NULL;
+    no->senao = NULL;
+    no->argumentos = NULL;
+    return no;
+}
+
+No* CriarNoChamadaFuncao(char* nome, ListaNo* argumentos) {
+    No* no = malloc(sizeof(No));
+    no->tipo = NoChamadaFuncao;
+    no->nome_funcao = nome;
+    no->argumentos = argumentos;
+    no->direito = no->esquerdo = NULL;
+    no->valor = 0;
+    no->valor_float = 0.0;
+    no->valor_str = NULL;
+    no->valor_bool = 0;
+    no->var = NULL;
+    no->op = 0;
+    no->lista = NULL;
+    no->condicao = NULL;
+    no->corpo = NULL;
+    no->senao = NULL;
+    no->parametros = NULL;
+    return no;
+}
+
 void DesalocarArvore(No *raiz){
     if(raiz == NULL){
         return;
@@ -55,6 +236,14 @@ void DesalocarArvore(No *raiz){
     DesalocarArvore(raiz->esquerdo);
     DesalocarArvore(raiz->direito);
     free(raiz);
+}
+
+void imprimeLista(ListaNo* lista, int nivel) {
+    ListaNo* atual = lista;
+    while (atual) {
+        imprimeArvore(atual->no, nivel);
+        atual = atual->prox;
+    }
 }
 
 void imprimeArvore(No *no, int nivel) {
@@ -71,23 +260,87 @@ void imprimeArvore(No *no, int nivel) {
         case NoLiteral:
             printf("Literal: %d\n", no->valor);
             break;
+        case NoFloat:
+            printf("Float: %f\n", no->valor_float);
+            break;
+        case NoString:
+            printf("String: '%s'\n", no->valor_str);
+            break;
+        case NoBool:
+            printf("Bool: %s\n", no->valor_bool ? "True" : "False");
+            break;
         case NoVariavel:
             printf("Variavel: %s\n", no->var);
             break;
         case NoOperacaoBinaria:
             printf("Operacao: %c\n", no->op);
+            if (no->esquerdo) imprimeArvore(no->esquerdo, nivel + 1);
+            if (no->direito) imprimeArvore(no->direito, nivel + 1);
             break;
         case NoAtribuicao:
             printf("Atribuicao\n");
+            if (no->esquerdo) imprimeArvore(no->esquerdo, nivel + 1);
+            if (no->direito) imprimeArvore(no->direito, nivel + 1);
             break;
-    }
-
-    // Imprime os filhos com indentação
-    if (no->esquerdo != NULL) {
-        imprimeArvore(no->esquerdo, nivel + 1);
-    }
-    if (no->direito != NULL) {
-        imprimeArvore(no->direito, nivel + 1);
+        case NoBloco:
+            printf("Bloco:\n");
+            imprimeLista(no->lista, nivel + 1);
+            break;
+        case NoIf:
+            printf("If:\n");
+            for (i = 0; i < nivel + 1; i++) printf("    ");
+            printf("Condicao:\n");
+            imprimeArvore(no->condicao, nivel + 2);
+            for (i = 0; i < nivel + 1; i++) printf("    ");
+            printf("Corpo:\n");
+            imprimeArvore(no->corpo, nivel + 2);
+            if (no->senao) {
+                for (i = 0; i < nivel + 1; i++) printf("    ");
+                printf("Senao:\n");
+                imprimeArvore(no->senao, nivel + 2);
+            }
+            break;
+        case NoWhile:
+            printf("While:\n");
+            for (i = 0; i < nivel + 1; i++) printf("    ");
+            printf("Condicao:\n");
+            imprimeArvore(no->condicao, nivel + 2);
+            for (i = 0; i < nivel + 1; i++) printf("    ");
+            printf("Corpo:\n");
+            imprimeArvore(no->corpo, nivel + 2);
+            break;
+        case NoFor:
+            printf("For:\n");
+            for (i = 0; i < nivel + 1; i++) printf("    ");
+            printf("Var:\n");
+            imprimeArvore(no->esquerdo, nivel + 2);
+            for (i = 0; i < nivel + 1; i++) printf("    ");
+            printf("Inicio:\n");
+            imprimeArvore(no->direito, nivel + 2);
+            for (i = 0; i < nivel + 1; i++) printf("    ");
+            printf("Fim:\n");
+            imprimeArvore(no->condicao, nivel + 2);
+            for (i = 0; i < nivel + 1; i++) printf("    ");
+            printf("Corpo:\n");
+            imprimeArvore(no->corpo, nivel + 2);
+            break;
+        case NoFuncao:
+            printf("Funcao: %s\n", no->nome_funcao);
+            for (i = 0; i < nivel + 1; i++) printf("    ");
+            printf("Parametros:\n");
+            imprimeLista(no->parametros, nivel + 2);
+            for (i = 0; i < nivel + 1; i++) printf("    ");
+            printf("Corpo:\n");
+            imprimeArvore(no->corpo, nivel + 2);
+            break;
+        case NoChamadaFuncao:
+            printf("ChamadaFuncao: %s\n", no->nome_funcao);
+            for (i = 0; i < nivel + 1; i++) printf("    ");
+            printf("Argumentos:\n");
+            imprimeLista(no->argumentos, nivel + 2);
+            break;
+        default:
+            printf("[Tipo de nó desconhecido]\n");
     }
 }
 
@@ -181,4 +434,15 @@ int avaliarArvore(No* no) {
             printf("[ERRO] Tipo de nó desconhecido: %d\n", no->tipo);
             return 0;
     }
+}
+
+ListaNo* AdicionarNoLista(ListaNo* lista, No* no) {
+    ListaNo* novo = malloc(sizeof(ListaNo));
+    novo->no = no;
+    novo->prox = NULL;
+    if (!lista) return novo;
+    ListaNo* atual = lista;
+    while (atual->prox) atual = atual->prox;
+    atual->prox = novo;
+    return lista;
 }

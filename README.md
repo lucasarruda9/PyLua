@@ -82,6 +82,35 @@ Resultado: 16
   - Cálculo de resultados das expressões
   - Recuperação de erros sintáticos
 
+## Novidades na AST
+
+Agora a AST do PyLua suporta:
+- Novos tipos de nós: float, string, bool, bloco, if, while, for, função, chamada de função.
+- Impressão detalhada e hierárquica da árvore, facilitando o debugging.
+
+### Como testar as novidades
+
+1. **Compilando o teste dos novos nós:**
+   No terminal, execute:
+   ```bash
+   gcc -I./ast -I./tabela ./ast/ast.c ./tabela/tabela.c ./tests/ast/test_novos_nos.c -o ./build/test_novos_nos -lm
+   ```
+   Isso irá compilar o arquivo de teste que cria exemplos de todos os novos tipos de nós.
+
+2. **Executando o teste:**
+   Ainda no terminal, rode:
+   ```bash
+   ./build/test_novos_nos
+   ```
+   Você verá a impressão detalhada de cada tipo de nó criado, mostrando valores, hierarquia e estrutura.
+
+### O que foi feito
+
+- Foram adicionados novos tipos de nós na AST para suportar estruturas de controle e funções.
+- Implementadas funções de criação para cada novo tipo de nó.
+- Melhorada a função de impressão da árvore para mostrar todos os detalhes dos nós.
+- Criado um teste automatizado em `tests/ast/test_novos_nos.c` para validar e demonstrar as novidades.
+
 ## Em Desenvolvimento
 
 - Análise léxica completa para Python
