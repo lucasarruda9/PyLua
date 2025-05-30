@@ -104,6 +104,20 @@ Agora a AST do PyLua suporta:
    ```
    Você verá a impressão detalhada de cada tipo de nó criado, mostrando valores, hierarquia e estrutura.
 
+### Testando estruturas de controle na AST
+
+Para testar a criação e impressão dos nós de estruturas de controle (if, while, for):
+
+1. Compile o teste:
+   ```bash
+   gcc -I./ast -I./tabela ./ast/ast.c ./tabela/tabela.c ./tests/ast/test_controle.c -o ./build/test_controle -lm
+   ```
+2. Execute:
+   ```bash
+   ./build/test_controle
+   ```
+   Você verá exemplos de if, if-else, while e for impressos de forma detalhada e hierárquica.
+
 ### O que foi feito
 
 - Foram adicionados novos tipos de nós na AST para suportar estruturas de controle e funções.
