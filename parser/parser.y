@@ -1,13 +1,20 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
-#include "../ast/ast.h" 
+#include "../ast/ast.h"
 #include "../tabela/tabela.h"
 #include <string.h>
 
 int yylex();  // Declaração da função yylex que será chamada pelo parser
 void yyerror(const char *s);  // Função de erro para lidar com erros sintáticos
 extern FILE *yyin;  // Arquivo de entrada (pode ser stdin ou um arquivo)
+extern int line_num;  // Linha atual (definida no scanner)
+extern int col_num;   // Coluna atual (definida no scanner)
+extern void inicializa_pilha();  // Declaração da função de inicialização da pilha de indentação
+
+void yyerror(const char *s) {
+    fprintf(stderr, "[ERRO SINTATICO] %s na linha %d, coluna %d\n", s, line_num, col_num);
+}
 %}
 
 /* Declaração de tipos para os valores */
@@ -25,6 +32,15 @@ extern FILE *yyin;  // Arquivo de entrada (pode ser stdin ou um arquivo)
 %token ASSIGN PLUS_EQ MINUS_EQ MULT_EQ DIV_EQ FLOOR_EQ POW_EQ MOD_EQ
 %token ERROR  // Token de erro
 %token NEWLINE
+%token <string> KEYWORD
+%token IF ELIF ELSE MATCH CASE
+%token FOR WHILE
+%token LBRACKET RBRACKET LBRACE RBRACE
+%token COMMA COLON DOT DECORATOR ARROW
+%token <string> FLOAT HEX OCT BIN
+%token <string> STRING_DQ STRING_SQ TRIPLE_DQ TRIPLE_SQ
+%token COMMENT
+%token INDENT DEDENT
 
 /* Precedência de operadores */
 %left PLUS MINUS
@@ -142,16 +158,13 @@ declaracao:  IDENTIFIER ASSIGN expr {
        ;
 %%
 
-/* Função para exibir erros */
-void yyerror(const char *s) {
-    /* Usando o parâmetro para evitar o warning */
-    fprintf(stderr, "%s\n", s);
-}
-
 /* Função principal para executar o parser */
 int main(int argc, char **argv) {
     /* Inicializa a tabela de símbolos */
     inicializarTabela();
+    
+    /* Inicializa a pilha de indentação */
+    inicializa_pilha();
     
     /* Configura o arquivo de entrada ou usa stdin */
     if (argc > 1) {

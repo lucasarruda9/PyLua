@@ -2,13 +2,31 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../src/parser.tab.h"  /* Caminho ajustado para o novo local do arquivo gerado */
+#include "../src/parser.tab.h"
 
 int convert_to_int(char *text) {
     return atoi(text);
 }
 
 int line_num = 1;
+int col_num = 1;
+
+void atualiza_coluna() {
+    col_num += yyleng;
+}
+
+void reset_coluna() {
+    col_num = 1;
+}
+
+int nivel_indentacao = 0;
+int pilha_indentacao[100];
+int topo_pilha = 0;
+
+void inicializa_pilha() {
+    pilha_indentacao[0] = 0;
+    topo_pilha = 0;
+}
 %}
 
 %option noyywrap noinput nounput nomain
@@ -78,7 +96,7 @@ RBRACE      "}"
 COMMA       ","
 COLON       ":"
 DOT         "."
-DECORATOR          "@"
+DECORATOR   "@"
 ARROW       "->"
 
 /* Identificadores */
@@ -94,8 +112,8 @@ BIN         0[bB][01]+
 /* Strings */
 STRING_DQ   \"([^\"\n\\]|\\(.|\n))*\"
 STRING_SQ   \'([^\'\n\\]|\\(.|\n))*\'
-TRIPLE_DQ   \"\"\"[^\"]*\"\"\"
-TRIPLE_SQ   \'\'\'[^\']*\'\'\'
+TRIPLE_DQ   \"\"\"([^\\]|\\.)*?\"\"\"
+TRIPLE_SQ   \'\'\'([^\\]|\\.)*?\'\'\'
 
 /* Comentários */
 COMMENT     #.*
@@ -104,80 +122,162 @@ INDENT      ^[ \t]+
 /* Regras */
 %%
 
-{KEYWORD}   { /* Palavra-chave reconhecida */ }
+{KEYWORD}   { atualiza_coluna(); yylval.string = strdup(yytext); return KEYWORD; }
 
-{UNDERLINE}  { /* UNDERLINE reconhecido */ }
-{ASYNC}  { /* ASYNC reconhecido */ }
-{AWAIT} { /* AWAIT reconhecido */ }
-{MATCH} { /* MATCH reconhecido */ }
-{CASE} { /* CASE reconhecido */ }
-{IF} { /* IF reconhecido */ }
-{ELIF} { /* ELIF reconhecido */ }
-{ELSE} { /* ELSE reconhecido */ }
-{PLUS}      { return PLUS; }
-{MINUS}     { return MINUS; }
-{MULTIPLY}  { return MULTIPLY; }
-{DIVIDE}    { return DIVIDE; }
-{MODULO}    { /* MODULO reconhecido */ }
-{POWER}     { /* POWER reconhecido */ }
-{FLOOR_DIV} { /* FLOOR_DIV reconhecido */ }
-{LT}        { /* LT reconhecido */ }
-{GT}        { /* GT reconhecido */ }
-{LE}        { /* LE reconhecido */ }
-{GE}        { /* GE reconhecido */ }
-{EQ}        { /* EQ reconhecido */ }
-{NE}        { /* NE reconhecido */ }
-{NE2}       { /* NE2 reconhecido */ }
-{ASSIGN}    { return ASSIGN; }
-{PLUS_EQ}   { return PLUS_EQ; }
-{MINUS_EQ}  { return MINUS_EQ; }
-{MULT_EQ}   { return MULT_EQ; }
-{DIV_EQ}    { return DIV_EQ; }
-{MOD_EQ}    { return MOD_EQ; }
-{FLOOR_EQ}  { return FLOOR_EQ; }
-{POW_EQ}    { return POW_EQ; }
-{BITAND}    { /* BITAND reconhecido */ }
-{BITOR}     { /* BITOR reconhecido */ }
-{BITXOR}    { /* BITXOR reconhecido */ }
-{BITNOT}    { /* BITNOT reconhecido */ }
-{SHIFTL}    { /* SHIFTL reconhecido */ }
-{SHIFTR}    { /* SHIFTR reconhecido */ }
-{AND_EQ}    { /* AND_EQ reconhecido */ }
-{OR_EQ}     { /* OR_EQ reconhecido */ }
-{XOR_EQ}    { /* XOR_EQ reconhecido */ }
-{SHIFTR_EQ} { /* SHIFTR_EQ reconhecido */ }
-{SHIFTL_EQ} { /* SHIFTL_EQ reconhecido */ }
+{IF}        { atualiza_coluna(); return IF; }
+{ELIF}      { atualiza_coluna(); return ELIF; }
+{ELSE}      { atualiza_coluna(); return ELSE; }
+{MATCH}     { atualiza_coluna(); return MATCH; }
+{CASE}      { atualiza_coluna(); return CASE; }
 
-{LPAREN}    { return LPAREN; }
-{RPAREN}    { return RPAREN; }
-{LBRACKET}  { /* LBRACKET reconhecido */ }
-{RBRACKET}  { /* RBRACKET reconhecido */ }
-{LBRACE}    { /* LBRACE reconhecido */ }
-{RBRACE}    { /* RBRACE reconhecido */ }
-{COMMA}     { /* COMMA reconhecido */ }
-{COLON}     { /* COLON reconhecido */ }
-{DOT}       { /* DOT reconhecido */ }
-{DECORATOR}        { /* DECORATOR reconhecido */ }
-{ARROW}     { /* ARROW reconhecido */ }
+{FOR}       { atualiza_coluna(); return FOR; }
+{WHILE}     { atualiza_coluna(); return WHILE; }
 
-{IDENTIFIER} { yylval.string = strdup(yytext); return IDENTIFIER; }
+{LPAREN}    { atualiza_coluna(); return LPAREN; }
+{RPAREN}    { atualiza_coluna(); return RPAREN; }
+{LBRACKET}  { atualiza_coluna(); return LBRACKET; }
+{RBRACKET}  { atualiza_coluna(); return RBRACKET; }
+{LBRACE}    { atualiza_coluna(); return LBRACE; }
+{RBRACE}    { atualiza_coluna(); return RBRACE; }
+{COMMA}     { atualiza_coluna(); return COMMA; }
+{COLON}     { atualiza_coluna(); return COLON; }
+{DOT}       { atualiza_coluna(); return DOT; }
+{DECORATOR} { atualiza_coluna(); return DECORATOR; }
+{ARROW}     { atualiza_coluna(); return ARROW; }
 
-{INTEGER}   { yylval.intval = convert_to_int(yytext); return INTEGER; }
-{FLOAT}     { /* FLOAT reconhecido */ }
-{HEX}       { /* HEX reconhecido */ }
-{OCT}       { /* OCT reconhecido */ }
-{BIN}       { /* BIN reconhecido */ }
+{IDENTIFIER} { 
+    atualiza_coluna(); 
+    yylval.string = strdup(yytext); 
+    return IDENTIFIER; 
+}
 
-{STRING_DQ} { /* STRING_DQ reconhecido */ }
-{STRING_SQ} { /* STRING_SQ reconhecido */ }
-{TRIPLE_DQ} { /* TRIPLE_DQ reconhecido */ }
-{TRIPLE_SQ} { /* TRIPLE_SQ reconhecido */ }
+{INTEGER}   { 
+    atualiza_coluna(); 
+    yylval.intval = convert_to_int(yytext); 
+    return INTEGER; 
+}
 
-{COMMENT}   { /* COMMENT reconhecido */ }
-{INDENT}    { /* INDENT reconhecido */ }
+{FLOAT}     { 
+    atualiza_coluna(); 
+    yylval.string = strdup(yytext); 
+    return FLOAT; 
+}
 
-\n          { line_num++; return NEWLINE; }
-[ \t\r]+    { /* ignora outros espaços em branco */ }
-.           { fprintf(stderr, "ERRO LÉXICO na linha %d: Caractere desconhecido: '%s'\n", line_num, yytext); return ERROR; }
+{HEX}       { 
+    atualiza_coluna(); 
+    yylval.string = strdup(yytext); 
+    return HEX; 
+}
+
+{OCT}       { 
+    atualiza_coluna(); 
+    yylval.string = strdup(yytext); 
+    return OCT; 
+}
+
+{BIN}       { 
+    atualiza_coluna(); 
+    yylval.string = strdup(yytext); 
+    return BIN; 
+}
+
+{STRING_DQ} { 
+    atualiza_coluna(); 
+    yylval.string = strdup(yytext); 
+    return STRING_DQ; 
+}
+
+{STRING_SQ} { 
+    atualiza_coluna(); 
+    yylval.string = strdup(yytext); 
+    return STRING_SQ; 
+}
+
+{TRIPLE_DQ} { 
+    char *p = yytext;
+    while (*p) {
+        if (*p == '\n') {
+            line_num++;
+            reset_coluna();
+        } else {
+            col_num++;
+        }
+        p++;
+    }
+    yylval.string = strdup(yytext); 
+    return TRIPLE_DQ; 
+}
+
+{TRIPLE_SQ} { 
+    char *p = yytext;
+    while (*p) {
+        if (*p == '\n') {
+            line_num++;
+            reset_coluna();
+        } else {
+            col_num++;
+        }
+        p++;
+    }
+    yylval.string = strdup(yytext); 
+    return TRIPLE_SQ; 
+}
+
+{COMMENT}   { 
+    atualiza_coluna(); 
+    return COMMENT; 
+}
+
+{INDENT}    {
+    if (yytext[0] == '\n') {
+        line_num++;
+        reset_coluna();
+    } else {
+        atualiza_coluna();
+    }
+    
+    int espacos = 0;
+    for (int i = 0; i < yyleng; i++) {
+        if (yytext[i] == ' ') {
+            espacos++;
+        } else if (yytext[i] == '\t') {
+            espacos += 8 - (espacos % 8);
+        }
+    }
+    
+    if (espacos > pilha_indentacao[topo_pilha]) {
+        topo_pilha++;
+        pilha_indentacao[topo_pilha] = espacos;
+        return INDENT;
+    } else if (espacos < pilha_indentacao[topo_pilha]) {
+        int dedents = 0;
+        while (topo_pilha > 0 && espacos < pilha_indentacao[topo_pilha]) {
+            topo_pilha--;
+            dedents++;
+        }
+        
+        if (espacos != pilha_indentacao[topo_pilha]) {
+            fprintf(stderr, "ERRO LÉXICO na linha %d, coluna %d: Indentação inconsistente\n", line_num, col_num);
+            return ERROR;
+        }
+        
+        return DEDENT;
+    }
+}
+
+\n          { 
+    line_num++; 
+    reset_coluna(); 
+    return NEWLINE; 
+}
+
+[ \t\r]+    { atualiza_coluna(); }
+
+.           { 
+    fprintf(stderr, "ERRO LÉXICO na linha %d, coluna %d: Caractere desconhecido: '%s'\n", 
+            line_num, col_num, yytext); 
+    atualiza_coluna();
+    return ERROR; 
+}
 
 %%
