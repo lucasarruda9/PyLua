@@ -133,6 +133,12 @@ INDENT      ^[ \t]+
 {FOR}       { atualiza_coluna(); return FOR; }
 {WHILE}     { atualiza_coluna(); return WHILE; }
 
+{PLUS}      { atualiza_coluna(); return PLUS; }
+{MINUS}     { atualiza_coluna(); return MINUS; }
+{MULTIPLY}  { atualiza_coluna(); return MULTIPLY; }
+{DIVIDE}    { atualiza_coluna(); return DIVIDE; }
+{ASSIGN}    { atualiza_coluna(); return ASSIGN; }
+
 {LPAREN}    { atualiza_coluna(); return LPAREN; }
 {RPAREN}    { atualiza_coluna(); return RPAREN; }
 {LBRACKET}  { atualiza_coluna(); return LBRACKET; }
