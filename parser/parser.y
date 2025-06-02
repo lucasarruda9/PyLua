@@ -152,6 +152,8 @@ void yyerror(const char *s) {
 int main(int argc, char **argv) {
     /* Inicializa a tabela de símbolos */
     inicializarTabela();
+
+    entrarEscopo(); // Inicializa escopo global
     
     /* Configura o arquivo de entrada ou usa stdin */
     if (argc > 1) {
@@ -173,6 +175,8 @@ int main(int argc, char **argv) {
     
     /* Libera a tabela de símbolos */
     liberarTabela();
+
+    sairEscopo(); // Libera escopo global
     
     /* Fecha o arquivo se necessário */
     if (argc > 1) {

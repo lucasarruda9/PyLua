@@ -8,6 +8,61 @@
 
 Simbolo *tabela[TAM];
 
+Escopo *escopo_atual = NULL;
+
+void entrarEscopo() {
+    Escopo *novo = (Escopo *)malloc(sizeof(Escopo));
+    novo->tabela = NULL;
+    novo->anterior = escopo_atual;
+    escopo_atual = novo;
+}
+
+void sairEscopo() {
+    if (escopo_atual) {
+        Simbolo *s = escopo_atual->tabela;
+        while (s) {
+            Simbolo *tmp = s;
+            s = s->proximo;
+            free(tmp);
+        }
+        Escopo *tmp = escopo_atual;
+        escopo_atual = escopo_atual->anterior;
+        free(tmp);
+    }
+}
+
+Simbolo *buscarSimboloEscopo(const char *nome) {
+    Escopo *esc = escopo_atual;
+    while (esc) {
+        Simbolo *s = esc->tabela;
+        while (s) {
+            if (strcmp(s->nome, nome) == 0)
+                return s;
+            s = s->proximo;
+        }
+        esc = esc->anterior;
+    }
+    return NULL;
+}
+
+void inserirSimboloEscopo(const char *nome, int tipo) {
+    if (!escopo_atual) entrarEscopo();
+    // Verifica redeclaração no escopo atual
+    Simbolo *s = escopo_atual->tabela;
+    while (s) {
+        if (strcmp(s->nome, nome) == 0) {
+            printf("[ERRO] Variável '%s' já declarada neste escopo\n", nome);
+            return;
+        }
+        s = s->proximo;
+    }
+    Simbolo *novo = (Simbolo *)malloc(sizeof(Simbolo));
+    strcpy(novo->nome, nome);
+    novo->tipo = tipo;
+    novo->proximo = escopo_atual->tabela;
+    escopo_atual->tabela = novo;
+}
+
 // Função hash para distribuir os símbolos na tabela
 unsigned hash(char *s) {
     unsigned h = 0;
