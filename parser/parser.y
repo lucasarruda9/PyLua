@@ -26,10 +26,14 @@ void yyerror(const char *s) {
 
 /* Declaração de tokens */
 %token <intval> INTEGER  // O token INTEGER irá carregar um valor inteiro
-%token PLUS MINUS MULTIPLY DIVIDE
+%token PLUS MINUS MULTIPLY DIVIDE MODULO
+%token POWER FLOOR_DIV
+%token LT GT LE GE EQ NE NE2
 %token LPAREN RPAREN
 %token <string> IDENTIFIER
 %token ASSIGN PLUS_EQ MINUS_EQ MULT_EQ DIV_EQ FLOOR_EQ POW_EQ MOD_EQ
+%token BITAND BITOR BITXOR BITNOT
+%token SHIFTL SHIFTR AND_EQ OR_EQ XOR_EQ SHIFTR_EQ SHIFTL_EQ
 %token ERROR  // Token de erro
 %token NEWLINE
 %token <string> KEYWORD
@@ -43,9 +47,17 @@ void yyerror(const char *s) {
 %token INDENT DEDENT
 
 /* Precedência de operadores */
+%left BITOR
+%left BITXOR
+%left BITAND
+%left EQ NE NE2
+%left LT GT LE GE
+%left SHIFTL SHIFTR
 %left PLUS MINUS
-%left MULTIPLY DIVIDE
+%left MULTIPLY DIVIDE MODULO FLOOR_DIV
+%right POWER
 %precedence NEG   /* Operador de menos unário */
+%precedence BITNOT   /* Operador bitwise NOT unário */
 
 /* Tipo de valor para o não-terminal "expr" */
 %type <no> expr
@@ -117,18 +129,34 @@ expr:    INTEGER               { $$ = CriarNoInteiro($1); }  // Cria um nó de i
                                $$ = CriarNoVariavel($1); 
                               }
        | LPAREN expr RPAREN    { $$ = $2; }  // Expressão entre parênteses
-       | expr PLUS expr        { $$ = CriarNoOperador($1, $3, '+'); }  // Cria nó de soma
-       | expr MINUS expr       { $$ = CriarNoOperador($1, $3, '-'); }  // Cria nó de subtração
-       | expr MULTIPLY expr    { $$ = CriarNoOperador($1, $3, '*'); }  // Cria nó de multiplicação
-       | expr DIVIDE expr      { 
-                                if ($3->valor == 0 && $3->tipo == NoLiteral) {  
+       | expr PLUS expr        { $$ = CriarNoOperador($1, $3, '+'); }  // Soma
+       | expr MINUS expr       { $$ = CriarNoOperador($1, $3, '-'); }  // Subtração
+       | expr MULTIPLY expr    { $$ = CriarNoOperador($1, $3, '*'); }  // Multiplicação
+       | expr DIVIDE expr      {
+                                if ($3->valor == 0 && $3->tipo == NoLiteral) {
                                     yyerror("Divisão por zero");
-                                    $$ = CriarNoInteiro(0);  // Retorna 0 em caso de erro
+                                    $$ = CriarNoInteiro(0);
                                 } else {
                                     $$ = CriarNoOperador($1, $3, '/');
                                 }
                               }
-       | MINUS expr %prec NEG  { $$ = CriarNoOperador($2, NULL, '-'); }  // Operador unário
+       | expr MODULO expr      { $$ = CriarNoOperador($1, $3, '%'); }  // Módulo
+       | expr POWER expr       { $$ = CriarNoOperador($1, $3, 'p'); }  // Potência
+       | expr FLOOR_DIV expr   { $$ = CriarNoOperador($1, $3, 'f'); }  // Divisão inteira
+       | expr LT expr          { $$ = CriarNoOperador($1, $3, '<'); }  // Menor que
+       | expr GT expr          { $$ = CriarNoOperador($1, $3, '>'); }  // Maior que
+       | expr LE expr          { $$ = CriarNoOperador($1, $3, 'l'); }  // Menor ou igual
+       | expr GE expr          { $$ = CriarNoOperador($1, $3, 'g'); }  // Maior ou igual
+       | expr EQ expr          { $$ = CriarNoOperador($1, $3, '='); }  // Igual
+       | expr NE expr          { $$ = CriarNoOperador($1, $3, 'n'); }  // Diferente
+       | expr NE2 expr         { $$ = CriarNoOperador($1, $3, 'n'); }  // Diferente (<>)
+       | expr BITAND expr      { $$ = CriarNoOperador($1, $3, '&'); }  // AND bitwise
+       | expr BITOR expr       { $$ = CriarNoOperador($1, $3, '|'); }  // OR bitwise
+       | expr BITXOR expr      { $$ = CriarNoOperador($1, $3, '^'); }  // XOR bitwise
+       | expr SHIFTL expr      { $$ = CriarNoOperador($1, $3, 's'); }  // Shift left
+       | expr SHIFTR expr      { $$ = CriarNoOperador($1, $3, 'r'); }  // Shift right
+       | MINUS expr %prec NEG  { $$ = CriarNoOperador($2, NULL, '-'); }  // Menos unário
+       | BITNOT expr %prec BITNOT { $$ = CriarNoOperador($2, NULL, '~'); }  // NOT bitwise
        ;
 
 declaracao:  IDENTIFIER ASSIGN expr { 
