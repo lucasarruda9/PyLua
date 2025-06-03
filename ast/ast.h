@@ -5,6 +5,7 @@
 
 typedef enum {
     NoLiteral,
+    NoLiteralFloat,
     NoVariavel,
     NoOperacaoBinaria,
     NoAtribuicao,
@@ -27,17 +28,17 @@ typedef struct ListaNo {
 
 typedef struct Arvore{
     Tipo tipo;
-    struct Arvore *direita, *meio, *esquerda;
+    struct Arvore *direito, *esquerdo;
+    
     int valor;
     float valor_float;
-    char* valor_str;
-    int valor_bool;
     char* var;
     char op;
     ListaNo *lista;
 }No;
 
 No* CriarNoInteiro(int valor);
+No* CriarNoFloat(float valor_float);
 No* CriarNoVariavel(char *var);
 No* CriarNoOperador(No *esquerda, No *direita, char op);
 No* CriaNoAtribuicao(No *var, No *exp);

@@ -50,6 +50,16 @@ No* CriarNoIf(No* condicao, No* corpo, No* senao) {
     raiz->meio = corpo;
     return raiz;
 }
+No *CriarNoFloat(float valor_float){
+    No *raiz = malloc(sizeof(No));
+    raiz->tipo = NoLiteralFloat;
+    raiz->direito = NULL;
+    raiz->esquerdo = NULL;
+    raiz->valor = valor_float;
+    raiz->var = NULL;
+    raiz->op = 0;
+    return raiz;
+}
 
 void DesalocarArvore(No *raiz){
     if(raiz == NULL){
