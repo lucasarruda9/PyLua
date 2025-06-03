@@ -72,7 +72,9 @@ void yyerror(const char *s) {
 
 /* Regras de análise sintática */
 input:   /* Produção vazia */
-       | input line  // Pode ter várias linhas de expressão
+       | input line  
+       | input DEDENT  // Dentação
+       | input INDENT  // identação
        ;
 
 line:    expr NEWLINE { 
@@ -115,8 +117,22 @@ line:    expr NEWLINE {
         DesalocarArvore($1);
         $$ = NULL;
 }
-        | condicional NEWLINE { imprimeArvore($1, 0); DesalocarArvore($1); $$ = NULL; }
-    | condicional { imprimeArvore($1, 0); DesalocarArvore($1); $$ = NULL; }
+        | condicional NEWLINE {
+            imprimeArvore($1, 0);
+            // Avaliar a semântica do condicional
+            int resultado = avaliarArvore($1);
+            printf("Resultado do condicional: %d\n", resultado);
+            DesalocarArvore($1);
+            $$ = NULL;
+        }
+    | condicional {
+            imprimeArvore($1, 0);
+            // Avaliar a semântica do condicional
+            int resultado = avaliarArvore($1);
+            printf("Resultado do condicional: %d\n", resultado);
+            DesalocarArvore($1);
+            $$ = NULL;
+        }
        | NEWLINE { $$ = NULL; } /* Aceitar linhas em branco */
        | error NEWLINE { 
                     printf("[ERRO SINTATICO] Erro recuperado até o final da linha\n"); 
@@ -201,11 +217,11 @@ linhas:
     ;
 
 condicional:
-      IF LPAREN expr RPAREN COLON bloco {
-          $$ = CriarNoIf($3, CriarNoBloco($6), NULL);
+      IF LPAREN expr RPAREN COLON NEWLINE bloco {
+          $$ = CriarNoIf($3, CriarNoBloco($7), NULL);
       }
-    | IF LPAREN expr RPAREN COLON bloco ELSE COLON bloco {
-          $$ = CriarNoIf($3, CriarNoBloco($6), CriarNoBloco($9));
+    | IF LPAREN expr RPAREN COLON NEWLINE bloco ELSE COLON NEWLINE bloco {
+          $$ = CriarNoIf($3, CriarNoBloco($7), CriarNoBloco($11));
       }
     ;
 %%

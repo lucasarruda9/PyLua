@@ -22,10 +22,14 @@ void reset_coluna() {
 int nivel_indentacao = 0;
 int pilha_indentacao[100];
 int topo_pilha = 0;
+int eof_dedents_pendentes = 0;  // Contador de DEDENTs pendentes no EOF
+int eof_encontrado = 0;         // Flag para indicar que EOF foi encontrado
 
 void inicializa_pilha() {
     pilha_indentacao[0] = 0;
     topo_pilha = 0;
+    eof_dedents_pendentes = 0;
+    eof_encontrado = 0;
 }
 %}
 
@@ -279,7 +283,6 @@ INDENT      ^[ \t]+
             espacos += 8 - (espacos % 8);
         }
     }
-    
     if (espacos > pilha_indentacao[topo_pilha]) {
         topo_pilha++;
         pilha_indentacao[topo_pilha] = espacos;
@@ -305,14 +308,19 @@ INDENT      ^[ \t]+
     reset_coluna(); 
     return NEWLINE; 
 }
-
 [ \t\r]+    { atualiza_coluna(); }
-
-.           { 
-    fprintf(stderr, "ERRO LÉXICO na linha %d, coluna %d: Caractere desconhecido: '%s'\n", 
-            line_num, col_num, yytext); 
+.           {
+    fprintf(stderr, "ERRO LÉXICO na linha %d, Caractere desconhecido: '%s'\n",
+            line_num,yytext);
     atualiza_coluna();
-    return ERROR; 
+    return ERROR;
 }
+<<EOF>>     {
 
+    if (topo_pilha > 0) {
+        topo_pilha--;
+        return DEDENT;
+    }
+    yyterminate();  
+}
 %%

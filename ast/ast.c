@@ -405,6 +405,18 @@ int avaliarArvore(No* no) {
                     }
                     resultado = valorEsq / valorDir;
                     break;
+                // Operadores de comparação
+                case '<': resultado = (valorEsq < valorDir) ? 1 : 0; break;  // Menor que
+                case '>': resultado = (valorEsq > valorDir) ? 1 : 0; break;  // Maior que
+                case 'l': resultado = (valorEsq <= valorDir) ? 1 : 0; break; // Menor ou igual
+                case 'g': resultado = (valorEsq >= valorDir) ? 1 : 0; break; // Maior ou igual
+                case '=': resultado = (valorEsq == valorDir) ? 1 : 0; break; // igual de comparação
+                case 'n': resultado = (valorEsq != valorDir) ? 1 : 0; break; // diferente de
+                case '&': resultado = valorEsq & valorDir; break;
+                case '|': resultado = valorEsq | valorDir; break;
+                case '^': resultado = valorEsq ^ valorDir; break;
+                case 's': resultado = valorEsq << valorDir; break; // Shift left
+                case 'r': resultado = valorEsq >> valorDir; break; // Shift right
                 default:
                     printf("[ERRO] Operador desconhecido: %c\n", no->op);
                     resultado = 0;
@@ -429,7 +441,33 @@ int avaliarArvore(No* no) {
             simbolo->inicializada = 1;
             
             return resultado;
+
+        case NoBloco:
+            // Avaliar todas as instruções do bloco
+            if (no->lista == NULL) return 0;
+
+            ListaNo* atual = no->lista;
+            int ultimoResultado = 0;
+            while (atual) {
+                if (atual->no) {
+                    ultimoResultado = avaliarArvore(atual->no);
+                }
+                atual = atual->prox;
+            }
+            return ultimoResultado;
+
+        case NoIf:
             
+            int condicao = avaliarArvore(no->condicao);
+
+            if (condicao) {
+                return avaliarArvore(no->corpo);
+            } else if (no->senao) {
+                return avaliarArvore(no->senao);
+            }
+
+            return 0;
+
         default:
             printf("[ERRO] Tipo de nó desconhecido: %d\n", no->tipo);
             return 0;
