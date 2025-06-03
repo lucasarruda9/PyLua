@@ -22,6 +22,7 @@ void yyerror(const char *s) {
     int intval;
     struct Arvore *no;
     char *string;
+    struct ListaNo *lista;
 }
 
 /* Declaração de tokens */
@@ -63,6 +64,9 @@ void yyerror(const char *s) {
 %type <no> expr
 %type <no> declaracao
 %type <no> line
+%type <no> condicional
+%type <lista> bloco
+%type <lista> linhas
 
 %%
 
@@ -111,6 +115,8 @@ line:    expr NEWLINE {
         DesalocarArvore($1);
         $$ = NULL;
 }
+        | condicional NEWLINE { imprimeArvore($1, 0); DesalocarArvore($1); $$ = NULL; }
+    | condicional { imprimeArvore($1, 0); DesalocarArvore($1); $$ = NULL; }
        | NEWLINE { $$ = NULL; } /* Aceitar linhas em branco */
        | error NEWLINE { 
                     printf("[ERRO SINTATICO] Erro recuperado até o final da linha\n"); 
@@ -184,6 +190,24 @@ declaracao:  IDENTIFIER ASSIGN expr {
             $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, 'a'));
 } 
        ;
+bloco:
+      INDENT linhas DEDENT { $$ = $2; }
+    
+    ;
+
+linhas:
+      linhas line { $$ = AdicionarNoLista($1, $2); }
+    | line { $$ = AdicionarNoLista(NULL, $1);}
+    ;
+
+condicional:
+      IF LPAREN expr RPAREN COLON bloco {
+          $$ = CriarNoIf($3, CriarNoBloco($6), NULL);
+      }
+    | IF LPAREN expr RPAREN COLON bloco ELSE COLON bloco {
+          $$ = CriarNoIf($3, CriarNoBloco($6), CriarNoBloco($9));
+      }
+    ;
 %%
 
 /* Função principal para executar o parser */

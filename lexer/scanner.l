@@ -263,6 +263,7 @@ INDENT      ^[ \t]+
 }
 
 {INDENT}    {
+    
     if (yytext[0] == '\n') {
         line_num++;
         reset_coluna();
