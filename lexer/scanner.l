@@ -163,12 +163,12 @@ INDENT      ^[ \t]+
 {IDENTIFIER} { yylval.string = strdup(yytext); return IDENTIFIER; }
 
 {INTEGER}   { yylval.intval = convert_to_int(yytext); return INTEGER; }
-{FLOAT}     { /* FLOAT reconhecido */ }
+{FLOAT}     {  yylval.floatval = atof(yytext); return FLOAT;  }
 {HEX}       { /* HEX reconhecido */ }
 {OCT}       { /* OCT reconhecido */ }
 {BIN}       { /* BIN reconhecido */ }
 
-{STRING_DQ} { /* STRING_DQ reconhecido */ }
+{STRING_DQ} { yylval.string = strdup(yytext); return STRING_DQ; }
 {STRING_SQ} { /* STRING_SQ reconhecido */ }
 {TRIPLE_DQ} { /* TRIPLE_DQ reconhecido */ }
 {TRIPLE_SQ} { /* TRIPLE_SQ reconhecido */ }

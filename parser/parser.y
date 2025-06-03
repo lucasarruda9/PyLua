@@ -13,15 +13,17 @@ extern FILE *yyin;  // Arquivo de entrada (pode ser stdin ou um arquivo)
 /* Declaração de tipos para os valores */
 %union {
     int intval;
+    double floatval;
     struct Arvore *no;
     char *string;
 }
 
 /* Declaração de tokens */
 %token <intval> INTEGER  // O token INTEGER irá carregar um valor inteiro
+%token <floatval> FLOAT  // O token FLOAT irá carregar um valor ponto flutuante
 %token PLUS MINUS MULTIPLY DIVIDE
 %token LPAREN RPAREN
-%token <string> IDENTIFIER
+%token <string> STRING_DQ
 %token ASSIGN PLUS_EQ MINUS_EQ MULT_EQ DIV_EQ FLOOR_EQ POW_EQ MOD_EQ
 %token ERROR  // Token de erro
 %token NEWLINE
@@ -92,7 +94,9 @@ line:    expr NEWLINE {
        ;
 
 expr:    INTEGER               { $$ = CriarNoInteiro($1); }  // Cria um nó de inteiro
-       | IDENTIFIER            { 
+        | FLOAT               { $$ = CriarNoFloat($1); }  // Cria um nó de ponto flutuante
+        | STRING_DQ        { $$ = CriarNoString($1); }  // Cria nó string
+        | IDENTIFIER            { 
                                Simbolo *s = buscarSimbolo($1);
                                if (s == NULL) {
                                    printf("[AVISO] Variável '%s' não declarada\n", $1);
