@@ -1,9 +1,10 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>  
 #include "../ast/ast.h" 
 #include "../tabela/tabela.h"
-#include <string.h>
+#include "../gerador_codigo_final/gerador_codigo_final.h"  // Modificado
 
 int yylex();  // Declaração da função yylex que será chamada pelo parser
 void yyerror(const char *s);  // Função de erro para lidar com erros sintáticos
@@ -45,6 +46,7 @@ input:   /* Produção vazia */
 
 line:    expr NEWLINE { 
         imprimeArvore($1, 0);
+        gerarCodigoLua($1);  // Modificado
         // Avaliação da expressão vai aqui
         int resultado = avaliarArvore($1);
         printf("Resultado: %d\n", resultado);
@@ -53,6 +55,7 @@ line:    expr NEWLINE {
 }
        | declaracao NEWLINE { 
         imprimeArvore($1, 0);
+        gerarCodigoLua($1);  // Modificado
         // Avalia e executa a atribuição na tabela de símbolos
         if ($1->tipo == NoAtribuicao) {
             if ($1->esquerdo->tipo == NoVariavel) {
@@ -150,31 +153,48 @@ void yyerror(const char *s) {
 
 /* Função principal para executar o parser */
 int main(int argc, char **argv) {
-    /* Inicializa a tabela de símbolos */
     inicializarTabela();
     
-    /* Configura o arquivo de entrada ou usa stdin */
+    char output_filename[256];
+    FILE* luaOutput;
+    
     if (argc > 1) {
-        yyin = fopen(argv[1], "r");  // Abre o arquivo de entrada
+        yyin = fopen(argv[1], "r");
         if (yyin == NULL) {
             printf("Erro ao abrir arquivo %s\n", argv[1]);
             return 1;
         }
+        
+        // Extrair nome base do arquivo de entrada
+        char *base_name = strrchr(argv[1], '/');
+        if (!base_name) base_name = strrchr(argv[1], '\\');
+        if (!base_name) 
+            base_name = argv[1];
+        else 
+            base_name++;
+            
+        // Criar nome do arquivo de saída
+        snprintf(output_filename, sizeof(output_filename), 
+                "saida_lua/%.*s.lua",  // Modificado: output_lua -> saida_lua
+                (int)(strrchr(base_name, '.') - base_name), 
+                base_name);
     } else {
-        yyin = stdin;  // Se não passar argumento, usa a entrada padrão
-        printf("Digite expressões em Python. Pressione Ctrl+D (Linux/Mac) ou Ctrl+Z seguido de Enter (Windows) para encerrar.\n");
+        yyin = stdin;
+        snprintf(output_filename, sizeof(output_filename), 
+                "saida_lua/output.lua");  
     }
     
-    /* Executa o parser */
-    yyparse();  // Chama o parser para começar a análise
+    // Abrir arquivo de saída
+    luaOutput = fopen(output_filename, "w");
+    if (!luaOutput) {
+        printf("Erro ao criar arquivo de saída: %s\n", output_filename);
+        return 1;
+    }
     
-    /* Imprime a tabela de símbolos */
-    imprimirTabela();
+    inicializarGerador(luaOutput);  // Modificado
+    yyparse();
+    finalizarGerador();  // Modificado
     
-    /* Libera a tabela de símbolos */
-    liberarTabela();
-    
-    /* Fecha o arquivo se necessário */
     if (argc > 1) {
         fclose(yyin);
     }

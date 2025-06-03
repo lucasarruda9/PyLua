@@ -17,3 +17,6 @@ a.out
 
 #Arquivo pylua gerado no makefile
 pylua
+
+# Arquivos lua
+*.lua

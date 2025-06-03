@@ -8,13 +8,16 @@ LEXER_DIR = lexer
 PARSER_DIR = parser
 AST_DIR = ast
 TABELA_DIR = tabela
+GERADOR_CODIGO_FINAL_DIR = gerador_codigo_final
 BUILD_DIR = build
+SAIDA_DIR = saida_lua 
 
 # Arquivos fonte
 LEXER = $(LEXER_DIR)/scanner.l
 PARSER = $(PARSER_DIR)/parser.y
 AST = $(AST_DIR)/ast.c
 TABELA = $(TABELA_DIR)/tabela.c
+GERADOR_CODIGO_FINAL = $(GERADOR_CODIGO_FINAL_DIR)/gerador_codigo_final.c 
 
 # Arquivos gerados (saída no diretório src)
 LEXER_C = $(SRC_DIR)/lex.yy.c
@@ -29,9 +32,9 @@ all: setup $(TARGET)
 
 # Criar diretórios necessários
 setup:
-	@mkdir -p $(SRC_DIR) $(BUILD_DIR)
+	@mkdir -p $(SRC_DIR) $(BUILD_DIR) $(SAIDA_DIR)
 
-$(TARGET): $(LEXER_C) $(PARSER_C) $(AST) $(TABELA)
+$(TARGET): $(LEXER_C) $(PARSER_C) $(AST) $(TABELA) $(GERADOR_CODIGO_FINAL)
 	$(CC) $(CFLAGS) -o $@ $^ -lfl -lm
 
 # Gerar parser.tab.c e parser.tab.h usando bison
@@ -45,6 +48,7 @@ $(LEXER_C): $(LEXER) $(PARSER_H) | setup
 clean:
 	rm -f $(SRC_DIR)/*.c $(SRC_DIR)/*.h
 	rm -f $(TARGET)
+	rm -rf $(SAIDA_DIR)  
 
 # Executar o programa
 run: all
@@ -55,4 +59,4 @@ test: $(TARGET)
 	@chmod +x run_tests.sh
 	@./run_tests.sh
 
-.PHONY: all clean run setup 
+.PHONY: all clean run setup
