@@ -1,9 +1,14 @@
-# Arquivos gerados pelo Flex
+# Arquivos gerados pelo Flex e Bison
 lex.yy.c
+parser.tab.c
+parser.tab.h
 
 # Executáveis
 scanner
 a.out
+pylua
+pylua_debug
+pylua_release
 
 # Arquivos de objeto
 *.o
@@ -11,9 +16,23 @@ a.out
 # Arquivos temporários
 *~
 *.swp
+temp/
 
-# Arquivos txt
-*.txt
+# Diretórios de build
+build/
+src/
 
-#Arquivo pylua gerado no makefile
-pylua
+# Arquivos Lua gerados (opcional - descomente se não quiser versionar)
+# saidas_lua/
+# *.lua
+
+# Arquivos de teste temporários
+tmp_*_output.txt
+
+# Logs e arquivos de debug
+*.log
+*.debug
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db

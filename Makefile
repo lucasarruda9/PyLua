@@ -19,15 +19,20 @@ LEXER_DIR = lexer
 PARSER_DIR = parser
 AST_DIR = ast
 TABELA_DIR = tabela
+GERADOR_DIR = gerador_codigo_final
 BUILD_DIR = build
 TEST_DIR = tests
 TEMP_DIR = temp
+EXEMPLOS_DIR = exemplos
+SAIDA_LUA_DIR = saidas_lua
+DOCS_DIR = docs
 
 # Arquivos fonte
 LEXER = $(LEXER_DIR)/scanner.l
 PARSER = $(PARSER_DIR)/parser.y
 AST = $(AST_DIR)/ast.c
 TABELA = $(TABELA_DIR)/tabela.c
+GERADOR = $(GERADOR_DIR)/gerador_codigo_final.c
 
 # Arquivos gerados (saída no diretório src)
 LEXER_C = $(SRC_DIR)/lex.yy.c
@@ -54,7 +59,7 @@ endif
 
 # Criar diretórios necessários
 setup:
-	@mkdir -p $(SRC_DIR) $(BUILD_DIR) $(TEMP_DIR)
+	@mkdir -p $(SRC_DIR) $(BUILD_DIR) $(TEMP_DIR) $(EXEMPLOS_DIR) $(SAIDA_LUA_DIR) $(DOCS_DIR)/gerados
 
 # Compilação em modo release
 release:
@@ -64,7 +69,7 @@ release:
 debug:
 	@$(MAKE) MODE=debug
 
-$(TARGET): $(LEXER_C) $(PARSER_C) $(AST) $(TABELA)
+$(TARGET): $(LEXER_C) $(PARSER_C) $(AST) $(TABELA) $(GERADOR)
 	$(CC) $(CFLAGS) -o $@ $^ -lfl -lm
 	@echo "Compilação concluída: $@"
 
@@ -81,6 +86,7 @@ clean:
 	rm -f $(SRC_DIR)/*.c $(SRC_DIR)/*.h
 	rm -f pylua pylua_debug pylua_release
 	rm -rf $(TEMP_DIR)/*
+	rm -f *.lua
 
 # Limpeza completa (inclui arquivos de build e temporários)
 distclean: clean
@@ -114,6 +120,24 @@ atualizar_gabaritos: $(TARGET)
 	@chmod +x ./run_tests.sh
 	@bash ./run_tests.sh --update-gabaritos
 
+# Testar gerador de código
+test_gerador: $(TARGET)
+	@echo "Testando gerador de código Lua..."
+	@chmod +x ./testar_gerador.sh
+	@bash ./testar_gerador.sh
+
+# Gerar exemplos Lua
+gerar_exemplos: $(TARGET)
+	@echo "Gerando exemplos de código Lua..."
+	@mkdir -p $(SAIDA_LUA_DIR)
+	@for arquivo in $(EXEMPLOS_DIR)/*.py; do \
+		if [ -f "$$arquivo" ]; then \
+			nome=$$(basename "$$arquivo" .py); \
+			echo "Processando $$arquivo -> $(SAIDA_LUA_DIR)/$$nome.lua"; \
+			./$(TARGET) "$$arquivo" --gerar-lua "$(SAIDA_LUA_DIR)/$$nome.lua"; \
+		fi \
+	done
+
 # Gerar documentação
 docs:
 	@echo "Gerando documentação..."
@@ -123,8 +147,8 @@ docs:
 # Verificar sintaxe do código fonte
 verificar_sintaxe:
 	@echo "Verificando sintaxe do código fonte..."
-	@for file in $(AST_DIR)/*.c $(TABELA_DIR)/*.c; do \
+	@for file in $(AST_DIR)/*.c $(TABELA_DIR)/*.c $(GERADOR_DIR)/*.c; do \
 		$(CC) -fsyntax-only $$file && echo "✓ $$file"; \
 	done
 
-.PHONY: all clean distclean run setup verificar_deps debug release test test_parser test_lexer test_semantico atualizar_gabaritos docs verificar_sintaxe
+.PHONY: all clean distclean run setup verificar_deps debug release test test_parser test_lexer test_semantico atualizar_gabaritos test_gerador gerar_exemplos docs verificar_sintaxe

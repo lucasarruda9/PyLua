@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "../ast/ast.h"
 #include "../tabela/tabela.h"
+#include "../gerador_codigo_final/gerador_codigo_final.h"
 #include <string.h>
 
 int yylex();  // Declaração da função yylex que será chamada pelo parser
@@ -11,6 +12,10 @@ extern FILE *yyin;  // Arquivo de entrada (pode ser stdin ou um arquivo)
 extern int line_num;  // Linha atual (definida no scanner)
 extern int col_num;   // Coluna atual (definida no scanner)
 extern void inicializa_pilha();  // Declaração da função de inicialização da pilha de indentação
+
+// Variáveis globais para controle da geração de código
+FILE *arquivo_lua = NULL;
+int gerar_codigo_lua = 0;
 
 void yyerror(const char *s) {
     fprintf(stderr, "[ERRO SINTATICO] %s na linha %d, coluna %d\n", s, line_num, col_num);
@@ -77,15 +82,21 @@ input:   /* Produção vazia */
        | input INDENT  // identação
        ;
 
-line:    expr NEWLINE { 
+line:    expr NEWLINE {
         imprimeArvore($1, 0);
-        // Avaliação da expressão vai aqui
+        // Avaliação da expressão
         int resultado = avaliarArvore($1);
         printf("Resultado: %d\n", resultado);
+
+        // Gera código Lua se habilitado
+        if (gerar_codigo_lua && arquivo_lua) {
+            gerarCodigoLua($1);
+        }
+
         DesalocarArvore($1);
         $$ = NULL;
 }
-       | declaracao NEWLINE { 
+       | declaracao NEWLINE {
         imprimeArvore($1, 0);
         // Avalia e executa a atribuição na tabela de símbolos
         if ($1->tipo == NoAtribuicao) {
@@ -94,18 +105,30 @@ line:    expr NEWLINE {
                 printf("Resultado da atribuição: %d\n", resultado);
             }
         }
+
+        // Gera código Lua se habilitado
+        if (gerar_codigo_lua && arquivo_lua) {
+            gerarCodigoLua($1);
+        }
+
         DesalocarArvore($1);
         $$ = NULL;
 }
-       | expr /* sem quebra de linha ao final */ { 
+       | expr /* sem quebra de linha ao final */ {
         imprimeArvore($1, 0);
-        // Avaliação da expressão vai aqui
+        // Avaliação da expressão
         int resultado = avaliarArvore($1);
         printf("Resultado: %d\n", resultado);
+
+        // Gera código Lua se habilitado
+        if (gerar_codigo_lua && arquivo_lua) {
+            gerarCodigoLua($1);
+        }
+
         DesalocarArvore($1);
         $$ = NULL;
 }
-       | declaracao /* sem quebra de linha ao final */ { 
+       | declaracao /* sem quebra de linha ao final */ {
         imprimeArvore($1, 0);
         // Avalia e executa a atribuição na tabela de símbolos
         if ($1->tipo == NoAtribuicao) {
@@ -114,6 +137,12 @@ line:    expr NEWLINE {
                 printf("Resultado da atribuição: %d\n", resultado);
             }
         }
+
+        // Gera código Lua se habilitado
+        if (gerar_codigo_lua && arquivo_lua) {
+            gerarCodigoLua($1);
+        }
+
         DesalocarArvore($1);
         $$ = NULL;
 }
@@ -230,35 +259,95 @@ condicional:
 int main(int argc, char **argv) {
     /* Inicializa a tabela de símbolos */
     inicializarTabela();
-    
+
     /* Inicializa a pilha de indentação */
     inicializa_pilha();
-    
-    /* Configura o arquivo de entrada ou usa stdin */
-    if (argc > 1) {
-        yyin = fopen(argv[1], "r");  // Abre o arquivo de entrada
+
+    /* Processa argumentos da linha de comando */
+    char *arquivo_entrada = NULL;
+    char *arquivo_saida_lua = NULL;
+
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "--gerar-lua") == 0 && i + 1 < argc) {
+            arquivo_saida_lua = argv[i + 1];
+            gerar_codigo_lua = 1;
+            i++; // Pula o próximo argumento
+        } else if (argv[i][0] != '-') {
+            arquivo_entrada = argv[i];
+        }
+    }
+
+    /* Configura o arquivo de entrada */
+    if (arquivo_entrada) {
+        yyin = fopen(arquivo_entrada, "r");
         if (yyin == NULL) {
-            printf("Erro ao abrir arquivo %s\n", argv[1]);
+            printf("Erro ao abrir arquivo %s\n", arquivo_entrada);
             return 1;
         }
     } else {
-        yyin = stdin;  // Se não passar argumento, usa a entrada padrão
+        yyin = stdin;
         printf("Digite expressões em Python. Pressione Ctrl+D (Linux/Mac) ou Ctrl+Z seguido de Enter (Windows) para encerrar.\n");
     }
-    
+
+    /* Configura o gerador de código Lua se necessário */
+    if (gerar_codigo_lua) {
+        if (arquivo_saida_lua) {
+            // Se o caminho não contém diretório, salva na pasta saidas_lua
+            char caminho_completo[512];
+            if (strchr(arquivo_saida_lua, '/') == NULL && strchr(arquivo_saida_lua, '\\') == NULL) {
+                snprintf(caminho_completo, sizeof(caminho_completo), "saidas_lua/%s", arquivo_saida_lua);
+                arquivo_saida_lua = caminho_completo;
+            }
+
+            arquivo_lua = fopen(arquivo_saida_lua, "w");
+            if (arquivo_lua == NULL) {
+                printf("Erro ao criar arquivo de saída Lua: %s\n", arquivo_saida_lua);
+                printf("Tentando criar diretório saidas_lua...\n");
+                system("mkdir -p saidas_lua");
+                arquivo_lua = fopen(arquivo_saida_lua, "w");
+                if (arquivo_lua == NULL) {
+                    printf("Erro persistente ao criar arquivo. Usando stdout.\n");
+                    arquivo_lua = stdout;
+                }
+            }
+
+            if (arquivo_lua != stdout) {
+                inicializarGerador(arquivo_lua);
+                printf("Gerando código Lua em: %s\n", arquivo_saida_lua);
+            } else {
+                inicializarGerador(arquivo_lua);
+                printf("=== CÓDIGO LUA GERADO ===\n");
+            }
+        } else {
+            arquivo_lua = stdout;
+            inicializarGerador(arquivo_lua);
+            printf("=== CÓDIGO LUA GERADO ===\n");
+        }
+    }
+
     /* Executa o parser */
-    yyparse();  // Chama o parser para começar a análise
-    
+    yyparse();
+
+    /* Finaliza o gerador de código se necessário */
+    if (gerar_codigo_lua) {
+        finalizarGerador();
+        if (arquivo_saida_lua) {
+            printf("Código Lua gerado com sucesso!\n");
+        } else {
+            printf("=== FIM DO CÓDIGO LUA ===\n");
+        }
+    }
+
     /* Imprime a tabela de símbolos */
     imprimirTabela();
-    
+
     /* Libera a tabela de símbolos */
     liberarTabela();
-    
-    /* Fecha o arquivo se necessário */
-    if (argc > 1) {
+
+    /* Fecha arquivos se necessário */
+    if (arquivo_entrada) {
         fclose(yyin);
     }
-    
+
     return 0;
 }
