@@ -142,7 +142,6 @@ No* CriarNoIf(No* condicao, No* corpo, No* senao) {
     no->var = NULL;
     no->op = 0;
     no->lista = NULL;
-    no->nome_funcao = NULL;
     no->parametros = NULL;
     no->argumentos = NULL;
     return no;
@@ -239,108 +238,157 @@ void DesalocarArvore(No *raiz){
 }
 
 void imprimeLista(ListaNo* lista, int nivel) {
+    int idx = 0;
     ListaNo* atual = lista;
     while (atual) {
-        imprimeArvore(atual->no, nivel);
+        for (int i = 0; i < nivel; i++) printf("    ");
+        printf("[ListaNo %d] ->\n", idx++);
+        imprimeArvore(atual->no, nivel + 1);
         atual = atual->prox;
     }
 }
 
 void imprimeArvore(No *no, int nivel) {
     int i;
-
-    if (no == NULL) return;
-
-    // Imprime o nó atual
-    for (i = 0; i < nivel; i++) {
-        printf("    ");  // Indentação
+    if (no == NULL) {
+        for (i = 0; i < nivel; i++) printf("    ");
+        printf("\033[1;31m(null)\033[0m\n");
+        return;
     }
-
+    // Cores para tipos
+    const char* corTipo = "\033[1;36m";
+    const char* corValor = "\033[1;33m";
+    const char* corReset = "\033[0m";
+    const char* corInfo = "\033[1;32m";
+    const char* corPtr = "\033[1;35m";
+    // Prefixo visual para facilitar leitura da árvore
+    for (i = 0; i < nivel; i++) printf("│   ");
+    // Nome do tipo do nó
+    const char* tipoNome = "?";
+    switch (no->tipo) {
+        case NoLiteral: tipoNome = "Literal"; break;
+        case NoFloat: tipoNome = "Float"; break;
+        case NoString: tipoNome = "String"; break;
+        case NoBool: tipoNome = "Bool"; break;
+        case NoVariavel: tipoNome = "Variavel"; break;
+        case NoOperacaoBinaria: tipoNome = "OperacaoBinaria"; break;
+        case NoAtribuicao: tipoNome = "Atribuicao"; break;
+        case NoBloco: tipoNome = "Bloco"; break;
+        case NoIf: tipoNome = "If"; break;
+        case NoWhile: tipoNome = "While"; break;
+        case NoFor: tipoNome = "For"; break;
+        case NoFuncao: tipoNome = "Funcao"; break;
+        case NoChamadaFuncao: tipoNome = "ChamadaFuncao"; break;
+        default: tipoNome = "Desconhecido";
+    }
+    printf("%sNo(%p)%s Tipo: %s%s (%d)%s ", corTipo, (void*)no, corReset, corInfo, tipoNome, no->tipo, corReset);
+    // Campos comuns
+    printf("%s[", corPtr);
+    printf("esq=%p, dir=%p, cond=%p, corpo=%p, senao=%p, lista=%p", (void*)no->esquerdo, (void*)no->direito, (void*)no->condicao, (void*)no->corpo, (void*)no->senao, (void*)no->lista);
+    printf("]%s\n", corReset);
+    // Detalhes por tipo
     switch (no->tipo) {
         case NoLiteral:
-            printf("Literal: %d\n", no->valor);
+            for (i = 0; i < nivel + 1; i++) printf("│   ");
+            printf("valor = %s%d%s\n", corValor, no->valor, corReset);
             break;
         case NoFloat:
-            printf("Float: %f\n", no->valor_float);
+            for (i = 0; i < nivel + 1; i++) printf("│   ");
+            printf("valor_float = %s%f%s\n", corValor, no->valor_float, corReset);
             break;
         case NoString:
-            printf("String: '%s'\n", no->valor_str);
+            for (i = 0; i < nivel + 1; i++) printf("│   ");
+            printf("valor_str = %s'%s'%s\n", corValor, no->valor_str ? no->valor_str : "", corReset);
             break;
         case NoBool:
-            printf("Bool: %s\n", no->valor_bool ? "True" : "False");
+            for (i = 0; i < nivel + 1; i++) printf("│   ");
+            printf("valor_bool = %s%s%s\n", corValor, no->valor_bool ? "True" : "False", corReset);
             break;
         case NoVariavel:
-            printf("Variavel: %s\n", no->var);
+            for (i = 0; i < nivel + 1; i++) printf("│   ");
+            printf("var = %s%s%s\n", corValor, no->var ? no->var : "(null)", corReset);
             break;
         case NoOperacaoBinaria:
-            printf("Operacao: %c\n", no->op);
-            if (no->esquerdo) imprimeArvore(no->esquerdo, nivel + 1);
-            if (no->direito) imprimeArvore(no->direito, nivel + 1);
+            for (i = 0; i < nivel + 1; i++) printf("│   ");
+            printf("op = %s'%c'%s\n", corValor, no->op, corReset);
+            for (i = 0; i < nivel + 1; i++) printf("│   ");
+            printf("Esquerdo:\n");
+            imprimeArvore(no->esquerdo, nivel + 2);
+            for (i = 0; i < nivel + 1; i++) printf("│   ");
+            printf("Direito:\n");
+            imprimeArvore(no->direito, nivel + 2);
             break;
         case NoAtribuicao:
-            printf("Atribuicao\n");
-            if (no->esquerdo) imprimeArvore(no->esquerdo, nivel + 1);
-            if (no->direito) imprimeArvore(no->direito, nivel + 1);
+            for (i = 0; i < nivel + 1; i++) printf("│   ");
+            printf("Var (esquerdo):\n");
+            imprimeArvore(no->esquerdo, nivel + 2);
+            for (i = 0; i < nivel + 1; i++) printf("│   ");
+            printf("Expressao (direito):\n");
+            imprimeArvore(no->direito, nivel + 2);
             break;
         case NoBloco:
-            printf("Bloco:\n");
-            imprimeLista(no->lista, nivel + 1);
+            if (no->lista == NULL) {
+                for (i = 0; i < nivel + 1; i++) printf("│   ");
+                printf("%s(Lista vazia)%s\n", corPtr, corReset);
+            } else {
+                imprimeLista(no->lista, nivel + 1);
+            }
             break;
         case NoIf:
-            printf("If:\n");
-            for (i = 0; i < nivel + 1; i++) printf("    ");
+            for (i = 0; i < nivel + 1; i++) printf("│   ");
             printf("Condicao:\n");
             imprimeArvore(no->condicao, nivel + 2);
-            for (i = 0; i < nivel + 1; i++) printf("    ");
+            for (i = 0; i < nivel + 1; i++) printf("│   ");
             printf("Corpo:\n");
             imprimeArvore(no->corpo, nivel + 2);
             if (no->senao) {
-                for (i = 0; i < nivel + 1; i++) printf("    ");
+                for (i = 0; i < nivel + 1; i++) printf("│   ");
                 printf("Senao:\n");
                 imprimeArvore(no->senao, nivel + 2);
             }
             break;
         case NoWhile:
-            printf("While:\n");
-            for (i = 0; i < nivel + 1; i++) printf("    ");
+            for (i = 0; i < nivel + 1; i++) printf("│   ");
             printf("Condicao:\n");
             imprimeArvore(no->condicao, nivel + 2);
-            for (i = 0; i < nivel + 1; i++) printf("    ");
+            for (i = 0; i < nivel + 1; i++) printf("│   ");
             printf("Corpo:\n");
             imprimeArvore(no->corpo, nivel + 2);
             break;
         case NoFor:
-            printf("For:\n");
-            for (i = 0; i < nivel + 1; i++) printf("    ");
+            for (i = 0; i < nivel + 1; i++) printf("│   ");
             printf("Var:\n");
             imprimeArvore(no->esquerdo, nivel + 2);
-            for (i = 0; i < nivel + 1; i++) printf("    ");
+            for (i = 0; i < nivel + 1; i++) printf("│   ");
             printf("Inicio:\n");
             imprimeArvore(no->direito, nivel + 2);
-            for (i = 0; i < nivel + 1; i++) printf("    ");
+            for (i = 0; i < nivel + 1; i++) printf("│   ");
             printf("Fim:\n");
             imprimeArvore(no->condicao, nivel + 2);
-            for (i = 0; i < nivel + 1; i++) printf("    ");
+            for (i = 0; i < nivel + 1; i++) printf("│   ");
             printf("Corpo:\n");
             imprimeArvore(no->corpo, nivel + 2);
             break;
         case NoFuncao:
-            printf("Funcao: %s\n", no->nome_funcao);
-            for (i = 0; i < nivel + 1; i++) printf("    ");
+            for (i = 0; i < nivel + 1; i++) printf("│   ");
+            printf("nome_funcao = %s%s%s\n", corValor, no->nome_funcao ? no->nome_funcao : "(anonima)", corReset);
+            for (i = 0; i < nivel + 1; i++) printf("│   ");
             printf("Parametros:\n");
             imprimeLista(no->parametros, nivel + 2);
-            for (i = 0; i < nivel + 1; i++) printf("    ");
+            for (i = 0; i < nivel + 1; i++) printf("│   ");
             printf("Corpo:\n");
             imprimeArvore(no->corpo, nivel + 2);
             break;
         case NoChamadaFuncao:
-            printf("ChamadaFuncao: %s\n", no->nome_funcao);
-            for (i = 0; i < nivel + 1; i++) printf("    ");
+            for (i = 0; i < nivel + 1; i++) printf("│   ");
+            printf("nome_funcao = %s%s%s\n", corValor, no->nome_funcao ? no->nome_funcao : "(anonima)", corReset);
+            for (i = 0; i < nivel + 1; i++) printf("│   ");
             printf("Argumentos:\n");
             imprimeLista(no->argumentos, nivel + 2);
             break;
         default:
-            printf("[Tipo de nó desconhecido]\n");
+            for (i = 0; i < nivel + 1; i++) printf("│   ");
+            printf("%s[Tipo de nó desconhecido: %d]%s\n", "\033[1;31m", no->tipo, corReset);
     }
 }
 
