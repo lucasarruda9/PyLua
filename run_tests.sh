@@ -39,7 +39,7 @@ for file in $TEST_DIR/*.txt; do
     fi
     expected="$EXPECTED_DIR/${base}.txt"
     output="tmp_${base}_output.txt"
-    ./pylua < "$file" > "$output"
+    ./pylua_debug < "$file" > "$output"
     if $update_gabaritos || [ ! -f "$expected" ]; then
         cp "$output" "$expected"
         echo "[GABARITO] $base gerado/atualizado."
