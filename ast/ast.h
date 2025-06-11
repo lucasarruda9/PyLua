@@ -15,6 +15,7 @@ typedef enum {
     NoIf,
     NoWhile,
     NoFor,
+    NoReturn,
     NoFuncao,
     NoChamadaFuncao
 } Tipo;
@@ -61,6 +62,10 @@ No* CriarNoWhile(No* condicao, No* corpo);
 No* CriarNoFor(No* var, No* inicio, No* fim, No* corpo);
 No* CriarNoFuncao(char* nome, ListaNo* parametros, No* corpo);
 No* CriarNoChamadaFuncao(char* nome, ListaNo* argumentos);
+No* CriarNoLista(ListaNo* elementos);
+No* CriarNoIndexacao(No* lista, No* indice);
+No* CriarNoReturn(No* valor);
+ListaNo* CriarListaElementos(No* elemento, ListaNo* prox);
 ListaNo* AdicionarNoLista(ListaNo* lista, No* no);
 
 void DesalocarArvore(struct Arvore* no);

@@ -228,6 +228,73 @@ No* CriarNoChamadaFuncao(char* nome, ListaNo* argumentos) {
     no->parametros = NULL;
     return no;
 }
+No* CriarNoLista(ListaNo* elementos) {
+    No* no = malloc(sizeof(No));
+    no->tipo = NoBloco; // Ou crie um tipo específico, ex: NoLista
+    no->lista = elementos;
+    no->direito = no->esquerdo = NULL;
+    no->valor = 0;
+    no->valor_float = 0.0;
+    no->valor_str = NULL;
+    no->valor_bool = 0;
+    no->var = NULL;
+    no->op = 0;
+    no->condicao = NULL;
+    no->corpo = NULL;
+    no->senao = NULL;
+    no->nome_funcao = NULL;
+    no->parametros = NULL;
+    no->argumentos = NULL;
+    return no;
+}
+
+No* CriarNoIndexacao(No* lista, No* indice) {
+    No* no = malloc(sizeof(No));
+    no->tipo = NoOperacaoBinaria; // Ou crie um tipo específico, ex: NoIndexacao
+    no->esquerdo = lista;
+    no->direito = indice;
+    no->valor = 0;
+    no->valor_float = 0.0;
+    no->valor_str = NULL;
+    no->valor_bool = 0;
+    no->var = NULL;
+    no->op = '@'; // Use um símbolo especial para indexação
+    no->lista = NULL;
+    no->condicao = NULL;
+    no->corpo = NULL;
+    no->senao = NULL;
+    no->nome_funcao = NULL;
+    no->parametros = NULL;
+    no->argumentos = NULL;
+    return no;
+}
+No* CriarNoReturn(No* valor) {
+    No* no = malloc(sizeof(No));
+    no->tipo = NoReturn;
+    no->esquerdo = valor;
+    no->direito = NULL;
+    no->valor = 0;
+    no->valor_float = 0.0;
+    no->valor_str = NULL;
+    no->valor_bool = 0;
+    no->var = NULL;
+    no->op = 0;
+    no->lista = NULL;
+    no->condicao = NULL;
+    no->corpo = NULL;
+    no->senao = NULL;
+    no->nome_funcao = NULL;
+    no->parametros = NULL;
+    no->argumentos = NULL;
+    return no;
+}
+
+ListaNo* CriarListaElementos(No* elemento, ListaNo* prox) {
+    ListaNo* lista = malloc(sizeof(ListaNo));
+    lista->no = elemento;
+    lista->prox = prox;
+    return lista;
+}
 
 void DesalocarArvore(No *raiz){
     if(raiz == NULL){
@@ -374,6 +441,9 @@ int avaliarArvore(No* no) {
             if (no->direito == NULL && no->op == '-') {
                 return -valorEsq;
             }
+            if (no->direito == NULL && no->op == '!') {
+                return !valorEsq;
+            }
             
             valorDir = avaliarArvore(no->direito);
             
@@ -381,6 +451,7 @@ int avaliarArvore(No* no) {
                 case '+': resultado = valorEsq + valorDir; break;
                 case '-': resultado = valorEsq - valorDir; break;
                 case '*': resultado = valorEsq * valorDir; break;
+                case '!': resultado = !valorEsq; break;
                 case '/': 
                     if (valorDir == 0) {
                         printf("[ERRO] Divisão por zero\n");

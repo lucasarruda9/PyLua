@@ -21,6 +21,19 @@ typedef struct simbolo {
     struct simbolo *proximo;
 } Simbolo;
 
+typedef struct Escopo {
+    Simbolo *tabela;           // Ponteiro para a tabela de símbolos deste escopo
+    struct Escopo *anterior;   // Ponteiro para o escopo anterior (pilha)
+} Escopo;
+
+extern Escopo *escopo_atual;
+
+// Funções para manipular escopos
+void entrarEscopo();
+void sairEscopo();
+Simbolo *buscarSimboloEscopo(const char *nome);
+void inserirSimboloEscopo(const char *nome, int tipo);
+
 // Funções da tabela de símbolos
 void inicializarTabela();
 void inserirSimbolo(char *nome, TipoSimbolo tipo);
