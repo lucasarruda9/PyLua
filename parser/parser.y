@@ -51,6 +51,7 @@ void yyerror(const char *s) {
 %token <string> STRING_DQ STRING_SQ TRIPLE_DQ TRIPLE_SQ
 %token COMMENT
 %token INDENT DEDENT
+%token DEF RETURN
 
 /* Precedência de operadores */
 %left BITOR
@@ -72,6 +73,9 @@ void yyerror(const char *s) {
 %type <no> condicional
 %type <lista> bloco
 %type <lista> linhas
+%type <no> funcao
+%type <lista> parametros lista_parametros
+%type <lista> lista_elementos
 
 %%
 
@@ -146,6 +150,14 @@ line:    expr NEWLINE {
         DesalocarArvore($1);
         $$ = NULL;
 }
+        | funcao NEWLINE {
+            imprimeArvore($1, 0);
+            if (gerar_codigo_lua && arquivo_lua) {
+                gerarCodigoLua($1);
+            }
+            DesalocarArvore($1);
+            $$ = NULL;
+        }
         | condicional NEWLINE {
             imprimeArvore($1, 0);
             // Avaliar a semântica do condicional
@@ -159,6 +171,22 @@ line:    expr NEWLINE {
             // Avaliar a semântica do condicional
             int resultado = avaliarArvore($1);
             printf("Resultado do condicional: %d\n", resultado);
+            DesalocarArvore($1);
+            $$ = NULL;
+        }
+       | comando_while NEWLINE {
+            imprimeArvore($1, 0);
+            if (gerar_codigo_lua && arquivo_lua) {
+                gerarCodigoLua($1);
+            }
+            DesalocarArvore($1);
+            $$ = NULL;
+        }
+       | comando_for NEWLINE {
+            imprimeArvore($1, 0);
+            if (gerar_codigo_lua && arquivo_lua) {
+                gerarCodigoLua($1);
+            }
             DesalocarArvore($1);
             $$ = NULL;
         }
@@ -208,6 +236,8 @@ expr:    INTEGER               { $$ = CriarNoInteiro($1); }  // Cria um nó de i
        | expr SHIFTR expr      { $$ = CriarNoOperador($1, $3, 'r'); }  // Shift right
        | MINUS expr %prec NEG  { $$ = CriarNoOperador($2, NULL, '-'); }  // Menos unário
        | BITNOT expr %prec BITNOT { $$ = CriarNoOperador($2, NULL, '~'); }  // NOT bitwise
+       | LBRACKET lista_elementos RBRACKET { $$ = CriarNoLista($2); }
+       | expr LBRACKET expr RBRACKET { $$ = CriarNoIndexacao($1, $3); }
        ;
 
 declaracao:  IDENTIFIER ASSIGN expr { 
@@ -234,23 +264,64 @@ declaracao:  IDENTIFIER ASSIGN expr {
        | IDENTIFIER POW_EQ expr { 
             $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, 'a'));
 } 
+       | RETURN expr { $$ = CriarNoReturn($2); }
        ;
 bloco:
       INDENT linhas DEDENT { $$ = $2; }
     
     ;
 
+
 linhas:
       linhas line { $$ = AdicionarNoLista($1, $2); }
     | line { $$ = AdicionarNoLista(NULL, $1);}
     ;
-
+funcao:
+    DEF IDENTIFIER LPAREN parametros RPAREN COLON NEWLINE bloco {
+        $$ = CriarNoFuncao($2, $4, CriarNoBloco($8));
+        inserirSimboloEscopo($2, TIPO_FUNCAO);
+        entrarEscopo();
+        ListaNo* param = $4;
+        while (param) {
+            inserirSimboloEscopo(param->no->var, TIPO_INT); // Adapte tipo conforme necessário
+            param = param->prox;
+        }
+        sairEscopo();
+    }
+;
+parametros:
+      /* vazio */ { $$ = NULL; }
+    | lista_parametros { $$ = $1; }
+;
+lista_parametros:
+      IDENTIFIER { 
+          $$ = CriarNoLista(CriarNoVariavel($1), NULL); 
+      }
+    | lista_parametros COMMA IDENTIFIER {
+          $$ = AdicionarNoLista($1, CriarNoVariavel($3));
+      }
+;
+lista_elementos:
+      expr { $$ = CriarListaElementos($1, NULL); }
+    | lista_elementos COMMA expr { $$ = CriarListaElementos($3, $1); }
+;
 condicional:
       IF LPAREN expr RPAREN COLON NEWLINE bloco {
           $$ = CriarNoIf($3, CriarNoBloco($7), NULL);
       }
     | IF LPAREN expr RPAREN COLON NEWLINE bloco ELSE COLON NEWLINE bloco {
           $$ = CriarNoIf($3, CriarNoBloco($7), CriarNoBloco($11));
+      }
+    ;
+comando_while:
+      WHILE LPAREN expr RPAREN COLON NEWLINE bloco {
+          $$ = CriarNoWhile($3, CriarNoBloco($7));
+      }
+    ;
+
+comando_for:
+      FOR IDENTIFIER IN expr COLON NEWLINE bloco {
+          $$ = CriarNoFor(CriarNoVariavel($2), $4, NULL, CriarNoBloco($7));
       }
     ;
 %%
