@@ -59,6 +59,30 @@
 - ✅ Documentação atualizada
 - ✅ Testes automatizados implementados
 
+## Sprint 4: Análise Semântica e Geração de Código
+**Período:** 15/05/2025 - 02/06/2025
+
+### Tarefas Realizadas
+
+| Tarefa | Responsável | Status | Observações |
+|--------|-------------|--------|-------------|
+| Verificação de Escopo | [Artur Mendonça](https://github.com/ArtyMend07) | ✅ Concluída | Validação básica de escopo na tabela de símbolos |  
+| Verificação Semântica | [Lucas Mendonça](https://github.com/lucasarruda9) | ✅ Concluída | Regras semânticas básicas implementadas |
+| Geração de Código Lua | [Artur Mendonça](https://github.com/ArtyMend07), [Gabriel Lopes](https://github.com/BrzGab) | ✅ Concluída | Implementação do gerador de código Lua |
+| Expansão da AST | [Guilherme Meister](https://github.com/gmeister18) | ✅ Concluída | Adição de novos tipos de nós (float, string, bool, bloco, if, while, for, função, chamada de função) |
+| Verificação de Tipos | [Gabriel Lopes](https://github.com/BrzGab), [Lucas Mendonça](https://github.com/lucasarruda9), [Matheus Ferreira](https://github.com/matferreira1) | ❌ Não Realizada | Sistema de verificação de tipos não implementado |
+| Código Intermediário | [Lucas Mendonça](https://github.com/lucasarruda9), [Samuel Alves](https://github.com/samuelalvess), [Gabriel Lopes](https://github.com/BrzGab) | ❌ Não Realizada | Estruturas intermediárias não implementadas |
+| Preparação para P2 | [Artur Mendonça](https://github.com/ArtyMend07), [Gabriel Lopes](https://github.com/BrzGab), [Guilherme Meister](https://github.com/gmeister18), [Lucas Mendonça](https://github.com/lucasarruda9), [Matheus Ferreira](https://github.com/matferreira1), [Samuel Alves](https://github.com/samuelalvess) | ✅ Concluída | Documentação e slides finalizados |
+| Apresentação P2 | [Artur Mendonça](https://github.com/ArtyMend07), [Gabriel Lopes](https://github.com/BrzGab), [Guilherme Meister](https://github.com/gmeister18), [Lucas Mendonça](https://github.com/lucasarruda9), [Matheus Ferreira](https://github.com/matferreira1), [Samuel Alves](https://github.com/samuelalvess) | ✅ Concluída | Apresentação realizada com sucesso |
+
+### Entregáveis
+- ✅ Validação básica de escopo
+- ✅ Verificação semântica básica
+- ✅ Gerador de código Lua inicialmente implementado
+- ✅ Expansão da AST com novos tipos de nós
+- ✅ Documentação atualizada
+- ✅ Apresentação P2 realizada com sucesso
+
 ## Status Geral do Projeto
 
 ### Componentes Implementados
@@ -68,22 +92,23 @@
 - ✅ Integração entre Scanner e Parser
 - ✅ AST (Árvore Sintática Abstrata)
 - ✅ Tabela de Símbolos
+- ✅ Análise Semântica Básica
+- ✅ Gerador de Código Lua
+- ❌ Verificação de Tipos
+- ❌ Código Intermediário
 
 ### Próximos Passos
-1. Iniciar implementação da análise semântica
-2. Preparar para geração de código intermediário
+1. Implementar sistema de verificação de tipos
+2. Desenvolver código intermediário
+3. Refinar o gerador de código Lua
+4. Expandir testes de integração
 
 ## Observações
-- A Sprint 1 foi concluída com sucesso, com a implementação do scanner funcional
-- A Sprint 2 teve progresso parcial, com a implementação do parser, mas faltando a integração com o scanner
-- Algumas tarefas planejadas não foram realizadas conforme o cronograma inicial
-- A pesquisa comparativa precisa ser documentada formalmente
-
-- Além das tarefas planejadas, algumas adições importantes foram realizadas fora do escopo original das sprints:
-    - Documentação de Metodologia: [Artur Mendonça](https://github.com/ArtyMend07) elaborou e adicionou a seção de metodologia do projeto, detalhando processos e práticas adotadas.
-    - Documentação de Ferramentas: [Samuel Alves](https://github.com/samuelalvess) criou e manteve atualizada a documentação das ferramentas utilizadas no projeto.
-    - Documentação das Sprints: [Lucas Mendonça](https://github.com/lucasarruda9) e [Gabriel Lopes](https://github.com/BrzGab) organizaram e atualizaram a documentação referente ao andamento das sprints.
-    - Documentação de Definição: [Guilherme Meister](https://github.com/gmeister18) elaborou o documento de definição do projeto, estabelecendo os requisitos e a base conceitual do compilador.
+- Todas as sprints até a Sprint 3 foram concluídas com sucesso
+- A Sprint 4 teve implementação parcial, com conclusão da análise semântica básica e gerador de código Lua
+- Por decisão técnica da equipe, optou-se por implementar diretamente o gerador de código final ao invés do código intermediário, antecipando esta entrega da Sprint 5
+- O sistema de verificação de tipos não foi implementado por ser uma característica não essencial em Python, que é uma linguagem dinamicamente tipada
+- A expansão da AST com novos tipos de nós foi uma adição não planejada que contribuiu significativamente para o projeto
 
 ## Referências Bibliográficas
 
@@ -92,8 +117,9 @@
 
 ## Histórico de Versões
 
-| Versão | Descrição | Autor(es) | Data | Revisor(es) | Data de Revisão |
-|--------|-----------|-----------|------|-------------|-----------------|
+| Versão | Descrição | Autor | Data | Revisor | Data Revisão |
+|--------|-----------|-------|------|---------|--------------|
 | 1.0 | Criação inicial da documentação das sprints realizadas | [Artur Mendonça](https://github.com/ArtyMend07) | 02/05/2025 | [Lucas Mendonça](https://github.com/lucasarruda9) | 02/05/2025 |
 | 1.1 | Atualização das sprints realizadas | [Matheus Ferreira](https://github.com/matferreira1) | 07/05/2025 | [Lucas Mendonça](https://github.com/lucasarruda9) | 07/05/2025 |
 | 1.2 | Adição da Sprint 3 e atualização de responsáveis | [Artur Mendonça](https://github.com/ArtyMend07) | 27/05/2025 | [Guilherme Meister](https://github.com/gmeister18) | 27/05/2025 |
+| 1.3 | Adição da Sprint 4 e atualização de responsaveis | [Artur Mendonça](https://github.com/ArtyMend07) | 15/06/2025 | [Gabriel Lopes](https://github.com/BrzGab), [Lucas Mendonça](https://github.com/lucasarruda9) | 15/06/2025 |

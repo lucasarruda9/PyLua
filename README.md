@@ -10,16 +10,30 @@ O PyLua está atualmente em estágios iniciais de desenvolvimento. Ele possui um
 
 ```
 PyLua/
-├── lexer/              # Analisador léxico
-│   └── scanner.l       # Definição do scanner Flex
-├── parser/             # Analisador sintático
-│   └── parser.y        # Definição do parser Bison
-├── src/                # Código fonte gerado automaticamente
-├── build/              # Diretório para arquivos de compilação
-├── Makefile            # Script de construção
-├── .gitignore          # Arquivo Git ignore
-├── LICENSE             # Arquivo de licença
-└── README.md           # Este arquivo
+├── ast/                # Árvore Sintática Abstrata
+│   ├── ast.c          # Implementação da AST
+│   └── ast.h          # Definições da AST
+├── build/             # Diretório de compilação
+├── docs/              # Documentação
+│   ├── Diagramas/     # Diagramas do projeto
+│   ├── Metodologia/   # Documentação de metodologia
+│   ├── planejamento/  # Documentos de planejamento
+│   └── Semana 1/      # Documentos da primeira semana
+├── exemplos/          # Exemplos de código Python
+├── gerador_codigo_final/ # Gerador de código Lua
+├── lexer/             # Analisador léxico
+│   └── scanner.l      # Definições Flex
+├── parser/            # Analisador sintático
+├── tabela/            # Tabela de símbolos
+├── tests/             # Testes do compilador
+├── .github/           # Templates para GitHub
+├── compilar.sh        # Script de compilação
+├── inicializar_projeto.sh # Script de inicialização
+├── Makefile          # Script de construção
+├── README.md         # Este arquivo
+├── run_tests.sh      # Script para execução de testes
+├── testar_gerador.sh # Script para testar gerador
+└── verificar_deps.sh # Script para verificar dependências
 ```
 
 ## Versões de Ferramentas Utilizadas
@@ -127,10 +141,7 @@ Para testar a criação e impressão dos nós de estruturas de controle (if, whi
 
 ## Em Desenvolvimento
 
-- Análise léxica completa para Python
-- Análise sintática para estruturas Python
 - Geração de código intermediário
-- Tradução de Python para Lua
 
 ## Como Contribuir
 
@@ -158,3 +169,12 @@ Grupo 8 - PyLua
 | ![Lucas Mendonça](https://github.com/lucasarruda9.png?size=100) | Lucas Mendonça | [lucasarruda9](https://github.com/lucasarruda9) |
 | ![Matheus Ferreira](https://github.com/matferreira1.png?size=100) | Matheus Ferreira | [matferreira1](https://github.com/matferreira1) |
 | ![Samuel Alves](https://github.com/samuelalvess.png?size=100) | Samuel Alves | [samuelalvess](https://github.com/samuelalvess) |
+
+
+## Histórico de Versões
+
+| Versão | Data | Descrição | Autor | Revisor |
+|--------|------|-----------|--------|----------|
+| 1.0 | 25/04/2025 | Estrutura inicial do README | [Artur Mendonça](https://github.com/ArtyMend07) | [Lucas Mendonça](https://github.com/lucasarruda9) |
+| 1.1 | 10/05/2025 | Atualização da estrutura do repositório e adição de novos tópicos | [Artur Mendonça](https://github.com/ArtyMend07) | [Lucas Mendonça](https://github.com/lucasarruda9) |
+| 1.2 | 14/06/2025 | Atualização da estrutura do repositório | [Artur Mendonça](https://github.com/ArtyMend07) | [Gabriel Lopes](https://github.com/BrzGab), [Lucas Mendonça](https://github.com/lucasarruda9) |
