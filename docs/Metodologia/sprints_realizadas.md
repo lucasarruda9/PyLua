@@ -100,8 +100,9 @@
 ### Próximos Passos
 1. Implementar sistema de verificação de tipos
 2. Desenvolver código intermediário
-3. Refinar o gerador de código Lua
-4. Expandir testes de integração
+3. Expandir gerador de código Lua para cobrir todo escopo definido
+4. Resolver problemas na geração de código para estruturas condicionais (if)
+5. Expandir testes de integração
 
 ## Observações
 - Todas as sprints até a Sprint 3 foram concluídas com sucesso
@@ -109,6 +110,9 @@
 - Por decisão técnica da equipe, optou-se por implementar diretamente o gerador de código final ao invés do código intermediário, antecipando esta entrega da Sprint 5
 - O sistema de verificação de tipos não foi implementado por ser uma característica não essencial em Python, que é uma linguagem dinamicamente tipada
 - A expansão da AST com novos tipos de nós foi uma adição não planejada que contribuiu significativamente para o projeto
+- O gerador de código Lua atual está funcional apenas para declaração e atribuição de variáveis
+- Existem problemas na geração de código para estruturas condicionais (if) que precisam ser resolvidos
+- Para mais informações sobre estas e outras decisões técnicas, consulte o documento [Decisões Técnicas](../Metodologia/decisoes_tecnicas.md)
 
 ## Referências Bibliográficas
 
@@ -123,3 +127,4 @@
 | 1.1 | Atualização das sprints realizadas | [Matheus Ferreira](https://github.com/matferreira1) | 07/05/2025 | [Lucas Mendonça](https://github.com/lucasarruda9) | 07/05/2025 |
 | 1.2 | Adição da Sprint 3 e atualização de responsáveis | [Artur Mendonça](https://github.com/ArtyMend07) | 27/05/2025 | [Guilherme Meister](https://github.com/gmeister18) | 27/05/2025 |
 | 1.3 | Adição da Sprint 4 e atualização de responsaveis | [Artur Mendonça](https://github.com/ArtyMend07) | 15/06/2025 | [Gabriel Lopes](https://github.com/BrzGab), [Lucas Mendonça](https://github.com/lucasarruda9) | 15/06/2025 |
+| 1.3.1 | Adição de link para decisões técnicas da equipe | [Artur Mendonça](https://github.com/ArtyMend07) | 15/06/2025 | [Gabriel Lopes](https://github.com/BrzGab), [Lucas Mendonça](https://github.com/lucasarruda9) | 15/06/2025 |
