@@ -51,6 +51,7 @@ void yyerror(const char *s) {
 %token <string> STRING_DQ STRING_SQ TRIPLE_DQ TRIPLE_SQ
 %token COMMENT
 %token INDENT DEDENT
+%token DEF TO
 
 /* Precedência de operadores */
 %left BITOR
@@ -72,6 +73,8 @@ void yyerror(const char *s) {
 %type <no> condicional
 %type <lista> bloco
 %type <lista> linhas
+%type <lista> lista_argumentos argumentos lista_parametros parametros
+%type <no> loop
 
 %%
 
@@ -171,6 +174,14 @@ line:    expr NEWLINE {
        ;
 
 expr:    INTEGER               { $$ = CriarNoInteiro($1); }  // Cria um nó de inteiro
+       | FLOAT                 { $$ = CriarNoFloat(atof($1)); }
+       | STRING_DQ             { $$ = CriarNoString($1); }
+       | STRING_SQ             { $$ = CriarNoString($1); }
+       | KEYWORD               { 
+                                 if (strcmp($1, "True") == 0) $$ = CriarNoBool(1);
+                                 else if (strcmp($1, "False") == 0) $$ = CriarNoBool(0);
+                                 else $$ = NULL;
+                               }
        | IDENTIFIER            { 
                                Simbolo *s = buscarSimbolo($1);
                                if (s == NULL) {
@@ -179,6 +190,7 @@ expr:    INTEGER               { $$ = CriarNoInteiro($1); }  // Cria um nó de i
                                }
                                $$ = CriarNoVariavel($1); 
                               }
+       | IDENTIFIER LPAREN lista_argumentos RPAREN { $$ = CriarNoChamadaFuncao($1, $3); } // chamada de função
        | LPAREN expr RPAREN    { $$ = $2; }  // Expressão entre parênteses
        | expr PLUS expr        { $$ = CriarNoOperador($1, $3, '+'); }  // Soma
        | expr MINUS expr       { $$ = CriarNoOperador($1, $3, '-'); }  // Subtração
@@ -192,7 +204,7 @@ expr:    INTEGER               { $$ = CriarNoInteiro($1); }  // Cria um nó de i
                                 }
                               }
        | expr MODULO expr      { $$ = CriarNoOperador($1, $3, '%'); }  // Módulo
-       | expr POWER expr       { $$ = CriarNoOperador($1, $3, 'p'); }  // Potência
+       | expr POWER expr       { $$ = CriarNoOperador($1, $3, 'a'); }  // Potência (padronizado)
        | expr FLOOR_DIV expr   { $$ = CriarNoOperador($1, $3, 'f'); }  // Divisão inteira
        | expr LT expr          { $$ = CriarNoOperador($1, $3, '<'); }  // Menor que
        | expr GT expr          { $$ = CriarNoOperador($1, $3, '>'); }  // Maior que
@@ -209,6 +221,16 @@ expr:    INTEGER               { $$ = CriarNoInteiro($1); }  // Cria um nó de i
        | MINUS expr %prec NEG  { $$ = CriarNoOperador($2, NULL, '-'); }  // Menos unário
        | BITNOT expr %prec BITNOT { $$ = CriarNoOperador($2, NULL, '~'); }  // NOT bitwise
        ;
+
+lista_argumentos:
+      /* vazio */ { $$ = NULL; }
+    | argumentos { $$ = $1; }
+    ;
+
+argumentos:
+      expr { $$ = AdicionarNoLista(NULL, $1); }
+    | argumentos COMMA expr { $$ = AdicionarNoLista($1, $3); }
+    ;
 
 declaracao:  IDENTIFIER ASSIGN expr { 
             $$ = CriaNoAtribuicao(CriarNoVariavel($1), $3);
@@ -234,10 +256,23 @@ declaracao:  IDENTIFIER ASSIGN expr {
        | IDENTIFIER POW_EQ expr { 
             $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, 'a'));
 } 
+       | DEF IDENTIFIER LPAREN lista_parametros RPAREN COLON NEWLINE bloco {
+            $$ = CriarNoFuncao($2, $4, CriarNoBloco($8));
+} 
        ;
+
+lista_parametros:
+      /* vazio */ { $$ = NULL; }
+    | parametros { $$ = $1; }
+    ;
+
+parametros:
+      IDENTIFIER { $$ = AdicionarNoLista(NULL, CriarNoVariavel($1)); }
+    | parametros COMMA IDENTIFIER { $$ = AdicionarNoLista($1, CriarNoVariavel($3)); }
+    ;
+
 bloco:
       INDENT linhas DEDENT { $$ = $2; }
-    
     ;
 
 linhas:
@@ -251,6 +286,15 @@ condicional:
       }
     | IF LPAREN expr RPAREN COLON NEWLINE bloco ELSE COLON NEWLINE bloco {
           $$ = CriarNoIf($3, CriarNoBloco($7), CriarNoBloco($11));
+      }
+    ;
+
+loop:
+      WHILE LPAREN expr RPAREN COLON NEWLINE bloco {
+          $$ = CriarNoWhile($3, CriarNoBloco($7));
+      }
+    | FOR IDENTIFIER ASSIGN expr TO expr COLON NEWLINE bloco {
+          $$ = CriarNoFor(CriarNoVariavel($2), $4, $6, CriarNoBloco($9));
       }
     ;
 %%
