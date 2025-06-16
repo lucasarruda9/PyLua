@@ -10,7 +10,6 @@ int yylex();  // Declaração da função yylex que será chamada pelo parser
 void yyerror(const char *s);  // Função de erro para lidar com erros sintáticos
 extern FILE *yyin;  // Arquivo de entrada (pode ser stdin ou um arquivo)
 extern int line_num;  // Linha atual (definida no scanner)
-extern int col_num;   // Coluna atual (definida no scanner)
 extern void inicializa_pilha();  // Declaração da função de inicialização da pilha de indentação
 
 // Variáveis globais para controle da geração de código
@@ -18,7 +17,7 @@ FILE *arquivo_lua = NULL;
 int gerar_codigo_lua = 0;
 
 void yyerror(const char *s) {
-    fprintf(stderr, "[ERRO SINTATICO] %s na linha %d, coluna %d\n", s, line_num, col_num);
+    fprintf(stderr, "[ERRO SINTATICO] %s na linha %d\n", s, line_num);
 }
 %}
 
@@ -146,14 +145,6 @@ line:    expr NEWLINE {
         DesalocarArvore($1);
         $$ = NULL;
 }
-        | condicional NEWLINE {
-            imprimeArvore($1, 0);
-            // Avaliar a semântica do condicional
-            int resultado = avaliarArvore($1);
-            printf("Resultado do condicional: %d\n", resultado);
-            DesalocarArvore($1);
-            $$ = NULL;
-        }
     | condicional {
             imprimeArvore($1, 0);
             // Avaliar a semântica do condicional
