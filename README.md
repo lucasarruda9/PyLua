@@ -1,180 +1,313 @@
-# PyLua
+# PyLua - Compilador Python para Lua
 
-PyLua é um compilador que traduz código Python para Lua. Este projeto está sendo desenvolvido como parte da disciplina de Compiladores 1.
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)]()
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/version-1.2-orange.svg)]()
 
-## Visão Geral do Projeto
+PyLua é um **Compilador** que converte código Python em código Lua equivalente, desenvolvido como projeto da disciplina de Compiladores 1. O projeto implementa todas as fases clássicas de um compilador: análise léxica, análise sintática, construção de AST, análise semântica básica e geração de código.
 
-O PyLua está atualmente em estágios iniciais de desenvolvimento. Ele possui um analisador léxico (scanner) para reconhecer tokens Python e um analisador sintático (parser) que pode processar expressões aritméticas básicas.
+## Características Principais
 
-## Estrutura do Repositório
+- **Análise Léxica Completa**: Reconhecimento de todos os tokens Python essenciais
+- **Parser Robusto**: Análise sintática com recuperação de erros
+- **AST Hierárquica**: Representação estruturada do código fonte
+- **Geração de Código Lua**: Transpilação direta Python → Lua
+- **Tabela de Símbolos**: Gerenciamento de variáveis e escopo
+- **Testes Automatizados**: Suite completa de testes de validação
 
+## Índice
+
+- [Instalação e Uso](#-instalação-e-uso)
+- [Exemplos Práticos](#-exemplos-práticos)
+- [Arquitetura](#-arquitetura)
+- [Funcionalidades](#-funcionalidades)
+- [Documentação Técnica](#-documentação-técnica)
+- [Desenvolvimento](#-desenvolvimento)
+- [Equipe](#-equipe)
+
+## 🛠 Instalação e Uso
+
+### Pré-requisitos
+- **GCC** (versão 7.0+)
+- **Flex** (versão 2.6.4+)
+- **Bison** (versão 3.0+)
+- **Make** (versão 4.2+)
+
+### Verificação de Dependências
+```bash
+chmod +x verificar_deps.sh
+./verificar_deps.sh
+```
+
+### Compilação
+```bash
+# Compilação completa
+make clean && make
+
+# Ou usando o script
+./compilar.sh
+```
+
+### Uso Básico
+
+#### Compilar arquivo Python para Lua
+```bash
+./pylua_debug arquivo.py --gerar-lua saida.lua
+```
+
+#### Modo interativo
+```bash
+./pylua_debug
+```
+
+#### Gerar código para stdout
+```bash
+./pylua_debug arquivo.py --gerar-lua
+```
+
+## Exemplos Práticos
+
+### Exemplo 1: Operações Aritméticas
+**Entrada Python (`exemplo.py`)**:
+```python
+x = 10
+y = 20
+resultado = (x + y) * 2
+print(resultado)
+```
+
+**Comando**:
+```bash
+./pylua_debug exemplo.py --gerar-lua
+```
+
+**Saída Lua**:
+```lua
+local x = 10
+local y = 20
+local resultado = ((x + y) * 2)
+print(resultado)
+```
+
+### Exemplo 2: Estruturas Condicionais
+**Entrada Python**:
+```python
+idade = 18
+if idade >= 18:
+    status = "adulto"
+else:
+    status = "menor"
+```
+
+**Saída Lua**:
+```lua
+local idade = 18
+if (idade >= 18) then
+    local status = "adulto"
+else
+    local status = "menor"
+end
+```
+
+### Exemplo 3: Funções
+**Entrada Python**:
+```python
+def soma(a, b):
+    return a + b
+
+resultado = soma(10, 5)
+```
+
+**Saída Lua**:
+```lua
+function soma(a, b)
+    return (a + b)
+end
+
+local resultado = soma(10, 5)
+```
+
+## 🏗 Arquitetura
+
+O PyLua segue a arquitetura clássica de compiladores:
+
+```
+Código Python → Lexer → Parser → AST → Gerador → Código Lua
+```
+
+### Componentes Principais
+
+| Componente | Arquivo | Responsabilidade |
+|------------|---------|------------------|
+| **Lexer** | `lexer/scanner.l` | Análise léxica e tokenização |
+| **Parser** | `parser/parser.y` | Análise sintática e construção da AST |
+| **AST** | `ast/ast.{h,c}` | Representação da estrutura do programa |
+| **Tabela de Símbolos** | `tabela/tabela.{h,c}` | Gerenciamento de variáveis |
+| **Gerador** | `gerador_codigo_final/` | Geração de código Lua |
+
+## Funcionalidades
+
+### Implementado
+- **Tipos de Dados**: `int`, `float`, `str`, `bool`
+- **Operadores**: Aritméticos, comparação, bitwise, atribuição
+- **Estruturas de Controle**: `if-else`, `while`, `for`
+- **Funções**: Definição e chamada
+- **Expressões**: Complexas com precedência correta
+- **Recuperação de Erros**: Parser robusto com recuperação
+
+### Em Desenvolvimento
+- Estruturas de dados (listas, dicionários)
+- Classes e herança
+- Módulos e imports
+- Tratamento de exceções
+
+## Documentação Técnica
+
+### Documentação Detalhada
+- **[Arquitetura do Compilador](docs/arquitetura.md)**: Visão geral da arquitetura
+- **[Analisador Léxico](docs/analisador_lexico.md)**: Documentação do lexer
+- **[Analisador Sintático](docs/analisador_sintatico.md)**: Documentação do parser
+- **[AST](docs/ast_documentacao.md)**: Estrutura da árvore sintática
+- **[Gerador de Código](docs/gerador_codigo.md)**: Transpilação Python→Lua
+- **[Guia de Desenvolvimento](docs/guia_desenvolvimento.md)**: Para contribuidores
+- **[Metodologia](docs/Metodologia/metodologia.md)**: Processo de desenvolvimento
+- **[Testes](docs/testes.md)**: Guia de testes automatizados
+
+### Estrutura do Projeto
 ```
 PyLua/
-├── ast/                # Árvore Sintática Abstrata
-│   ├── ast.c          # Implementação da AST
-│   └── ast.h          # Definições da AST
-├── build/             # Diretório de compilação
-├── docs/              # Documentação
-│   ├── Diagramas/     # Diagramas do projeto
-│   ├── Metodologia/   # Documentação de metodologia
-│   ├── planejamento/  # Documentos de planejamento
-│   └── Semana 1/      # Documentos da primeira semana
-├── exemplos/          # Exemplos de código Python
-├── gerador_codigo_final/ # Gerador de código Lua
-├── lexer/             # Analisador léxico
-│   └── scanner.l      # Definições Flex
-├── parser/            # Analisador sintático
-├── tabela/            # Tabela de símbolos
-├── tests/             # Testes do compilador
-├── .github/           # Templates para GitHub
-├── compilar.sh        # Script de compilação
-├── inicializar_projeto.sh # Script de inicialização
-├── Makefile          # Script de construção
-├── README.md         # Este arquivo
-├── run_tests.sh      # Script para execução de testes
-├── testar_gerador.sh # Script para testar gerador
-└── verificar_deps.sh # Script para verificar dependências
+├── lexer/              # Analisador léxico
+│   └── scanner.l       # Definições Flex
+├── parser/             # Analisador sintático  
+│   └── parser.y        # Gramática Bison
+├── ast/                # Árvore sintática abstrata
+│   ├── ast.h           # Definições de tipos
+│   └── ast.c           # Implementação
+├── tabela/             # Tabela de símbolos
+│   ├── tabela.h        # Interface
+│   └── tabela.c        # Implementação
+├── gerador_codigo_final/ # Gerador de código
+│   ├── gerador_codigo_final.h
+│   └── gerador_codigo_final.c
+├── src/                # Arquivos gerados (temporários)
+├── build/              # Executáveis de teste
+├── tests/              # Testes automatizados
+├── exemplos/           # Exemplos de código Python
+└── docs/               # Documentação
 ```
 
-## Versões de Ferramentas Utilizadas
+## Testes
 
-Este projeto foi construído e testado utilizando as seguintes versões de ferramentas:
-* **GCC**: Versão compatível com C11
-* **Flex**: 2.6.4
-* **Bison**: 3.0 ou superior
-* **Make**: 4.2 ou superior
-
-## Pré-requisitos
-
-Para compilar e executar o PyLua, você precisa ter o seguinte instalado:
-- Compilador GCC
-- Flex
-- Bison
-- Make
-
-## Compilando o Projeto
-
-Para compilar o projeto completo:
+### Executar Todos os Testes
 ```bash
-make
+make test
 ```
 
-Para limpar os arquivos gerados:
+### Testes Específicos
 ```bash
-make clean
+# Testar AST
+make test_ast
+
+# Testar gerador de código
+./testar_gerador.sh
+
+# Gerar exemplos
+make gerar_exemplos
 ```
 
-## Executando o Compilador
-
-### Analisador de Expressões Aritméticas
-
-O projeto atual implementa um analisador de expressões aritméticas:
+### Validação com Valgrind
 ```bash
-./expr_parser
+make valgrind
 ```
 
-Este analisador permite digitar expressões matemáticas terminadas com ponto e vírgula (;) e exibe o resultado:
+### Comandos Úteis
+```bash
+# Verificar dependências
+./verificar_deps.sh
+
+# Compilar em modo debug
+make debug
+
+# Executar com debugging
+gdb ./pylua_debug
+
+# Verificar vazamentos de memória
+valgrind --leak-check=full ./pylua_debug arquivo.py
 ```
-Digite expressoes, terminadas com ';'. Pressione Ctrl+D para encerrar.
-3+4*2;
-Resultado: 11
-(3+5)*2;
-Resultado: 16
-3++2;
-[ERRO SINTATICO] Erro recuperado ate ';'
-```
 
-## Funcionalidades Atuais
-
-- **Análise Léxica**: 
-  - Reconhecimento de tokens Python
-  - Identificação de operadores, identificadores, números e símbolos
-
-- **Análise Sintática**:
-  - Parser para expressões aritméticas básicas
-  - Suporte a operadores +, -, *, / e parênteses
-  - Cálculo de resultados das expressões
-  - Recuperação de erros sintáticos
-
-## Novidades na AST
-
-Agora a AST do PyLua suporta:
-- Novos tipos de nós: float, string, bool, bloco, if, while, for, função, chamada de função.
-- Impressão detalhada e hierárquica da árvore, facilitando o debugging.
-
-### Como testar as novidades
-
-1. **Compilando o teste dos novos nós:**
-   No terminal, execute:
-   ```bash
-   gcc -I./ast -I./tabela ./ast/ast.c ./tabela/tabela.c ./tests/ast/test_novos_nos.c -o ./build/test_novos_nos -lm
-   ```
-   Isso irá compilar o arquivo de teste que cria exemplos de todos os novos tipos de nós.
-
-2. **Executando o teste:**
-   Ainda no terminal, rode:
-   ```bash
-   ./build/test_novos_nos
-   ```
-   Você verá a impressão detalhada de cada tipo de nó criado, mostrando valores, hierarquia e estrutura.
-
-### Testando estruturas de controle na AST
-
-Para testar a criação e impressão dos nós de estruturas de controle (if, while, for):
-
-1. Compile o teste:
-   ```bash
-   gcc -I./ast -I./tabela ./ast/ast.c ./tabela/tabela.c ./tests/ast/test_controle.c -o ./build/test_controle -lm
-   ```
-2. Execute:
-   ```bash
-   ./build/test_controle
-   ```
-   Você verá exemplos de if, if-else, while e for impressos de forma detalhada e hierárquica.
-
-### O que foi feito
-
-- Foram adicionados novos tipos de nós na AST para suportar estruturas de controle e funções.
-- Implementadas funções de criação para cada novo tipo de nó.
-- Melhorada a função de impressão da árvore para mostrar todos os detalhes dos nós.
-- Criado um teste automatizado em `tests/ast/test_novos_nos.c` para validar e demonstrar as novidades.
-
-## Em Desenvolvimento
-
-- Geração de código intermediário
-
-## Como Contribuir
-
-Para contribuir com o projeto:
-
-1. Clone o repositório
-2. Crie uma branch para sua feature (`git checkout -b feature/nova-funcionalidade`)
-3. Faça commit das suas mudanças (`git commit -m 'Adiciona nova funcionalidade'`)
-4. Faça push para a branch (`git push origin feature/nova-funcionalidade`)
-5. Abra um Pull Request
+Consulte o **[Guia de Desenvolvimento](docs/guia_desenvolvimento.md)** para informações detalhadas.
 
 ## Licença
 
-Veja o arquivo [LICENSE](LICENSE) para detalhes.
+Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
 
 ## Equipe
 
-Grupo 8 - PyLua
+**Grupo 8 - PyLua** | Compiladores 1 - 2025.1
 
-| Foto | Nome | GitHub |
-|------|------|--------|
-| ![Artur Mendonça](https://github.com/ArtyMend07.png?size=100) | Artur Mendonça | [ArtyMend07](https://github.com/ArtyMend07) |
-| ![Gabriel Lopes](https://github.com/BrzGab.png?size=100) | Gabriel Lopes | [BrzGab](https://github.com/BrzGab) |
-| ![Guilherme Meister](https://github.com/gmeister18.png?size=100) | Guilherme Meister | [gmeister18](https://github.com/gmeister18) |
-| ![Lucas Mendonça](https://github.com/lucasarruda9.png?size=100) | Lucas Mendonça | [lucasarruda9](https://github.com/lucasarruda9) |
-| ![Matheus Ferreira](https://github.com/matferreira1.png?size=100) | Matheus Ferreira | [matferreira1](https://github.com/matferreira1) |
-| ![Samuel Alves](https://github.com/samuelalvess.png?size=100) | Samuel Alves | [samuelalvess](https://github.com/samuelalvess) |
+<table>
+<tr>
+<td align="center">
+<img src="https://github.com/ArtyMend07.png?size=100" width="100px" alt="Artur Mendonça"/><br/>
+<b>Artur Mendonça</b><br/>
+<i>Scrum Master</i><br/>
+<a href="https://github.com/ArtyMend07">@ArtyMend07</a>
+</td>
+<td align="center">
+<img src="https://github.com/BrzGab.png?size=100" width="100px" alt="Gabriel Lopes"/><br/>
+<b>Gabriel Lopes</b><br/>
+<i>Product Owner</i><br/>
+<a href="https://github.com/BrzGab">@BrzGab</a>
+</td>
+<td align="center">
+<img src="https://github.com/gmeister18.png?size=100" width="100px" alt="Guilherme Meister"/><br/>
+<b>Guilherme Meister</b><br/>
+<i>Developer</i><br/>
+<a href="https://github.com/gmeister18">@gmeister18</a>
+</td>
+</tr>
+<tr>
+<td align="center">
+<img src="https://github.com/lucasarruda9.png?size=100" width="100px" alt="Lucas Mendonça"/><br/>
+<b>Lucas Mendonça</b><br/>
+<i>Developer</i><br/>
+<a href="https://github.com/lucasarruda9">@lucasarruda9</a>
+</td>
+<td align="center">
+<img src="https://github.com/matferreira1.png?size=100" width="100px" alt="Matheus Ferreira"/><br/>
+<b>Matheus Ferreira</b><br/>
+<i>Developer</i><br/>
+<a href="https://github.com/matferreira1">@matferreira1</a>
+</td>
+<td align="center">
+<img src="https://github.com/samuelalvess.png?size=100" width="100px" alt="Samuel Alves"/><br/>
+<b>Samuel Alves</b><br/>
+<i>Developer</i><br/>
+<a href="https://github.com/samuelalvess">@samuelalvess</a>
+</td>
+</tr>
+</table>
 
+---
+
+## Estatísticas do Projeto
+
+- **Linguagem Principal**: C (Flex/Bison)
+- **Linhas de Código**: ~3000+
+- **Testes**: 50+ casos de teste
+- **Cobertura**: Lexer, Parser, AST, Gerador
+- **Documentação**: 8 documentos técnicos
+
+## Links Úteis
+
+- **[Documentação Completa](docs/)**
+- **[Exemplos de Código](exemplos/)**
+- **[Testes Automatizados](tests/)**
+- **[Metodologia Scrum](docs/Metodologia/metodologia.md)**
 
 ## Histórico de Versões
 
 | Versão | Data | Descrição | Autor | Revisor |
 |--------|------|-----------|--------|----------|
 | 1.0 | 25/04/2025 | Estrutura inicial do README | [Artur Mendonça](https://github.com/ArtyMend07) | [Lucas Mendonça](https://github.com/lucasarruda9) |
-| 1.1 | 10/05/2025 | Atualização da estrutura do repositório e adição de novos tópicos | [Artur Mendonça](https://github.com/ArtyMend07) | [Lucas Mendonça](https://github.com/lucasarruda9) |
-| 1.2 | 14/06/2025 | Atualização da estrutura do repositório | [Artur Mendonça](https://github.com/ArtyMend07) | [Gabriel Lopes](https://github.com/BrzGab), [Lucas Mendonça](https://github.com/lucasarruda9) |
+| 2.0| 17/06/2025 | Atualização da estrutura do repositório | [Artur Mendonça](https://github.com/ArtyMend07) | [Lucas Mendonça](https://github.com/lucasarruda9) |
