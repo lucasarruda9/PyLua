@@ -472,6 +472,12 @@ int avaliarArvore(No* no) {
             // Aqui pode-se implementar chamada real no futuro
             return 0;
 
+        case NoFloat:
+            return (int)no->valor_float; // Retorna o valor float convertido para int (ajuste conforme necessário)
+        case NoString:
+            printf("String: '%s'\n", no->valor_str);
+            return 0;
+
         default:
             printf("[ERRO] Tipo de nó desconhecido: %d\n", no->tipo);
             return 0;
