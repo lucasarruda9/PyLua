@@ -165,6 +165,7 @@ line:    expr NEWLINE {
             DesalocarArvore($1);
             $$ = NULL;
         }
+       | COMMENT NEWLINE { $$ = NULL; } // Aceitar e ignorar linhas de comentário
        | NEWLINE { $$ = NULL; } /* Aceitar linhas em branco */
        | error NEWLINE { 
                     printf("[ERRO SINTATICO] Erro recuperado até o final da linha\n"); 
