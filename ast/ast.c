@@ -142,7 +142,6 @@ No* CriarNoIf(No* condicao, No* corpo, No* senao) {
     no->var = NULL;
     no->op = 0;
     no->lista = NULL;
-    no->nome_funcao = NULL;
     no->parametros = NULL;
     no->argumentos = NULL;
     return no;
@@ -466,6 +465,17 @@ int avaliarArvore(No* no) {
                 return avaliarArvore(no->senao);
             }
 
+            return 0;
+
+        case NoChamadaFuncao:
+            printf("[INFO] Chamada de função '%s' (avaliação simbólica)\n", no->nome_funcao);
+            // Aqui pode-se implementar chamada real no futuro
+            return 0;
+
+        case NoFloat:
+            return (int)no->valor_float; // Retorna o valor float convertido para int (ajuste conforme necessário)
+        case NoString:
+            printf("String: '%s'\n", no->valor_str);
             return 0;
 
         default:

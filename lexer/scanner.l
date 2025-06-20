@@ -219,16 +219,24 @@ INDENT      ^[ \t]+
     return BIN; 
 }
 
-{STRING_DQ} { 
-    atualiza_coluna(); 
-    yylval.string = strdup(yytext); 
-    return STRING_DQ; 
+{STRING_DQ} {
+    atualiza_coluna();
+    int len = yyleng - 2;
+    char *str = (char*)malloc(len + 1);
+    strncpy(str, yytext + 1, len);
+    str[len] = '\0';
+    yylval.string = str;
+    return STRING_DQ;
 }
 
-{STRING_SQ} { 
-    atualiza_coluna(); 
-    yylval.string = strdup(yytext); 
-    return STRING_SQ; 
+{STRING_SQ} {
+    atualiza_coluna();
+    int len = yyleng - 2;
+    char *str = (char*)malloc(len + 1);
+    strncpy(str, yytext + 1, len);
+    str[len] = '\0';
+    yylval.string = str;
+    return STRING_SQ;
 }
 
 {TRIPLE_DQ} { 
