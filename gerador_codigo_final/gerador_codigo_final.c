@@ -118,7 +118,12 @@ void gerarCodigoLua(No* no) {
             gerarExpressao(no->esquerda);
             fprintf(gerador.arquivo_saida, " then\n");
             aumentarIndentacao();
-            gerarCodigoLua(no->meio);
+            if (no->meio && no->meio->tipo == NoBloco) {
+                gerarBlocoLua(no->meio->lista);
+            } 
+            else if (no->meio) {
+                gerarCodigoLua(no->meio);
+            }
             diminuirIndentacao();
             if (no->direita) {
                 indentar();

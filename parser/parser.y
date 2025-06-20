@@ -73,6 +73,8 @@ void yyerror(const char *s) {
 %type <no> condicional
 %type <no> bloco
 %type <lista> linhas
+%type <no> line_exec
+
 
 %%
 
@@ -85,9 +87,7 @@ input:   /* Produção vazia */
 
 line:    expr NEWLINE {
         imprimeArvore($1, 0);
-
-        // Gera código Lua se habilitado
-        if (gerar_codigo_lua && arquivo_lua) {
+        if (gerar_codigo_lua && arquivo_lua && $1->tipo != NoIf) {
             gerarCodigoLua($1);
         }
 
@@ -207,22 +207,42 @@ declaracao:  IDENTIFIER ASSIGN expr {
             $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, 'a'));
 } 
        ;
+
+//nao terminal pra processar blocos
+line_exec:
+      expr NEWLINE         { $$ = $1; }
+    | declaracao NEWLINE   { $$ = $1; }
+    | condicional          { $$ = $1; }
+    | expr                 { $$ = $1; }
+    | declaracao           { $$ = $1; }
+    ;
+
+//linhas podem ter 1 ou mais line_exec
+linhas:
+      linhas line_exec { $$ = AdicionarNoLista($1, $2); }
+    | line_exec       { $$ = AdicionarNoLista(NULL, $1); }
+    ;
+
+//é considerado bloco se tiver indentado corretamente
 bloco:
       INDENT linhas DEDENT { $$ = CriarNoBloco($2); }
     
-    ;
-
-linhas:
-      linhas line { $$ = AdicionarNoLista($1, $2); }
-    | line { $$ = AdicionarNoLista(NULL, $1);}
     ;
 
 condicional:
       IF LPAREN expr RPAREN COLON NEWLINE bloco {
           $$ = CriarNoIf($3, $7, NULL);
       }
+
+    |  IF expr COLON NEWLINE bloco {
+          $$ = CriarNoIf($2, $5, NULL);
+      }
+      
     | IF LPAREN expr RPAREN COLON NEWLINE bloco ELSE COLON NEWLINE bloco {
           $$ = CriarNoIf($3, $7, $11);
+      }
+    | IF expr COLON NEWLINE bloco ELSE COLON NEWLINE bloco{
+          $$ = CriarNoIf($2, $5, $9);
       }
     ;
 %%
