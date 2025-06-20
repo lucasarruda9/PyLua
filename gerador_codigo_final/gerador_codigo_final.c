@@ -123,7 +123,7 @@ void gerarCodigoLua(No* no) {
             } 
             else if (no->meio) {
                 gerarCodigoLua(no->meio);
-            }
+        }
             diminuirIndentacao();
             if (no->direita) {
                 indentar();

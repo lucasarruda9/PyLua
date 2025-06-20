@@ -81,8 +81,6 @@ void yyerror(const char *s) {
 /* Regras de análise sintática */
 input:   /* Produção vazia */
        | input line  
-       | input DEDENT  // Dentação
-       | input INDENT  // identação
        ;
 
 line:    expr NEWLINE {

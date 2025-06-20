@@ -19,8 +19,9 @@ void inicializa_pilha() {
 }
 %}
 
-%option noyywrap noinput nounput nomain
+%option noyywrap noinput nomain
 
+%x IDENT
 /* Definição de tokens */
 
 /* Palavras-chave do Python */
@@ -107,7 +108,6 @@ TRIPLE_SQ   \'\'\'([^\\]|\\.)*?\'\'\'
 
 /* Comentários */
 COMMENT     #.*
-INDENT      ^[ \t]+
 
 /* Regras */
 %%
@@ -238,39 +238,45 @@ INDENT      ^[ \t]+
 }
 
 
-{INDENT} {
-    int espacos = 0;
-    for (int i = 0; i < yyleng; i++) {
-        if (yytext[i] == ' ') espacos++;
-        else if (yytext[i] == '\t') espacos += 8; // Ajuste conforme necessário
-    }
-    
-    if (espacos > pilha_indentacao[topo_pilha]) {
-        pilha_indentacao[++topo_pilha] = espacos;
-
-        return INDENT;
-    } else if (espacos < pilha_indentacao[topo_pilha]) {
-        topo_pilha--;
-        return DEDENT;
-    }
-}
-
 
 \n {
     line_num++;
-    // Emitir DEDENT 
-    if (topo_pilha > 0 && pilha_indentacao[topo_pilha] > pilha_indentacao[topo_pilha - 1]) {
-        topo_pilha--;
-        return DEDENT;
-    }
-    
+    // Após uma quebra de linha, verificar a próxima indentação
+    BEGIN(IDENT);
     return NEWLINE;
 }
 
 
-\n          { 
-    line_num++; 
-    return NEWLINE; 
+<IDENT>^[ \t]+ {
+    int espacos = 0;
+    for (int i = 0; i < yyleng; i++) {
+        if (yytext[i] == ' ') espacos++;
+        else if (yytext[i] == '\t') espacos += 4; // Ajuste conforme necessário
+    }
+    
+    if (espacos > pilha_indentacao[topo_pilha]) {
+        pilha_indentacao[++topo_pilha] = espacos;
+        BEGIN(INITIAL);
+        return INDENT;
+    } else if (espacos < pilha_indentacao[topo_pilha]) {
+        while(topo_pilha > 0 && espacos < pilha_indentacao[topo_pilha]){
+            topo_pilha--;
+        }
+        BEGIN(INITIAL);
+        return DEDENT;
+    }
+    BEGIN(INITIAL);
+}
+
+<IDENT>^[^ \t\n] {
+    unput(yytext[0]); 
+    if (pilha_indentacao[topo_pilha] > 0) {
+        // Se estávamos indentados, gera DEDENT
+        topo_pilha--;
+        BEGIN(INITIAL);
+        return DEDENT;
+    }
+    BEGIN(INITIAL);
 }
 
 [ \t\r]+    {}
