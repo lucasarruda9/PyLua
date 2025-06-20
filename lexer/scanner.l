@@ -247,10 +247,9 @@ INDENT      ^[ \t]+
     
     if (espacos > pilha_indentacao[topo_pilha]) {
         pilha_indentacao[++topo_pilha] = espacos;
-        printf("[DEBUG] INDENT (%d espaços)\n", espacos);
+
         return INDENT;
     } else if (espacos < pilha_indentacao[topo_pilha]) {
-        printf("[DEBUG] DEDENT (%d espaços)\n", espacos);
         topo_pilha--;
         return DEDENT;
     }
@@ -259,12 +258,9 @@ INDENT      ^[ \t]+
 
 \n {
     line_num++;
-    printf("[DEBUG] NEWLINE\n");
-    
-    // Emitir DEDENT se necessário
+    // Emitir DEDENT 
     if (topo_pilha > 0 && pilha_indentacao[topo_pilha] > pilha_indentacao[topo_pilha - 1]) {
         topo_pilha--;
-        printf("[DEBUG] DEDENT (NEWLINE)\n");
         return DEDENT;
     }
     
@@ -274,7 +270,6 @@ INDENT      ^[ \t]+
 
 \n          { 
     line_num++; 
-    printf("[DEBUG] NEWLINE\n");
     return NEWLINE; 
 }
 
@@ -289,7 +284,6 @@ INDENT      ^[ \t]+
 
     if (topo_pilha > 0) {
         topo_pilha--;
-        printf("[DEBUG] DEDENT (EOF)\n");
         return DEDENT;
     }
     yyterminate();  
