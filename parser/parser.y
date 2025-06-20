@@ -8,17 +8,18 @@
 
 int yylex();  // Declaração da função yylex que será chamada pelo parser
 void yyerror(const char *s);  // Função de erro para lidar com erros sintáticos
-extern FILE *yyin;  // Arquivo de entrada (pode ser stdin ou um arquivo)
+extern FILE *yyin;  // Arquivo de entrada 
 extern int line_num;  // Linha atual (definida no scanner)
-extern int col_num;   // Coluna atual (definida no scanner)
 extern void inicializa_pilha();  // Declaração da função de inicialização da pilha de indentação
+// No início do parser.y
+ListaNo* ast_global = NULL;
 
 // Variáveis globais para controle da geração de código
 FILE *arquivo_lua = NULL;
 int gerar_codigo_lua = 0;
 
 void yyerror(const char *s) {
-    fprintf(stderr, "[ERRO SINTATICO] %s na linha %d, coluna %d\n", s, line_num, col_num);
+    fprintf(stderr, "[ERRO SINTATICO] %s na linha %d\n", s, line_num);
 }
 %}
 
@@ -31,7 +32,7 @@ void yyerror(const char *s) {
 }
 
 /* Declaração de tokens */
-%token <intval> INTEGER  // O token INTEGER irá carregar um valor inteiro
+%token <intval> INTEGER  
 %token PLUS MINUS MULTIPLY DIVIDE MODULO
 %token POWER FLOOR_DIV
 %token LT GT LE GE EQ NE NE2
@@ -40,7 +41,7 @@ void yyerror(const char *s) {
 %token ASSIGN PLUS_EQ MINUS_EQ MULT_EQ DIV_EQ FLOOR_EQ POW_EQ MOD_EQ
 %token BITAND BITOR BITXOR BITNOT
 %token SHIFTL SHIFTR AND_EQ OR_EQ XOR_EQ SHIFTR_EQ SHIFTL_EQ
-%token ERROR  // Token de erro
+%token ERROR
 %token NEWLINE
 %token <string> KEYWORD
 %token IF ELIF ELSE MATCH CASE
@@ -70,26 +71,21 @@ void yyerror(const char *s) {
 %type <no> declaracao
 %type <no> line
 %type <no> condicional
-%type <lista> bloco
+%type <no> bloco
 %type <lista> linhas
+%type <no> line_exec
+
 
 %%
 
 /* Regras de análise sintática */
 input:   /* Produção vazia */
        | input line  
-       | input DEDENT  // Dentação
-       | input INDENT  // identação
        ;
 
 line:    expr NEWLINE {
         imprimeArvore($1, 0);
-        // Avaliação da expressão
-        int resultado = avaliarArvore($1);
-        printf("Resultado: %d\n", resultado);
-
-        // Gera código Lua se habilitado
-        if (gerar_codigo_lua && arquivo_lua) {
+        if (gerar_codigo_lua && arquivo_lua && $1->tipo != NoIf) {
             gerarCodigoLua($1);
         }
 
@@ -98,13 +94,6 @@ line:    expr NEWLINE {
 }
        | declaracao NEWLINE {
         imprimeArvore($1, 0);
-        // Avalia e executa a atribuição na tabela de símbolos
-        if ($1->tipo == NoAtribuicao) {
-            if ($1->esquerdo->tipo == NoVariavel) {
-                int resultado = avaliarArvore($1);
-                printf("Resultado da atribuição: %d\n", resultado);
-            }
-        }
 
         // Gera código Lua se habilitado
         if (gerar_codigo_lua && arquivo_lua) {
@@ -116,9 +105,6 @@ line:    expr NEWLINE {
 }
        | expr /* sem quebra de linha ao final */ {
         imprimeArvore($1, 0);
-        // Avaliação da expressão
-        int resultado = avaliarArvore($1);
-        printf("Resultado: %d\n", resultado);
 
         // Gera código Lua se habilitado
         if (gerar_codigo_lua && arquivo_lua) {
@@ -130,14 +116,6 @@ line:    expr NEWLINE {
 }
        | declaracao /* sem quebra de linha ao final */ {
         imprimeArvore($1, 0);
-        // Avalia e executa a atribuição na tabela de símbolos
-        if ($1->tipo == NoAtribuicao) {
-            if ($1->esquerdo->tipo == NoVariavel) {
-                int resultado = avaliarArvore($1);
-                printf("Resultado da atribuição: %d\n", resultado);
-            }
-        }
-
         // Gera código Lua se habilitado
         if (gerar_codigo_lua && arquivo_lua) {
             gerarCodigoLua($1);
@@ -146,19 +124,11 @@ line:    expr NEWLINE {
         DesalocarArvore($1);
         $$ = NULL;
 }
-        | condicional NEWLINE {
-            imprimeArvore($1, 0);
-            // Avaliar a semântica do condicional
-            int resultado = avaliarArvore($1);
-            printf("Resultado do condicional: %d\n", resultado);
-            DesalocarArvore($1);
-            $$ = NULL;
-        }
     | condicional {
             imprimeArvore($1, 0);
-            // Avaliar a semântica do condicional
-            int resultado = avaliarArvore($1);
-            printf("Resultado do condicional: %d\n", resultado);
+            if (gerar_codigo_lua && arquivo_lua) {
+            gerarCodigoLua($1);
+        }
             DesalocarArvore($1);
             $$ = NULL;
         }
@@ -235,22 +205,42 @@ declaracao:  IDENTIFIER ASSIGN expr {
             $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, 'a'));
 } 
        ;
-bloco:
-      INDENT linhas DEDENT { $$ = $2; }
-    
+
+//nao terminal pra processar blocos
+line_exec:
+      expr NEWLINE         { $$ = $1; }
+    | declaracao NEWLINE   { $$ = $1; }
+    | condicional          { $$ = $1; }
+    | expr                 { $$ = $1; }
+    | declaracao           { $$ = $1; }
     ;
 
+//linhas podem ter 1 ou mais line_exec
 linhas:
-      linhas line { $$ = AdicionarNoLista($1, $2); }
-    | line { $$ = AdicionarNoLista(NULL, $1);}
+      linhas line_exec { $$ = AdicionarNoLista($1, $2); }
+    | line_exec       { $$ = AdicionarNoLista(NULL, $1); }
+    ;
+
+//é considerado bloco se tiver indentado corretamente
+bloco:
+      INDENT linhas DEDENT { $$ = CriarNoBloco($2); }
+    
     ;
 
 condicional:
       IF LPAREN expr RPAREN COLON NEWLINE bloco {
-          $$ = CriarNoIf($3, CriarNoBloco($7), NULL);
+          $$ = CriarNoIf($3, $7, NULL);
       }
+
+    |  IF expr COLON NEWLINE bloco {
+          $$ = CriarNoIf($2, $5, NULL);
+      }
+      
     | IF LPAREN expr RPAREN COLON NEWLINE bloco ELSE COLON NEWLINE bloco {
-          $$ = CriarNoIf($3, CriarNoBloco($7), CriarNoBloco($11));
+          $$ = CriarNoIf($3, $7, $11);
+      }
+    | IF expr COLON NEWLINE bloco ELSE COLON NEWLINE bloco{
+          $$ = CriarNoIf($2, $5, $9);
       }
     ;
 %%
