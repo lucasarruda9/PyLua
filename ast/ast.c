@@ -51,6 +51,53 @@ No* CriarNoIf(No* condicao, No* corpo, No* senao) {
     return raiz;
 }
 
+No* CriarNoFloat(float valor) {
+    No *raiz = CriarNo(NoFloat, NULL, NULL);
+    raiz->valor_float = valor;
+    return raiz;
+}
+
+No* CriarNoString(char* valor) {
+    No *raiz = CriarNo(NoString, NULL, NULL);
+    raiz->valor_str = valor;
+    return raiz;
+}
+
+No* CriarNoBool(int valor) {
+    No *raiz = CriarNo(NoBool, NULL, NULL);
+    raiz->valor_bool = valor;
+    return raiz;
+}
+
+No* CriarNoWhile(No* condicao, No* corpo) {
+    No *raiz = CriarNo(NoWhile, condicao, NULL);
+    raiz->meio = corpo;
+    return raiz;
+}
+
+No* CriarNoFor(No* init, No* cond, No* inc, No* corpo) {
+    No *raiz = CriarNo(NoFor, init, inc);
+    raiz->meio = cond;
+    // Armazenar corpo na lista para manter consistência
+    raiz->lista = AdicionarNoLista(NULL, corpo);
+    return raiz;
+}
+
+No* CriarNoFuncao(char* nome, ListaNo* parametros, No* corpo) {
+    No *raiz = CriarNo(NoFuncao, NULL, NULL);
+    raiz->var = nome;
+    raiz->lista = AdicionarNoLista(NULL, corpo);
+    // TODO: tratar parâmetros
+    return raiz;
+}
+
+No* CriarNoChamadaFuncao(char* nome, ListaNo* argumentos) {
+    No *raiz = CriarNo(NoChamadaFuncao, NULL, NULL);
+    raiz->var = nome;
+    raiz->lista = argumentos;
+    return raiz;
+}
+
 void DesalocarArvore(No *raiz){
     if(raiz == NULL){
         return;
@@ -108,6 +155,15 @@ void imprimeArvore(No *no, int nivel) {
             if (no->esquerda) imprimeArvore(no->esquerda, nivel + 1);
             if (no->direita) imprimeArvore(no->direita, nivel + 1);
             break;
+        case NoFloat:
+            printf("Float: %.2f\n", no->valor_float);
+            break;
+        case NoString:
+            printf("String: %s\n", no->valor_str);
+            break;
+        case NoBool:
+            printf("Bool: %s\n", no->valor_bool ? "True" : "False");
+            break;
         case NoBloco:
             printf("Bloco:\n");
             imprimeLista(no->lista, nivel + 1);
@@ -150,6 +206,23 @@ void imprimeArvore(No *no, int nivel) {
             printf("Corpo:\n");
             imprimeArvore(no->meio, nivel + 2);
             break;
+        case NoFuncao:
+            printf("Funcao: %s\n", no->var ? no->var : "anonima");
+            if (no->lista) {
+                for (i = 0; i < nivel + 1; i++) printf("    ");
+                printf("Corpo:\n");
+                imprimeLista(no->lista, nivel + 2);
+            }
+            break;
+        case NoChamadaFuncao:
+            printf("ChamadaFuncao: %s\n", no->var ? no->var : "anonima");
+            if (no->lista) {
+                for (i = 0; i < nivel + 1; i++) printf("    ");
+                printf("Argumentos:\n");
+                imprimeLista(no->lista, nivel + 2);
+            }
+            break;
+        default:
             printf("[Tipo de nó desconhecido]\n");
     }
 }
