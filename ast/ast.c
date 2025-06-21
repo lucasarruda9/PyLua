@@ -22,6 +22,12 @@ No *CriarNoInteiro(int valor){
     return raiz;
 }
 
+No *CriarNoFloat(float valor_float){
+    No *raiz = CriarNo(NoFloat, NULL, NULL);
+    raiz->valor_float = valor_float;
+    return raiz;
+}
+
 No *CriarNoVariavel(char *var){
     No *raiz = CriarNo(NoVariavel, NULL, NULL);
     raiz->var = var;
@@ -94,6 +100,9 @@ void imprimeArvore(No *no, int nivel) {
     switch (no->tipo) {
         case NoLiteral:
             printf("Literal: %d\n", no->valor);
+            break;
+        case NoFloat:
+            printf("Float: %.2f\n", no->valor_float);
             break;
         case NoVariavel:
             printf("Variavel: %s\n", no->var);
