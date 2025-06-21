@@ -51,8 +51,8 @@ char* gerarExpressaoTAC(No* no) {
             return strdup(no->var);
 
         case NoOperacaoBinaria: {
-            char* esq = gerarExpressaoTAC(no->esquerdo);
-            char* dir = gerarExpressaoTAC(no->direito);
+            char* esq = gerarExpressaoTAC(no->esquerda);
+            char* dir = gerarExpressaoTAC(no->direita);
             char* temp = novaVariavelTemp();
             
             imprimirInstrucaoTAC(temp, esq, no->op, dir);
@@ -81,9 +81,9 @@ char* gerarCodigoTAC(No* no) {
 
     switch (no->tipo) {
         case NoAtribuicao: {
-            char* valor = gerarExpressaoTAC(no->direito);
-            if (no->esquerdo && no->esquerdo->tipo == NoVariavel) {
-                imprimirInstrucaoTAC(no->esquerdo->var, valor, 0, NULL);
+            char* valor = gerarExpressaoTAC(no->direita);
+            if (no->esquerda && no->esquerda->tipo == NoVariavel) {
+                imprimirInstrucaoTAC(no->esquerda->var, valor, 0, NULL);
             }
             free(valor);
             return NULL;
@@ -96,17 +96,17 @@ char* gerarCodigoTAC(No* no) {
             return NULL;
 
         case NoIf: {
-            char* condicao = gerarExpressaoTAC(no->condicao);
+            char* condicao = gerarExpressaoTAC(no->esquerda);
             char* label_else = novoLabel();
             char* label_fim = novoLabel();
             
             fprintf(gerador_tac.arquivo_saida, "if %s == 0 goto %s\n", condicao, label_else);
-            gerarCodigoTAC(no->corpo);
+            gerarCodigoTAC(no->direita);
             fprintf(gerador_tac.arquivo_saida, "goto %s\n", label_fim);
             fprintf(gerador_tac.arquivo_saida, "%s:\n", label_else);
             
-            if (no->senao) {
-                gerarCodigoTAC(no->senao);
+            if (no->meio) {
+                gerarCodigoTAC(no->meio);
             }
             
             fprintf(gerador_tac.arquivo_saida, "%s:\n", label_fim);
@@ -122,9 +122,9 @@ char* gerarCodigoTAC(No* no) {
             char* label_fim = novoLabel();
             
             fprintf(gerador_tac.arquivo_saida, "%s:\n", label_inicio);
-            char* condicao = gerarExpressaoTAC(no->condicao);
+            char* condicao = gerarExpressaoTAC(no->esquerda);
             fprintf(gerador_tac.arquivo_saida, "if %s == 0 goto %s\n", condicao, label_fim);
-            gerarCodigoTAC(no->corpo);
+            gerarCodigoTAC(no->direita);
             fprintf(gerador_tac.arquivo_saida, "goto %s\n", label_inicio);
             fprintf(gerador_tac.arquivo_saida, "%s:\n", label_fim);
             
@@ -138,22 +138,24 @@ char* gerarCodigoTAC(No* no) {
             char* label_inicio = novoLabel();
             char* label_fim = novoLabel();
             
-            if (no->esquerdo) {
-                gerarCodigoTAC(no->esquerdo);
+            if (no->esquerda) {
+                gerarCodigoTAC(no->esquerda);
             }
             
             fprintf(gerador_tac.arquivo_saida, "%s:\n", label_inicio);
             
-            if (no->condicao) {
-                char* condicao = gerarExpressaoTAC(no->condicao);
+            if (no->meio) {
+                char* condicao = gerarExpressaoTAC(no->meio);
                 fprintf(gerador_tac.arquivo_saida, "if %s == 0 goto %s\n", condicao, label_fim);
                 free(condicao);
             }
             
-            gerarCodigoTAC(no->corpo);
+            if (no->lista) {
+                gerarBlocoTAC(no->lista);
+            }
             
-            if (no->direito) {
-                gerarCodigoTAC(no->direito);
+            if (no->direita) {
+                gerarCodigoTAC(no->direita);
             }
             
             fprintf(gerador_tac.arquivo_saida, "goto %s\n", label_inicio);
@@ -165,15 +167,17 @@ char* gerarCodigoTAC(No* no) {
         }
 
         case NoFuncao: {
-            fprintf(gerador_tac.arquivo_saida, "function %s:\n", no->nome_funcao ? no->nome_funcao : "func");
-            gerarCodigoTAC(no->corpo);
+            fprintf(gerador_tac.arquivo_saida, "function %s:\n", no->var ? no->var : "func");
+            if (no->lista) {
+                gerarBlocoTAC(no->lista);
+            }
             fprintf(gerador_tac.arquivo_saida, "return\n");
             return NULL;
         }
 
         case NoChamadaFuncao: {
-            if (no->argumentos) {
-                ListaNo* atual = no->argumentos;
+            if (no->lista) {
+                ListaNo* atual = no->lista;
                 int param_count = 0;
                 while (atual) {
                     char* arg = gerarExpressaoTAC(atual->no);
@@ -185,7 +189,7 @@ char* gerarCodigoTAC(No* no) {
             }
             
             char* temp = novaVariavelTemp();
-            fprintf(gerador_tac.arquivo_saida, "%s = call %s\n", temp, no->nome_funcao ? no->nome_funcao : "func");
+            fprintf(gerador_tac.arquivo_saida, "%s = call %s\n", temp, no->var ? no->var : "func");
             return temp;
         }
 
