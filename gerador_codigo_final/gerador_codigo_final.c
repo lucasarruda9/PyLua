@@ -45,9 +45,21 @@ static void gerarExpressao(No* no) {
             fprintf(gerador.arquivo_saida, "%.6f", no->valor_float);
             break;
 
-        case NoString:
-            fprintf(gerador.arquivo_saida, "\"%s\"", no->valor_str ? no->valor_str : "");
+        case NoString: {
+            char* str = no->valor_str;
+            if (str && strlen(str) >= 2) {
+                int len = strlen(str);
+                if ((str[0] == '"' && str[len-1] == '"') || 
+                    (str[0] == '\'' && str[len-1] == '\'')) {
+                    fprintf(gerador.arquivo_saida, "%s", str);
+                } else {
+                    fprintf(gerador.arquivo_saida, "\"%s\"", str);
+                }
+            } else {
+                fprintf(gerador.arquivo_saida, "\"\"");
+            }
             break;
+        }
 
         case NoBool:
             fprintf(gerador.arquivo_saida, "%s", no->valor_bool ? "true" : "false");

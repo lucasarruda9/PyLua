@@ -26,6 +26,7 @@ void yyerror(const char *s) {
 /* Declaração de tipos para os valores */
 %union {
     int intval;
+    float floatval;
     struct Arvore *no;
     char *string;
     struct ListaNo *lista;
@@ -33,6 +34,8 @@ void yyerror(const char *s) {
 
 /* Declaração de tokens */
 %token <intval> INTEGER  
+%token <floatval> FLOAT
+%token <intval> TRUE FALSE
 %token PLUS MINUS MULTIPLY DIVIDE MODULO
 %token POWER FLOOR_DIV
 %token LT GT LE GE EQ NE NE2
@@ -48,7 +51,7 @@ void yyerror(const char *s) {
 %token FOR WHILE
 %token LBRACKET RBRACKET LBRACE RBRACE
 %token COMMA COLON DOT DECORATOR ARROW
-%token <string> FLOAT HEX OCT BIN
+%token <string> HEX OCT BIN
 %token <string> STRING_DQ STRING_SQ TRIPLE_DQ TRIPLE_SQ
 %token COMMENT
 %token INDENT DEDENT
@@ -141,6 +144,11 @@ line:    expr NEWLINE {
        ;
 
 expr:    INTEGER               { $$ = CriarNoInteiro($1); }  // Cria um nó de inteiro
+       | FLOAT                 { $$ = CriarNoFloat($1); }  // Cria um nó float
+       | TRUE                  { $$ = CriarNoBool($1); }  // Cria um nó bool true
+       | FALSE                 { $$ = CriarNoBool($1); }  // Cria um nó bool false
+       | STRING_DQ             { $$ = CriarNoString($1); }  // String com aspas duplas
+       | STRING_SQ             { $$ = CriarNoString($1); }  // String com aspas simples
        | IDENTIFIER            { 
                                Simbolo *s = buscarSimbolo($1);
                                if (s == NULL) {
