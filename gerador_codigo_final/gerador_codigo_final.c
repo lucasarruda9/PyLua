@@ -78,19 +78,25 @@ static void gerarExpressao(No* no) {
                 case '*': fprintf(gerador.arquivo_saida, " * "); break;
                 case '/': fprintf(gerador.arquivo_saida, " / "); break;
                 case '%': fprintf(gerador.arquivo_saida, " %% "); break;
-                case 'a': fprintf(gerador.arquivo_saida, " ^ "); break;
-                case 'b': fprintf(gerador.arquivo_saida, " // "); break;
+                case 'p': fprintf(gerador.arquivo_saida, " ^ "); break;
+                case 'f': fprintf(gerador.arquivo_saida, " // "); break;
                 case '=': fprintf(gerador.arquivo_saida, " == "); break;
+                case '<': fprintf(gerador.arquivo_saida, " < "); break;
+                case '>': fprintf(gerador.arquivo_saida, " > "); break;
+                case 'l': fprintf(gerador.arquivo_saida, " <= "); break;
+                case 'g': fprintf(gerador.arquivo_saida, " >= "); break;
+                case 'n': fprintf(gerador.arquivo_saida, " ~= "); break;
+                case '&': fprintf(gerador.arquivo_saida, " & "); break;
+                case '|': fprintf(gerador.arquivo_saida, " | "); break;
+                case '^': fprintf(gerador.arquivo_saida, " ~ "); break;
+                case 's': fprintf(gerador.arquivo_saida, " << "); break;
+                case 'r': fprintf(gerador.arquivo_saida, " >> "); break;
                 default: fprintf(gerador.arquivo_saida, " ? "); break;
             }
             gerarExpressao(no->direita);
             fprintf(gerador.arquivo_saida, ")");
             break;
 
-            gerarExpressao(no->direita);
-            fprintf(gerador.arquivo_saida, ")");
-            break;
-        
         default:
             // Para outros tipos que podem aparecer em expressões
             break;
