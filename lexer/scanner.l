@@ -234,7 +234,7 @@ COMMENT     #.*
 }
 
 {COMMENT}   { 
-    return COMMENT; 
+    /* Ignorar comentários - não retornar token */
 }
 
 
