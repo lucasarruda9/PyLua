@@ -49,6 +49,7 @@ void yyerror(const char *s) {
 %token <string> KEYWORD
 %token IF ELIF ELSE MATCH CASE
 %token FOR WHILE
+%token DEF RETURN
 %token LBRACKET RBRACKET LBRACE RBRACE
 %token COMMA COLON DOT DECORATOR ARROW
 %token <string> HEX OCT BIN
@@ -77,6 +78,7 @@ void yyerror(const char *s) {
 %type <no> bloco
 %type <lista> linhas
 %type <no> line_exec
+%type <no> funcao
 
 
 %%
@@ -127,6 +129,14 @@ line:    expr NEWLINE {
         DesalocarArvore($1);
         $$ = NULL;
 }
+    | funcao {
+            imprimeArvore($1, 0);
+            if (gerar_codigo_lua && arquivo_lua) {
+                gerarCodigoLua($1);
+            }
+            DesalocarArvore($1);
+            $$ = NULL;
+        }
     | condicional {
             imprimeArvore($1, 0);
             if (gerar_codigo_lua && arquivo_lua) {
@@ -272,6 +282,12 @@ linhas:
 bloco:
       INDENT linhas DEDENT { $$ = CriarNoBloco($2); }
     
+    ;
+
+funcao:
+      DEF IDENTIFIER LPAREN RPAREN COLON NEWLINE bloco {
+          $$ = CriarNoFuncao($2, NULL, $7);
+      }
     ;
 
 condicional:

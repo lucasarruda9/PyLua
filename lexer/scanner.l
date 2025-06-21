@@ -25,11 +25,15 @@ void inicializa_pilha() {
 /* Definição de tokens */
 
 /* Palavras-chave do Python */
-KEYWORD     and|as|assert|break|class|continue|def|del|except|finally|from|global|import|in|is|lambda|None|nonlocal|not|or|pass|raise|return|try|with|yield
+KEYWORD     and|as|assert|break|class|continue|del|except|finally|from|global|import|in|is|lambda|None|nonlocal|not|or|pass|raise|return|try|with|yield
 
 /* Booleanos */
 TRUE        "True"
 FALSE       "False"
+
+/* Definição de função */
+DEF         "def"
+RETURN      "return"
 
 UNDERLINE   "_"
 ASYNC       "async"
@@ -118,6 +122,9 @@ COMMENT     #.*
 
 {TRUE}      { yylval.intval = 1; return TRUE; }
 {FALSE}     { yylval.intval = 0; return FALSE; }
+
+{DEF}       { return DEF; }
+{RETURN}    { return RETURN; }
 
 {KEYWORD}   { yylval.string = strdup(yytext); return KEYWORD; }
 

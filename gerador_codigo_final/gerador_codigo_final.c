@@ -183,6 +183,18 @@ void gerarCodigoLua(No* no) {
             fprintf(gerador.arquivo_saida, "end\n");
             break;
 
+        case NoFuncao:
+            indentar();
+            fprintf(gerador.arquivo_saida, "function %s()\n", no->var ? no->var : "anonima");
+            aumentarIndentacao();
+            if (no->lista) {
+                gerarBlocoLua(no->lista);
+            }
+            diminuirIndentacao();
+            indentar();
+            fprintf(gerador.arquivo_saida, "end\n");
+            break;
+
         default:
             // Para expressões simples ou outros tipos
             indentar();
