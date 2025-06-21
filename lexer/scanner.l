@@ -174,16 +174,15 @@ COMMENT     #.*
     return IDENTIFIER; 
 }
 
-{INTEGER}   { yylval.intval = convert_to_int(yytext); return INTEGER; }
-{FLOAT}     {  yylval.floatval = atof(yytext); return FLOAT;  }
-{HEX}       { /* HEX reconhecido */ }
-{OCT}       { /* OCT reconhecido */ }
-{BIN}       { /* BIN reconhecido */ }
+{INTEGER}   { 
+    yylval.intval = convert_to_int(yytext); 
+    return INTEGER; 
+}
 
-{STRING_DQ} { yylval.string = strdup(yytext); return STRING_DQ; }
-{STRING_SQ} { /* STRING_SQ reconhecido */ }
-{TRIPLE_DQ} { /* TRIPLE_DQ reconhecido */ }
-{TRIPLE_SQ} { /* TRIPLE_SQ reconhecido */ }
+{FLOAT}     { 
+    yylval.floatval = atof(yytext); 
+    return FLOAT; 
+}
 
 {HEX}       { 
     yylval.string = strdup(yytext); 

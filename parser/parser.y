@@ -37,7 +37,7 @@ void yyerror(const char *s) {
 %token <floatval> FLOAT  // O token FLOAT irá carregar um valor ponto flutuante
 %token PLUS MINUS MULTIPLY DIVIDE
 %token LPAREN RPAREN
-%token <string> STRING_DQ
+%token <string>IDENTIFIER
 %token ASSIGN PLUS_EQ MINUS_EQ MULT_EQ DIV_EQ FLOOR_EQ POW_EQ MOD_EQ
 %token BITAND BITOR BITXOR BITNOT
 %token SHIFTL SHIFTR AND_EQ OR_EQ XOR_EQ SHIFTR_EQ SHIFTL_EQ
@@ -48,7 +48,7 @@ void yyerror(const char *s) {
 %token FOR WHILE
 %token LBRACKET RBRACKET LBRACE RBRACE
 %token COMMA COLON DOT DECORATOR ARROW
-%token <string> FLOAT HEX OCT BIN
+%token <string> HEX OCT BIN
 %token <string> STRING_DQ STRING_SQ TRIPLE_DQ TRIPLE_SQ
 %token COMMENT
 %token INDENT DEDENT
@@ -142,7 +142,6 @@ line:    expr NEWLINE {
 
 expr:    INTEGER               { $$ = CriarNoInteiro($1); }  // Cria um nó de inteiro
         | FLOAT               { $$ = CriarNoFloat($1); }  // Cria um nó de ponto flutuante
-        | STRING_DQ        { $$ = CriarNoString($1); }  // Cria nó string
         | IDENTIFIER            { 
                                Simbolo *s = buscarSimbolo($1);
                                if (s == NULL) {

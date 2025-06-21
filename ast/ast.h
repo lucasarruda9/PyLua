@@ -28,10 +28,11 @@ typedef struct ListaNo {
 
 typedef struct Arvore{
     Tipo tipo;
-    struct Arvore *direito, *esquerdo;
-    
+    struct Arvore *direita, *meio, *esquerda;
     int valor;
     float valor_float;
+    char* valor_str;
+    int valor_bool;
     char* var;
     char op;
     ListaNo *lista;
