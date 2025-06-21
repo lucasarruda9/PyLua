@@ -180,7 +180,7 @@ COMMENT     #.*
 }
 
 {FLOAT}     { 
-    yylval.string = strdup(yytext); 
+    yylval.floatval = atof(yytext); 
     return FLOAT; 
 }
 
