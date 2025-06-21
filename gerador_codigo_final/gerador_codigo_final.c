@@ -45,14 +45,6 @@ static void gerarExpressao(No* no) {
             fprintf(gerador.arquivo_saida, "%.6f", no->valor_float);
             break;
 
-        case NoString:
-            fprintf(gerador.arquivo_saida, "\"%s\"", no->valor_str ? no->valor_str : "");
-            break;
-
-        case NoBool:
-            fprintf(gerador.arquivo_saida, "%s", no->valor_bool ? "true" : "false");
-            break;
-
         case NoVariavel:
             fprintf(gerador.arquivo_saida, "%s", no->var);
             break;
