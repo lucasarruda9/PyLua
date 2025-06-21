@@ -289,6 +289,12 @@ condicional:
     | IF expr COLON NEWLINE bloco ELSE COLON NEWLINE bloco{
           $$ = CriarNoIf($2, $5, $9);
       }
+    | WHILE expr COLON NEWLINE bloco {
+          $$ = CriarNoWhile($2, $5);
+      }
+    | WHILE LPAREN expr RPAREN COLON NEWLINE bloco {
+          $$ = CriarNoWhile($3, $7);
+      }
     ;
 %%
 
