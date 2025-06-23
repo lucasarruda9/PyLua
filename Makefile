@@ -20,11 +20,13 @@ PARSER_DIR = parser
 AST_DIR = ast
 TABELA_DIR = tabela
 GERADOR_DIR = gerador_codigo_final
+CODIGO_INTER_DIR = codigo_intermediario
 BUILD_DIR = build
 TEST_DIR = tests
 TEMP_DIR = temp
 EXEMPLOS_DIR = exemplos
 SAIDA_LUA_DIR = saidas_lua
+SAIDA_TAC_DIR = saidas_tac
 DOCS_DIR = docs
 
 # Arquivos fonte
@@ -33,6 +35,7 @@ PARSER = $(PARSER_DIR)/parser.y
 AST = $(AST_DIR)/ast.c
 TABELA = $(TABELA_DIR)/tabela.c
 GERADOR = $(GERADOR_DIR)/gerador_codigo_final.c
+CODIGO_INTER = $(CODIGO_INTER_DIR)/codigo_intermediario.c
 
 # Arquivos gerados (saída no diretório src)
 LEXER_C = $(SRC_DIR)/lex.yy.c
@@ -59,7 +62,7 @@ endif
 
 # Criar diretórios necessários
 setup:
-	@mkdir -p $(SRC_DIR) $(BUILD_DIR) $(TEMP_DIR) $(EXEMPLOS_DIR) $(SAIDA_LUA_DIR) $(DOCS_DIR)/gerados
+	@mkdir -p $(SRC_DIR) $(BUILD_DIR) $(TEMP_DIR) $(EXEMPLOS_DIR) $(SAIDA_LUA_DIR) $(SAIDA_TAC_DIR) $(DOCS_DIR)/gerados
 
 # Compilação em modo release
 release:
@@ -69,7 +72,7 @@ release:
 debug:
 	@$(MAKE) MODE=debug
 
-$(TARGET): $(LEXER_C) $(PARSER_C) $(AST) $(TABELA) $(GERADOR)
+$(TARGET): $(LEXER_C) $(PARSER_C) $(AST) $(TABELA) $(GERADOR) $(CODIGO_INTER)
 	$(CC) $(CFLAGS) -o $@ $^ -lfl -lm
 	@echo "Compilação concluída: $@"
 
@@ -86,7 +89,7 @@ clean:
 	rm -f $(SRC_DIR)/*.c $(SRC_DIR)/*.h
 	rm -f pylua pylua_debug pylua_release
 	rm -rf $(TEMP_DIR)/*
-	rm -f *.lua
+	rm -f *.lua *.tac
 
 # Limpeza completa (inclui arquivos de build e temporários)
 distclean: clean
@@ -126,6 +129,8 @@ test_gerador: $(TARGET)
 	@chmod +x ./testar_gerador.sh
 	@bash ./testar_gerador.sh
 
+
+
 # Gerar exemplos Lua
 gerar_exemplos: $(TARGET)
 	@echo "Gerando exemplos de código Lua..."
@@ -147,7 +152,7 @@ docs:
 # Verificar sintaxe do código fonte
 verificar_sintaxe:
 	@echo "Verificando sintaxe do código fonte..."
-	@for file in $(AST_DIR)/*.c $(TABELA_DIR)/*.c $(GERADOR_DIR)/*.c; do \
+	@for file in $(AST_DIR)/*.c $(TABELA_DIR)/*.c $(GERADOR_DIR)/*.c $(CODIGO_INTER_DIR)/*.c; do \
 		$(CC) -fsyntax-only $$file && echo "✓ $$file"; \
 	done
 
