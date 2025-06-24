@@ -9,36 +9,31 @@ int convert_to_int(char *text) {
 }
 
 int line_num = 1;
-int col_num = 1;
-
-void atualiza_coluna() {
-    col_num += yyleng;
-}
-
-void reset_coluna() {
-    col_num = 1;
-}
-
-int nivel_indentacao = 0;
 int pilha_indentacao[100];
 int topo_pilha = 0;
-int eof_dedents_pendentes = 0;  // Contador de DEDENTs pendentes no EOF
-int eof_encontrado = 0;         // Flag para indicar que EOF foi encontrado
+
 
 void inicializa_pilha() {
     pilha_indentacao[0] = 0;
     topo_pilha = 0;
-    eof_dedents_pendentes = 0;
-    eof_encontrado = 0;
 }
 %}
 
-%option noyywrap noinput nounput nomain
+%option noyywrap noinput nomain
 
+%x IDENT
 /* Definição de tokens */
 
 /* Palavras-chave do Python */
-KEYWORD     and|as|assert|break|class|continue|def|del|except|False|finally|from|global|import|in|is|lambda|None|nonlocal|not|or|pass|raise|return|True|try|with|yield
+KEYWORD     and|as|assert|break|class|continue|del|except|finally|from|global|import|in|is|lambda|None|nonlocal|not|or|pass|raise|return|try|with|yield
+
+/* Booleanos */
+TRUE        "True"
+FALSE       "False"
+
+/* Definição de função */
+DEF         "def"
+RETURN      "return"
 
 UNDERLINE   "_"
 ASYNC       "async"
@@ -121,122 +116,111 @@ TRIPLE_SQ   \'\'\'([^\\]|\\.)*?\'\'\'
 
 /* Comentários */
 COMMENT     #.*
-INDENT      ^[ \t]+
 
 /* Regras */
 %%
 
-{KEYWORD}   { atualiza_coluna(); yylval.string = strdup(yytext); return KEYWORD; }
+{TRUE}      { yylval.intval = 1; return TRUE; }
+{FALSE}     { yylval.intval = 0; return FALSE; }
 
-{IF}        { atualiza_coluna(); return IF; }
-{ELIF}      { atualiza_coluna(); return ELIF; }
-{ELSE}      { atualiza_coluna(); return ELSE; }
-{MATCH}     { atualiza_coluna(); return MATCH; }
-{CASE}      { atualiza_coluna(); return CASE; }
+{DEF}       { return DEF; }
+{RETURN}    { return RETURN; }
 
-{FOR}       { atualiza_coluna(); return FOR; }
-{WHILE}     { atualiza_coluna(); return WHILE; }
+{KEYWORD}   { yylval.string = strdup(yytext); return KEYWORD; }
 
-{POWER}     { atualiza_coluna(); return POWER; }
-{FLOOR_DIV} { atualiza_coluna(); return FLOOR_DIV; }
-{PLUS_EQ}   { atualiza_coluna(); return PLUS_EQ; }
-{MINUS_EQ}  { atualiza_coluna(); return MINUS_EQ; }
-{MULT_EQ}   { atualiza_coluna(); return MULT_EQ; }
-{DIV_EQ}    { atualiza_coluna(); return DIV_EQ; }
-{MOD_EQ}    { atualiza_coluna(); return MOD_EQ; }
-{FLOOR_EQ}  { atualiza_coluna(); return FLOOR_EQ; }
-{POW_EQ}    { atualiza_coluna(); return POW_EQ; }
-{EQ}        { atualiza_coluna(); return EQ; }
-{NE}        { atualiza_coluna(); return NE; }
-{NE2}       { atualiza_coluna(); return NE2; }
-{LE}        { atualiza_coluna(); return LE; }
-{GE}        { atualiza_coluna(); return GE; }
-{LT}        { atualiza_coluna(); return LT; }
-{GT}        { atualiza_coluna(); return GT; }
-{PLUS}      { atualiza_coluna(); return PLUS; }
-{MINUS}     { atualiza_coluna(); return MINUS; }
-{MULTIPLY}  { atualiza_coluna(); return MULTIPLY; }
-{DIVIDE}    { atualiza_coluna(); return DIVIDE; }
-{MODULO}    { atualiza_coluna(); return MODULO; }
-{ASSIGN}    { atualiza_coluna(); return ASSIGN; }
-{SHIFTL}    { atualiza_coluna(); return SHIFTL; }
-{SHIFTR}    { atualiza_coluna(); return SHIFTR; }
-{AND_EQ}    { atualiza_coluna(); return AND_EQ; }
-{OR_EQ}     { atualiza_coluna(); return OR_EQ; }
-{XOR_EQ}    { atualiza_coluna(); return XOR_EQ; }
-{SHIFTR_EQ} { atualiza_coluna(); return SHIFTR_EQ; }
-{SHIFTL_EQ} { atualiza_coluna(); return SHIFTL_EQ; }
-{BITAND}    { atualiza_coluna(); return BITAND; }
-{BITOR}     { atualiza_coluna(); return BITOR; }
-{BITXOR}    { atualiza_coluna(); return BITXOR; }
-{BITNOT}    { atualiza_coluna(); return BITNOT; }
+{IF}        { return IF; }
+{ELIF}      { return ELIF; }
+{ELSE}      { return ELSE; }
+{MATCH}     { return MATCH; }
+{CASE}      { return CASE; }
 
-{LPAREN}    { atualiza_coluna(); return LPAREN; }
-{RPAREN}    { atualiza_coluna(); return RPAREN; }
-{LBRACKET}  { atualiza_coluna(); return LBRACKET; }
-{RBRACKET}  { atualiza_coluna(); return RBRACKET; }
-{LBRACE}    { atualiza_coluna(); return LBRACE; }
-{RBRACE}    { atualiza_coluna(); return RBRACE; }
-{COMMA}     { atualiza_coluna(); return COMMA; }
-{COLON}     { atualiza_coluna(); return COLON; }
-{DOT}       { atualiza_coluna(); return DOT; }
-{DECORATOR} { atualiza_coluna(); return DECORATOR; }
-{ARROW}     { atualiza_coluna(); return ARROW; }
+{FOR}       { return FOR; }
+{WHILE}     { return WHILE; }
 
-{IDENTIFIER} { 
-    atualiza_coluna(); 
+{POWER}     { return POWER; }
+{FLOOR_DIV} { return FLOOR_DIV; }
+{PLUS_EQ}   { return PLUS_EQ; }
+{MINUS_EQ}  { return MINUS_EQ; }
+{MULT_EQ}   { return MULT_EQ; }
+{DIV_EQ}    { return DIV_EQ; }
+{MOD_EQ}    { return MOD_EQ; }
+{FLOOR_EQ}  { return FLOOR_EQ; }
+{POW_EQ}    { return POW_EQ; }
+{EQ}        { return EQ; }
+{NE}        { return NE; }
+{NE2}       { return NE2; }
+{LE}        { return LE; }
+{GE}        { return GE; }
+{LT}        { return LT; }
+{GT}        { return GT; }
+{PLUS}      { return PLUS; }
+{MINUS}     { return MINUS; }
+{MULTIPLY}  { return MULTIPLY; }
+{DIVIDE}    { return DIVIDE; }
+{MODULO}    { return MODULO; }
+{ASSIGN}    { return ASSIGN; }
+{SHIFTL}    { return SHIFTL; }
+{SHIFTR}    { return SHIFTR; }
+{AND_EQ}    { return AND_EQ; }
+{OR_EQ}     { return OR_EQ; }
+{XOR_EQ}    { return XOR_EQ; }
+{SHIFTR_EQ} { return SHIFTR_EQ; }
+{SHIFTL_EQ} { return SHIFTL_EQ; }
+{BITAND}    { return BITAND; }
+{BITOR}     { return BITOR; }
+{BITXOR}    { return BITXOR; }
+{BITNOT}    { return BITNOT; }
+
+{LPAREN}    { return LPAREN; }
+{RPAREN}    { return RPAREN; }
+{LBRACKET}  { return LBRACKET; }
+{RBRACKET}  { return RBRACKET; }
+{LBRACE}    { return LBRACE; }
+{RBRACE}    { return RBRACE; }
+{COMMA}     { return COMMA; }
+{COLON}     { return COLON; }
+{DOT}       { return DOT; }
+{DECORATOR} { return DECORATOR; }
+{ARROW}     { return ARROW; }
+
+{IDENTIFIER} {  
     yylval.string = strdup(yytext); 
     return IDENTIFIER; 
 }
 
 {INTEGER}   { 
-    atualiza_coluna(); 
     yylval.intval = convert_to_int(yytext); 
     return INTEGER; 
 }
 
 {FLOAT}     { 
-    atualiza_coluna(); 
-    yylval.string = strdup(yytext); 
+    yylval.floatval = atof(yytext); 
     return FLOAT; 
 }
 
 {HEX}       { 
-    atualiza_coluna(); 
     yylval.string = strdup(yytext); 
     return HEX; 
 }
 
 {OCT}       { 
-    atualiza_coluna(); 
     yylval.string = strdup(yytext); 
     return OCT; 
 }
 
 {BIN}       { 
-    atualiza_coluna(); 
     yylval.string = strdup(yytext); 
     return BIN; 
 }
 
-{STRING_DQ} {
-    atualiza_coluna();
-    int len = yyleng - 2;
-    char *str = (char*)malloc(len + 1);
-    strncpy(str, yytext + 1, len);
-    str[len] = '\0';
-    yylval.string = str;
-    return STRING_DQ;
+{STRING_DQ} { 
+    yylval.string = strdup(yytext); 
+    return STRING_DQ; 
 }
 
-{STRING_SQ} {
-    atualiza_coluna();
-    int len = yyleng - 2;
-    char *str = (char*)malloc(len + 1);
-    strncpy(str, yytext + 1, len);
-    str[len] = '\0';
-    yylval.string = str;
-    return STRING_SQ;
+{STRING_SQ} { 
+    yylval.string = strdup(yytext); 
+    return STRING_SQ; 
 }
 
 {TRIPLE_DQ} { 
@@ -244,10 +228,7 @@ INDENT      ^[ \t]+
     while (*p) {
         if (*p == '\n') {
             line_num++;
-            reset_coluna();
-        } else {
-            col_num++;
-        }
+        } 
         p++;
     }
     yylval.string = strdup(yytext); 
@@ -259,10 +240,7 @@ INDENT      ^[ \t]+
     while (*p) {
         if (*p == '\n') {
             line_num++;
-            reset_coluna();
-        } else {
-            col_num++;
-        }
+        } 
         p++;
     }
     yylval.string = strdup(yytext); 
@@ -270,57 +248,56 @@ INDENT      ^[ \t]+
 }
 
 {COMMENT}   { 
-    atualiza_coluna(); 
-    return COMMENT; 
+    /* Ignorar comentários - não retornar token */
 }
 
-{INDENT}    {
-    
-    if (yytext[0] == '\n') {
-        line_num++;
-        reset_coluna();
-    } else {
-        atualiza_coluna();
-    }
-    
+
+
+\n {
+    line_num++;
+    // Após uma quebra de linha, verificar a próxima indentação
+    BEGIN(IDENT);
+    return NEWLINE;
+}
+
+
+<IDENT>^[ \t]+ {
     int espacos = 0;
     for (int i = 0; i < yyleng; i++) {
-        if (yytext[i] == ' ') {
-            espacos++;
-        } else if (yytext[i] == '\t') {
-            espacos += 8 - (espacos % 8);
-        }
+        if (yytext[i] == ' ') espacos++;
+        else if (yytext[i] == '\t') espacos += 4; // Ajuste conforme necessário
     }
+    
     if (espacos > pilha_indentacao[topo_pilha]) {
-        topo_pilha++;
-        pilha_indentacao[topo_pilha] = espacos;
+        pilha_indentacao[++topo_pilha] = espacos;
+        BEGIN(INITIAL);
         return INDENT;
     } else if (espacos < pilha_indentacao[topo_pilha]) {
-        int dedents = 0;
-        while (topo_pilha > 0 && espacos < pilha_indentacao[topo_pilha]) {
+        while(topo_pilha > 0 && espacos < pilha_indentacao[topo_pilha]){
             topo_pilha--;
-            dedents++;
         }
-        
-        if (espacos != pilha_indentacao[topo_pilha]) {
-            fprintf(stderr, "ERRO LÉXICO na linha %d, coluna %d: Indentação inconsistente\n", line_num, col_num);
-            return ERROR;
-        }
-        
+        BEGIN(INITIAL);
         return DEDENT;
     }
+    BEGIN(INITIAL);
 }
 
-\n          { 
-    line_num++; 
-    reset_coluna(); 
-    return NEWLINE; 
+<IDENT>^[^ \t\n] {
+    unput(yytext[0]); 
+    if (pilha_indentacao[topo_pilha] > 0) {
+        // Se estávamos indentados, gera DEDENT
+        topo_pilha--;
+        BEGIN(INITIAL);
+        return DEDENT;
+    }
+    BEGIN(INITIAL);
 }
-[ \t\r]+    { atualiza_coluna(); }
+
+[ \t\r]+    {}
 .           {
     fprintf(stderr, "ERRO LÉXICO na linha %d, Caractere desconhecido: '%s'\n",
             line_num,yytext);
-    atualiza_coluna();
+
     return ERROR;
 }
 <<EOF>>     {

@@ -49,6 +49,7 @@ No* CriarNoBool(int valor);
 No* CriarNoBloco(ListaNo* lista);
 No* CriarNoIf(No* condicao, No* corpo, No* senao);
 No* CriarNoWhile(No* condicao, No* corpo);
+No* CriarNoFor(No* init, No* cond, No* inc, No* corpo);
 No* CriarNoFuncao(char* nome, ListaNo* parametros, No* corpo);
 No* CriarNoChamadaFuncao(char* nome, ListaNo* argumentos);
 ListaNo* AdicionarNoLista(ListaNo* lista, No* no);
