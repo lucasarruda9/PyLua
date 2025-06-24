@@ -45,6 +45,26 @@ static void gerarExpressao(No* no) {
             fprintf(gerador.arquivo_saida, "%.6f", no->valor_float);
             break;
 
+        case NoString: {
+            char* str = no->valor_str;
+            if (str && strlen(str) >= 2) {
+                int len = strlen(str);
+                if ((str[0] == '"' && str[len-1] == '"') || 
+                    (str[0] == '\'' && str[len-1] == '\'')) {
+                    fprintf(gerador.arquivo_saida, "%s", str);
+                } else {
+                    fprintf(gerador.arquivo_saida, "\"%s\"", str);
+                }
+            } else {
+                fprintf(gerador.arquivo_saida, "\"\"");
+            }
+            break;
+        }
+
+        case NoBool:
+            fprintf(gerador.arquivo_saida, "%s", no->valor_bool ? "true" : "false");
+            break;
+
         case NoVariavel:
             fprintf(gerador.arquivo_saida, "%s", no->var);
             break;
@@ -58,19 +78,25 @@ static void gerarExpressao(No* no) {
                 case '*': fprintf(gerador.arquivo_saida, " * "); break;
                 case '/': fprintf(gerador.arquivo_saida, " / "); break;
                 case '%': fprintf(gerador.arquivo_saida, " %% "); break;
-                case 'a': fprintf(gerador.arquivo_saida, " ^ "); break;
-                case 'b': fprintf(gerador.arquivo_saida, " // "); break;
+                case 'p': fprintf(gerador.arquivo_saida, " ^ "); break;
+                case 'f': fprintf(gerador.arquivo_saida, " // "); break;
                 case '=': fprintf(gerador.arquivo_saida, " == "); break;
+                case '<': fprintf(gerador.arquivo_saida, " < "); break;
+                case '>': fprintf(gerador.arquivo_saida, " > "); break;
+                case 'l': fprintf(gerador.arquivo_saida, " <= "); break;
+                case 'g': fprintf(gerador.arquivo_saida, " >= "); break;
+                case 'n': fprintf(gerador.arquivo_saida, " ~= "); break;
+                case '&': fprintf(gerador.arquivo_saida, " & "); break;
+                case '|': fprintf(gerador.arquivo_saida, " | "); break;
+                case '^': fprintf(gerador.arquivo_saida, " ~ "); break;
+                case 's': fprintf(gerador.arquivo_saida, " << "); break;
+                case 'r': fprintf(gerador.arquivo_saida, " >> "); break;
                 default: fprintf(gerador.arquivo_saida, " ? "); break;
             }
             gerarExpressao(no->direita);
             fprintf(gerador.arquivo_saida, ")");
             break;
 
-            gerarExpressao(no->direita);
-            fprintf(gerador.arquivo_saida, ")");
-            break;
-        
         default:
             // Para outros tipos que podem aparecer em expressões
             break;
@@ -152,6 +178,18 @@ void gerarCodigoLua(No* no) {
             fprintf(gerador.arquivo_saida, " do\n");
             aumentarIndentacao();
             gerarCodigoLua(no->meio);
+            diminuirIndentacao();
+            indentar();
+            fprintf(gerador.arquivo_saida, "end\n");
+            break;
+
+        case NoFuncao:
+            indentar();
+            fprintf(gerador.arquivo_saida, "function %s()\n", no->var ? no->var : "anonima");
+            aumentarIndentacao();
+            if (no->lista) {
+                gerarBlocoLua(no->lista);
+            }
             diminuirIndentacao();
             indentar();
             fprintf(gerador.arquivo_saida, "end\n");
