@@ -89,9 +89,10 @@ clean:
 	rm -f $(SRC_DIR)/*.c $(SRC_DIR)/*.h
 	rm -f pylua pylua_debug pylua_release
 	rm -rf $(TEMP_DIR)/*
-	rm -f $(SAIDA_LUA_DIR)/*.lua
-	rm -f $(SAIDA_TAC_DIR)/*.tac
+	rm -rf saidas_lua
+	rm -rf saidas_tac
 	rm -f *.lua *.tac
+	rm -rf logs
 
 # limpeza dos arquivos de builds e os temporários
 distclean: clean
@@ -142,13 +143,6 @@ validar_lua:
 	@echo "Validando sintaxe dos códigos Lua..."
 	@chmod +x ./pylua.sh
 	@./pylua.sh test-generator --validar
-
-# Limpar scripts externos desnecessários
-clean_scripts:
-	@chmod +x ./pylua.sh
-	@./pylua.sh clean-scripts
-
-
 
 # Gerar exemplos Lua
 gerar_exemplos: $(TARGET)

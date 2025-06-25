@@ -34,7 +34,7 @@ mostrar_ajuda() {
     echo "  --test [nome]         Executa teste específico"
     echo "  --completo            Testa todos os exemplos (test-generator)"
     echo "  --executar            Tenta executar códigos Lua gerados"
-    echo "  --validar             Valida sintaxe dos códigos Lua"
+    echo "  --validar             Valida códigos comparando com gabaritos"
     echo ""
     echo "EXEMPLOS:"
     echo "  ./pylua.sh init"
@@ -327,9 +327,10 @@ _teste_completo_gerador() {
 
     mkdir -p saidas_lua temp logs
 
-    # arquivo de log
-    local LOG_FILE="logs/teste_completo_$(date +%Y%m%d_%H%M%S).log"
-    echo "Log de testes completos - $(date)" > "$LOG_FILE"
+    # arquivo de log que serve para especificar quais erros deram de maneira mais limpa
+    local DATA_LOG=$(date +"%d_%m_%Y_%H%M%S")
+    local LOG_FILE="logs/teste_completo_${DATA_LOG}.log"
+    echo "Log de testes completos - $(date '+%d/%m/%Y às %H:%M:%S')" > "$LOG_FILE"
 
     local PASSOU_GER=0
     local FALHOU_GER=0
@@ -425,65 +426,89 @@ _teste_completo_gerador() {
         fi
     fi
 
-    print_color $BLUE "Log salvo: $LOG_FILE"
+    print_color $BLUE "Log salvo em: $LOG_FILE"
 
     return $FALHOU_GER
 }
 
-#função pra validar sintaxe lua
+# função pra validar comparando com gabaritos (sem usar luac)
 _validar_lua() {
-    print_color $BLUE "=== Validando Códigos Lua ==="
-
-    if ! command -v lua &> /dev/null; then
-        print_color $RED "Lua não encontrado!"
-        print_color $YELLOW "Instale: sudo apt-get install lua5.3"
-        return 1
-    fi
+    print_color $BLUE "=== Validando Códigos Lua (comparação de texto) ==="
 
     if [ ! -d "saidas_lua" ]; then
         print_color $RED "Pasta saidas_lua não encontrada!"
         return 1
     fi
 
-    local VALIDOS=0
-    local INVALIDOS=0
+    # cria pasta de gabaritos se não existir
+    mkdir -p exemplos_gabaritos
+
+    local PASSOU=0
+    local FALHOU=0
+    local ATUALIZADOS=0
     local TOTAL=0
 
     for arquivo in saidas_lua/*.lua; do
         if [ -f "$arquivo" ]; then
-            local nome=$(basename "$arquivo")
+            local nome=$(basename "$arquivo" .lua)  # remove .lua
+            local gabarito="exemplos_gabaritos/${nome}.txt"  # gabarito é .txt
+
             echo -n "Validando $nome... "
 
-            # tenta validar sintaxe com luac primeiro
-            if command -v luac &> /dev/null; then
-                if luac -p "$arquivo" 2>/dev/null; then
-                    print_color $GREEN "OK"
-                    VALIDOS=$((VALIDOS+1))
-                else
-                    print_color $RED "ERRO"
-                    INVALIDOS=$((INVALIDOS+1))
-                    echo "  Erro de sintaxe:"
-                    luac -p "$arquivo" 2>&1 | head -2 | sed 's/^/    /'
-                fi
+            # verifica se tem gabarito
+            if [ ! -f "$gabarito" ]; then
+                print_color $YELLOW "SEM GABARITO"
+                echo "  Crie o arquivo: $gabarito"
+                ATUALIZADOS=$((ATUALIZADOS+1))
             else
-                # se não tem luac, tenta carregar o arquivo
-                if lua -e "dofile('$arquivo')" 2>/dev/null; then
+                # compara arquivo .lua com gabarito .txt
+                if diff -q "$arquivo" "$gabarito" > /dev/null 2>&1; then
                     print_color $GREEN "OK"
-                    VALIDOS=$((VALIDOS+1))
+                    PASSOU=$((PASSOU+1))
                 else
-                    print_color $RED "ERRO"
-                    INVALIDOS=$((INVALIDOS+1))
-                    echo "  Erro:"
-                    lua -e "dofile('$arquivo')" 2>&1 | head -2 | sed 's/^/    /'
+                    print_color $RED "DIFERENTE"
+                    FALHOU=$((FALHOU+1))
+                    echo "  Diferenças encontradas:"
+                    diff "$gabarito" "$arquivo" | head -3 | sed 's/^/    /'
                 fi
             fi
             TOTAL=$((TOTAL+1))
         fi
     done
 
-    print_color $BLUE "Resumo: $VALIDOS válidos, $INVALIDOS inválidos"
-    return $INVALIDOS
+    echo ""
+    print_color $BLUE "Resumo da validação:"
+    if [ $ATUALIZADOS -gt 0 ]; then
+        print_color $YELLOW "Sem gabarito: $ATUALIZADOS"
+    fi
+    if [ $TOTAL -gt $ATUALIZADOS ]; then
+        print_color $GREEN "Passou: $PASSOU"
+        print_color $RED "Falhou: $FALHOU"
+        local testados=$((TOTAL - ATUALIZADOS))
+        if [ $testados -gt 0 ]; then
+            local taxa=$(( 100 * PASSOU / testados ))
+            print_color $BLUE "Taxa de sucesso: $taxa%"
+        fi
+    fi
+
+    if [ $ATUALIZADOS -gt 0 ]; then
+        echo ""
+        print_color $BLUE "Para criar gabaritos, copie os códigos corretos:"
+        for arquivo in saidas_lua/*.lua; do
+            if [ -f "$arquivo" ]; then
+                local nome=$(basename "$arquivo" .lua)
+                local gabarito="exemplos_gabaritos/${nome}.txt"
+                if [ ! -f "$gabarito" ]; then
+                    print_color $YELLOW "cp $arquivo $gabarito"
+                fi
+            fi
+        done
+    fi
+
+    return $FALHOU
 }
+
+
 
 # função principal do teste do gerador
 testar_gerador() {

@@ -1,0 +1,8 @@
+local idade = 18
+if (idade >= 18) then
+    local maior = true
+    local status = "adulto"
+else
+    local maior = false
+    local status = "menor"
+end

@@ -1,0 +1,14 @@
+local a = 10
+local b = 20
+local c = 30
+local soma = (a + b)
+local subtracao = (c - a)
+local multiplicacao = (a * b)
+local divisao = (c / a)
+local modulo = (b % 7)
+local x = 100
+x = (x + 25)
+local y = 50
+y = (y - 10)
+local z = 5
+z = (z * 4)

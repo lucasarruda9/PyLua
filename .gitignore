@@ -30,6 +30,7 @@ saidas_lua/
 tmp_*_output.txt
 
 # Logs e arquivos de debug
+logs/
 *.log
 *.debug
 
@@ -40,3 +41,5 @@ Thumbs.db
 #pasta/diretório da geração do código de três endereços (Tac)
 
 saidas_tac/
+
+

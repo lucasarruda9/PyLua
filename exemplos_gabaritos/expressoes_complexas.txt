@@ -1,0 +1,13 @@
+local base = 10
+local altura = 5
+local raio = 3
+local area_retangulo = (base * altura)
+local perimetro_retangulo = (2 * (base + altura))
+local area_circulo = ((3.141590 * raio) * raio)
+local circunferencia = ((2 * 3.141590) * raio)
+local resultado1 = ((base + altura) * 2)
+local resultado2 = ((area_retangulo + area_circulo) / 2)
+local resultado3 = (((base * altura) + (raio * raio)) * 3)
+local calculo = ((base + (altura * raio)) - 5)
+local calculo2 = ((base + altura) * (raio - 1))
+local calculo3 = ((base * altura) + (raio * raio))
