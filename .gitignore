@@ -36,3 +36,7 @@ tmp_*_output.txt
 # Arquivos do sistema
 .DS_Store
 Thumbs.db
+
+#pasta/diretório da geração do código de três endereços (Tac)
+
+saidas_tac/

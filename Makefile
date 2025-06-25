@@ -91,7 +91,7 @@ clean:
 	rm -rf $(TEMP_DIR)/*
 	rm -f *.lua *.tac
 
-# Limpeza completa (inclui arquivos de build e temporários)
+# limpeza dos arquivos de builds e os temporários
 distclean: clean
 	rm -rf $(BUILD_DIR)
 	rm -rf $(TEMP_DIR)
