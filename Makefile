@@ -89,6 +89,8 @@ clean:
 	rm -f $(SRC_DIR)/*.c $(SRC_DIR)/*.h
 	rm -f pylua pylua_debug pylua_release
 	rm -rf $(TEMP_DIR)/*
+	rm -f $(SAIDA_LUA_DIR)/*.lua
+	rm -f $(SAIDA_TAC_DIR)/*.tac
 	rm -f *.lua *.tac
 
 # limpeza dos arquivos de builds e os temporários
@@ -126,8 +128,25 @@ atualizar_gabaritos: $(TARGET)
 # Testar gerador de código
 test_gerador: $(TARGET)
 	@echo "Testando gerador de código Lua..."
-	@chmod +x ./testar_gerador.sh
-	@bash ./testar_gerador.sh
+	@chmod +x ./pylua.sh
+	@./pylua.sh test-generator
+
+# vai testar os arquivos em python do diretório de exemplos
+test_exemplos: $(TARGET)
+	@echo "Testando todos os exemplos automaticamente..."
+	@chmod +x ./pylua.sh
+	@./pylua.sh test-generator --completo
+
+# vê se a sintaxe do codigo lua está correto
+validar_lua:
+	@echo "Validando sintaxe dos códigos Lua..."
+	@chmod +x ./pylua.sh
+	@./pylua.sh test-generator --validar
+
+# Limpar scripts externos desnecessários
+clean_scripts:
+	@chmod +x ./pylua.sh
+	@./pylua.sh clean-scripts
 
 
 
@@ -156,4 +175,4 @@ verificar_sintaxe:
 		$(CC) -fsyntax-only $$file && echo "✓ $$file"; \
 	done
 
-.PHONY: all clean distclean run setup verificar_deps debug release test test_parser test_lexer test_semantico atualizar_gabaritos test_gerador gerar_exemplos docs verificar_sintaxe
+.PHONY: all clean distclean run setup verificar_deps debug release test test_parser test_lexer test_semantico atualizar_gabaritos test_gerador test_exemplos validar_lua clean_scripts gerar_exemplos docs verificar_sintaxe
