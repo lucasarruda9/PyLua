@@ -21,6 +21,8 @@ int gerar_codigo_lua = 0;
 void yyerror(const char *s) {
     fprintf(stderr, "[ERRO SINTATICO] %s na linha %d\n", s, line_num);
 }
+void entrarEscopo();
+void sairEscopo();
 %}
 
 /* Declaração de tipos para os valores */
@@ -280,7 +282,7 @@ linhas:
 
 //é considerado bloco se tiver indentado corretamente
 bloco:
-      INDENT linhas DEDENT { $$ = CriarNoBloco($2); }
+      INDENT {entrarEscopo();} linhas DEDENT { sairEscopo(); $$ = CriarNoBloco($3); }
     
     ;
 
@@ -317,7 +319,7 @@ condicional:
 /* Função principal para executar o parser */
 int main(int argc, char **argv) {
     /* Inicializa a tabela de símbolos */
-    inicializarTabela();
+
 
     /* Inicializa a pilha de indentação */
     inicializa_pilha();

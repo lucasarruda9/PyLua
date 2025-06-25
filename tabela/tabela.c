@@ -4,9 +4,7 @@
 #include <stdbool.h>
 #include "tabela.h"
 
-#define TAM 211
-
-Simbolo *tabela[TAM];
+ Escopo *escopo_atual = NULL;
 
 // Função hash para distribuir os símbolos na tabela
 unsigned hash(char *s) {
@@ -15,64 +13,83 @@ unsigned hash(char *s) {
     return h % TAM;
 }
 
-// Inicializa a tabela de símbolos
-void inicializarTabela() {
+void entrarEscopo() {
+    Escopo* novo = malloc(sizeof(Escopo));
+    for (int i = 0; i < TAM; i++) novo->tabela[i] = NULL;
+    novo->pai = escopo_atual;
+    escopo_atual = novo;
+    printf("[DEBUG] Entrando em escopo\n");
+}
+
+// Sair do escopo atual
+void sairEscopo() {
+    printf("[DEBUG] Saindo de escopo\n");
     for (int i = 0; i < TAM; i++) {
-        tabela[i] = NULL;
+        Simbolo* s = escopo_atual->tabela[i];
+        while (s) {
+            Simbolo* temp = s;
+            s = s->proximo;
+            free(temp);
+        }
     }
+    Escopo* anterior = escopo_atual->pai;
+    free(escopo_atual);
+    escopo_atual = anterior;
 }
 
 // Insere um novo símbolo na tabela
 void inserirSimbolo(char *nome, TipoSimbolo tipo) {
+    if (!escopo_atual) entrarEscopo();
     unsigned i = hash(nome);
-    Simbolo *s = malloc(sizeof(Simbolo));
-    
-    if (s == NULL) {
-        printf("Erro: Falha ao alocar memória para símbolo\n");
-        return;
-    }
+  
 
-    strncpy(s->nome, nome, 31);
-    s->nome[31] = '\0';  // Garante que a string termina com \0
-    s->tipo = tipo;
-    s->proximo = tabela[i];
-    tabela[i] = s;
+    Simbolo* novo = malloc(sizeof(Simbolo));
+    strncpy(novo->nome, nome, 31);
+    novo->nome[31] = '\0';
+    novo->tipo = tipo;
+    novo->proximo = escopo_atual->tabela[i];
+    escopo_atual->tabela[i] = novo;
 }
 
 // Busca um símbolo na tabela
 Simbolo *buscarSimbolo(char *nome) {
-    unsigned i = hash(nome);
-    for (Simbolo *s = tabela[i]; s; s = s->proximo) {
-        if (strcmp(s->nome, nome) == 0) return s;
+    Escopo* esc = escopo_atual;
+    while (esc) {
+        unsigned i = hash(nome);
+        Simbolo* s = esc->tabela[i];
+        while (s) {
+            if (strcmp(s->nome, nome) == 0) return s;
+            s = s->proximo;
+        }
+        esc = esc->pai;
     }
     return NULL;
 }
 
 // Imprime o conteúdo da tabela de símbolos
-void imprimirTabela() {
+void imprimirTabela() {// Imprime todos os escopos (debug){
+    Escopo* esc = escopo_atual;
+    int nivel = 0;
     printf("\n=== Tabela de Símbolos ===\n");
-    for (int i = 0; i < TAM; i++) {
-        for (Simbolo *s = tabela[i]; s; s = s->proximo) {
-            printf("Nome: %s, Tipo: %d", s->nome, s->tipo);
-            printf("\n");
+    while (esc) {
+        
+        printf("\nEscopo nível %d\n", nivel++);
+        for (int i = 0; i < TAM; i++) {
+            Simbolo* s = esc->tabela[i];
+            while (s) {
+                printf("Nome: %s Tipo: %d\n", s->nome, s->tipo);
+                s = s->proximo;
+            }
         }
+        esc = esc->pai;
     }
-    printf("========================\n\n");
+    printf("============================\n");
 }
 
 // Libera a memória alocada para a tabela de símbolos
-void liberarTabela() {
-    for (int i = 0; i < TAM; i++) {
-        Simbolo *atual = tabela[i];
-        while (atual != NULL) {
-            Simbolo *proximo = atual->proximo;
-            if (atual->tipo == TIPO_STRING && atual->valorString != NULL) {
-                free(atual->valorString);
-            }
-            free(atual);
-            atual = proximo;
-        }
-        tabela[i] = NULL;
+void liberarTabela()  {
+    while (escopo_atual != NULL) {
+        sairEscopo();
     }
 }
 
