@@ -102,11 +102,23 @@ static void gerarExpressao(No* no) {
             break;
     }
 }
-
+//usado para converter listas em código lua
 void gerarBlocoLua(ListaNo* lista) {
     ListaNo* atual = lista;
     while (atual) {
         gerarCodigoLua(atual->no);
+        atual = atual->prox;
+    }
+}
+
+//como se fosse gerarBlocoLua mas imprime com vírgula (para print)
+void gerarListaArgumentosPrint(ListaNo* lista) {
+    ListaNo* atual = lista;
+    while (atual) {
+        gerarExpressao(atual->no);  // imprime argumento
+        if (atual->prox) {
+            fprintf(gerador.arquivo_saida, ", ");
+        }
         atual = atual->prox;
     }
 }
@@ -194,7 +206,12 @@ void gerarCodigoLua(No* no) {
             indentar();
             fprintf(gerador.arquivo_saida, "end\n");
             break;
-
+        case NoPrint:
+            indentar();
+            fprintf(gerador.arquivo_saida, "print(");
+            gerarListaArgumentosPrint(no->lista);
+            fprintf(gerador.arquivo_saida, ")");
+            break;
         default:
             // Para expressões simples ou outros tipos
             indentar();

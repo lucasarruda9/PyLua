@@ -59,6 +59,7 @@ void yyerror(const char *s) {
 %token <string> STRING_DQ STRING_SQ TRIPLE_DQ TRIPLE_SQ
 %token COMMENT
 %token INDENT DEDENT
+%token PRINT
 
 /* Precedência de operadores */
 %left BITOR
@@ -82,6 +83,8 @@ void yyerror(const char *s) {
 %type <lista> linhas
 %type <no> line_exec
 %type <no> funcao
+%type <lista> print_args
+%type <no> print
 
 
 %%
@@ -169,6 +172,22 @@ line:    expr NEWLINE {
                     yyerrok;
                     $$ = NULL;
                 }
+       | print NEWLINE {
+            imprimeArvore($1, 0);
+            if (gerar_codigo_lua && arquivo_lua){
+                gerarCodigoLua($1);
+            }
+            DesalocarArvore($1);
+            $$ = NULL;
+       }
+       | print {
+            imprimeArvore($1, 0);
+            if (gerar_codigo_lua && arquivo_lua){
+                gerarCodigoLua($1);
+            }
+            DesalocarArvore($1);
+            $$ = NULL;
+       }
        ;
 
 expr:    INTEGER               { $$ = CriarNoInteiro($1); }  // Cria um nó de inteiro
@@ -310,6 +329,10 @@ funcao:
       }
     ;
 
+funcao_args:
+        IDENTIFIER {}
+        | funcao_args COMMA IDENTIFIER
+
 condicional:
       IF LPAREN expr RPAREN COLON NEWLINE bloco {
           $$ = CriarNoIf($3, $7, NULL);
@@ -332,6 +355,14 @@ condicional:
           $$ = CriarNoWhile($3, $7);
       }
     ;
+
+print:  
+     PRINT LPAREN print_args RPAREN {$$ = CriarNoPrint($3); }
+
+print_args:
+    expr              {$$ = AdicionarNoLista(NULL, $1); }
+    | print_args COMMA expr {$$ = AdicionarNoLista($1, $3); }
+
 %%
 
 /* Função principal para executar o parser */

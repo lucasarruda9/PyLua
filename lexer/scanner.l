@@ -32,6 +32,7 @@ TRUE        "True"
 FALSE       "False"
 
 /* Definição de função */
+PRINT       "print"
 DEF         "def"
 RETURN      "return"
 
@@ -125,7 +126,7 @@ COMMENT     #.*
 
 {DEF}       { return DEF; }
 {RETURN}    { return RETURN; }
-
+{PRINT}     { return PRINT; }
 {KEYWORD}   { yylval.string = strdup(yytext); return KEYWORD; }
 
 {IF}        { return IF; }
@@ -284,8 +285,7 @@ COMMENT     #.*
 
 <IDENT>^[^ \t\n] {
     unput(yytext[0]); 
-    if (pilha_indentacao[topo_pilha] > 0) {
-        // Se estávamos indentados, gera DEDENT
+    while (topo_pilha > 0) {
         topo_pilha--;
         BEGIN(INITIAL);
         return DEDENT;
@@ -303,8 +303,10 @@ COMMENT     #.*
 <<EOF>>     {
 
     if (topo_pilha > 0) {
-        topo_pilha--;
-        return DEDENT;
+        while(topo_pilha>0){
+            topo_pilha--;
+            return DEDENT;
+        }
     }
     yyterminate();  
 }
