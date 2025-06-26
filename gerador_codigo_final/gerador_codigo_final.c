@@ -210,7 +210,7 @@ void gerarCodigoLua(No* no) {
             indentar();
             fprintf(gerador.arquivo_saida, "print(");
             gerarListaArgumentosPrint(no->lista);
-            fprintf(gerador.arquivo_saida, ")");
+            fprintf(gerador.arquivo_saida, ")\n");
             break;
         default:
             // Para expressões simples ou outros tipos
