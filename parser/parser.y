@@ -298,8 +298,10 @@ linhas:
 
 //é considerado bloco se tiver indentado corretamente
 bloco:
-      INDENT linhas DEDENT { $$ = CriarNoBloco($2); }
-    
+      INDENT { entrarEscopo(); } linhas DEDENT {
+          sairEscopo();
+          $$ = CriarNoBloco($3);
+      }
     ;
 
 funcao:
