@@ -351,7 +351,7 @@ int main(int argc, char **argv) {
     /* Configura o arquivo de entrada */
     if (arquivo_entrada) {
         yyin = fopen(arquivo_entrada, "r");
-
+    }
     entrarEscopo(); // Inicializa escopo global
     
     /* Configura o arquivo de entrada ou usa stdin */
@@ -425,11 +425,13 @@ int main(int argc, char **argv) {
     if (arquivo_entrada) {
 
     sairEscopo(); // Libera escopo global
-    
+    }
     /* Fecha o arquivo se necessário */
     if (argc > 1) {
         fclose(yyin);
     }
 
     return 0;
+    
+    
 }
