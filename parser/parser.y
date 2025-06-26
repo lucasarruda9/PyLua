@@ -56,6 +56,7 @@ void yyerror(const char *s) {
 %token <string> STRING_DQ STRING_SQ TRIPLE_DQ TRIPLE_SQ
 %token COMMENT
 %token INDENT DEDENT
+%token DEF RETURN
 
 /* Precedência de operadores */
 %left BITOR
@@ -77,6 +78,9 @@ void yyerror(const char *s) {
 %type <no> condicional
 %type <no> bloco
 %type <lista> linhas
+%type <no> funcao
+%type <lista> parametros lista_parametros
+%type <lista> lista_elementos
 %type <no> line_exec
 %type <no> funcao
 
@@ -129,7 +133,16 @@ line:    expr NEWLINE {
         DesalocarArvore($1);
         $$ = NULL;
 }
-    | funcao {
+        | funcao NEWLINE {
+            imprimeArvore($1, 0);
+            if (gerar_codigo_lua && arquivo_lua) {
+                gerarCodigoLua($1);
+            }
+            DesalocarArvore($1);
+            $$ = NULL;
+        }
+        
+        | funcao {
             imprimeArvore($1, 0);
             if (gerar_codigo_lua && arquivo_lua) {
                 gerarCodigoLua($1);
@@ -142,6 +155,22 @@ line:    expr NEWLINE {
             if (gerar_codigo_lua && arquivo_lua) {
             gerarCodigoLua($1);
         }
+            DesalocarArvore($1);
+            $$ = NULL;
+        }
+       | comando_while NEWLINE {
+            imprimeArvore($1, 0);
+            if (gerar_codigo_lua && arquivo_lua) {
+                gerarCodigoLua($1);
+            }
+            DesalocarArvore($1);
+            $$ = NULL;
+        }
+       | comando_for NEWLINE {
+            imprimeArvore($1, 0);
+            if (gerar_codigo_lua && arquivo_lua) {
+                gerarCodigoLua($1);
+            }
             DesalocarArvore($1);
             $$ = NULL;
         }
@@ -196,6 +225,8 @@ expr:    INTEGER               { $$ = CriarNoInteiro($1); }  // Cria um nó de i
        | expr SHIFTR expr      { $$ = CriarNoOperador($1, $3, 'r'); }  // Shift right
        | MINUS expr %prec NEG  { $$ = CriarNoOperador($2, NULL, '-'); }  // Menos unário
        | BITNOT expr %prec BITNOT { $$ = CriarNoOperador($2, NULL, '~'); }  // NOT bitwise
+       | LBRACKET lista_elementos RBRACKET { $$ = CriarNoLista($2); }
+       | expr LBRACKET expr RBRACKET { $$ = CriarNoIndexacao($1, $3); }
        ;
 
 declaracao:  IDENTIFIER ASSIGN expr { 
@@ -261,6 +292,7 @@ declaracao:  IDENTIFIER ASSIGN expr {
             }
             $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, 'a'));
 } 
+       | RETURN expr { $$ = CriarNoReturn($2); }
        ;
 
 //nao terminal pra processar blocos
@@ -284,12 +316,44 @@ bloco:
     
     ;
 
+
+linhas:
+      linhas line { $$ = AdicionarNoLista($1, $2); }
+    | line { $$ = AdicionarNoLista(NULL, $1);}
 funcao:
       DEF IDENTIFIER LPAREN RPAREN COLON NEWLINE bloco {
           $$ = CriarNoFuncao($2, NULL, $7);
       }
     ;
-
+funcao:
+    DEF IDENTIFIER LPAREN parametros RPAREN COLON NEWLINE bloco {
+        $$ = CriarNoFuncao($2, $4, CriarNoBloco($8));
+        inserirSimboloEscopo($2, TIPO_FUNCAO);
+        entrarEscopo();
+        ListaNo* param = $4;
+        while (param) {
+            inserirSimboloEscopo(param->no->var, TIPO_INT); // Adapte tipo conforme necessário
+            param = param->prox;
+        }
+        sairEscopo();
+    }
+;
+parametros:
+      /* vazio */ { $$ = NULL; }
+    | lista_parametros { $$ = $1; }
+;
+lista_parametros:
+      IDENTIFIER { 
+          $$ = CriarNoLista(CriarNoVariavel($1), NULL); 
+      }
+    | lista_parametros COMMA IDENTIFIER {
+          $$ = AdicionarNoLista($1, CriarNoVariavel($3));
+      }
+;
+lista_elementos:
+      expr { $$ = CriarListaElementos($1, NULL); }
+    | lista_elementos COMMA expr { $$ = CriarListaElementos($3, $1); }
+;
 condicional:
       IF LPAREN expr RPAREN COLON NEWLINE bloco {
           $$ = CriarNoIf($3, $7, NULL);
@@ -310,6 +374,17 @@ condicional:
       }
     | WHILE LPAREN expr RPAREN COLON NEWLINE bloco {
           $$ = CriarNoWhile($3, $7);
+      }
+    ;
+comando_while:
+      WHILE LPAREN expr RPAREN COLON NEWLINE bloco {
+          $$ = CriarNoWhile($3, CriarNoBloco($7));
+      }
+    ;
+
+comando_for:
+      FOR IDENTIFIER IN expr COLON NEWLINE bloco {
+          $$ = CriarNoFor(CriarNoVariavel($2), $4, NULL, CriarNoBloco($7));
       }
     ;
 %%
@@ -339,6 +414,12 @@ int main(int argc, char **argv) {
     /* Configura o arquivo de entrada */
     if (arquivo_entrada) {
         yyin = fopen(arquivo_entrada, "r");
+    }
+    entrarEscopo(); // Inicializa escopo global
+    
+    /* Configura o arquivo de entrada ou usa stdin */
+    if (argc > 1) {
+        yyin = fopen(argv[1], "r");  // Abre o arquivo de entrada
         if (yyin == NULL) {
             printf("Erro ao abrir arquivo %s\n", arquivo_entrada);
             return 1;
@@ -405,8 +486,15 @@ int main(int argc, char **argv) {
 
     /* Fecha arquivos se necessário */
     if (arquivo_entrada) {
+
+    sairEscopo(); // Libera escopo global
+    }
+    /* Fecha o arquivo se necessário */
+    if (argc > 1) {
         fclose(yyin);
     }
 
     return 0;
+    
+    
 }
