@@ -8,30 +8,34 @@
 
 int yylex();  // Declaração da função yylex que será chamada pelo parser
 void yyerror(const char *s);  // Função de erro para lidar com erros sintáticos
-extern FILE *yyin;  // Arquivo de entrada (pode ser stdin ou um arquivo)
+extern FILE *yyin;  // Arquivo de entrada 
 extern int line_num;  // Linha atual (definida no scanner)
-extern int col_num;   // Coluna atual (definida no scanner)
 extern void inicializa_pilha();  // Declaração da função de inicialização da pilha de indentação
+// No início do parser.y
+ListaNo* ast_global = NULL;
 
 // Variáveis globais para controle da geração de código
 FILE *arquivo_lua = NULL;
 int gerar_codigo_lua = 0;
 
 void yyerror(const char *s) {
-    fprintf(stderr, "[ERRO SINTATICO] %s na linha %d, coluna %d\n", s, line_num, col_num);
+    fprintf(stderr, "[ERRO SINTATICO] %s na linha %d\n", s, line_num);
 }
 %}
 
 /* Declaração de tipos para os valores */
 %union {
     int intval;
+    float floatval;
     struct Arvore *no;
     char *string;
     struct ListaNo *lista;
 }
 
 /* Declaração de tokens */
-%token <intval> INTEGER  // O token INTEGER irá carregar um valor inteiro
+%token <intval> INTEGER  
+%token <floatval> FLOAT
+%token <intval> TRUE FALSE
 %token PLUS MINUS MULTIPLY DIVIDE MODULO
 %token POWER FLOOR_DIV
 %token LT GT LE GE EQ NE NE2
@@ -40,14 +44,15 @@ void yyerror(const char *s) {
 %token ASSIGN PLUS_EQ MINUS_EQ MULT_EQ DIV_EQ FLOOR_EQ POW_EQ MOD_EQ
 %token BITAND BITOR BITXOR BITNOT
 %token SHIFTL SHIFTR AND_EQ OR_EQ XOR_EQ SHIFTR_EQ SHIFTL_EQ
-%token ERROR  // Token de erro
+%token ERROR
 %token NEWLINE
 %token <string> KEYWORD
 %token IF ELIF ELSE MATCH CASE
 %token FOR WHILE
+%token DEF RETURN
 %token LBRACKET RBRACKET LBRACE RBRACE
 %token COMMA COLON DOT DECORATOR ARROW
-%token <string> FLOAT HEX OCT BIN
+%token <string> HEX OCT BIN
 %token <string> STRING_DQ STRING_SQ TRIPLE_DQ TRIPLE_SQ
 %token COMMENT
 %token INDENT DEDENT
@@ -71,29 +76,25 @@ void yyerror(const char *s) {
 %type <no> declaracao
 %type <no> line
 %type <no> condicional
-%type <lista> bloco
+%type <no> bloco
 %type <lista> linhas
 %type <no> funcao
 %type <lista> parametros lista_parametros
 %type <lista> lista_elementos
+%type <no> line_exec
+%type <no> funcao
+
 
 %%
 
 /* Regras de análise sintática */
 input:   /* Produção vazia */
        | input line  
-       | input DEDENT  // Dentação
-       | input INDENT  // identação
        ;
 
 line:    expr NEWLINE {
         imprimeArvore($1, 0);
-        // Avaliação da expressão
-        int resultado = avaliarArvore($1);
-        printf("Resultado: %d\n", resultado);
-
-        // Gera código Lua se habilitado
-        if (gerar_codigo_lua && arquivo_lua) {
+        if (gerar_codigo_lua && arquivo_lua && $1->tipo != NoIf) {
             gerarCodigoLua($1);
         }
 
@@ -102,13 +103,6 @@ line:    expr NEWLINE {
 }
        | declaracao NEWLINE {
         imprimeArvore($1, 0);
-        // Avalia e executa a atribuição na tabela de símbolos
-        if ($1->tipo == NoAtribuicao) {
-            if ($1->esquerdo->tipo == NoVariavel) {
-                int resultado = avaliarArvore($1);
-                printf("Resultado da atribuição: %d\n", resultado);
-            }
-        }
 
         // Gera código Lua se habilitado
         if (gerar_codigo_lua && arquivo_lua) {
@@ -120,9 +114,6 @@ line:    expr NEWLINE {
 }
        | expr /* sem quebra de linha ao final */ {
         imprimeArvore($1, 0);
-        // Avaliação da expressão
-        int resultado = avaliarArvore($1);
-        printf("Resultado: %d\n", resultado);
 
         // Gera código Lua se habilitado
         if (gerar_codigo_lua && arquivo_lua) {
@@ -134,14 +125,6 @@ line:    expr NEWLINE {
 }
        | declaracao /* sem quebra de linha ao final */ {
         imprimeArvore($1, 0);
-        // Avalia e executa a atribuição na tabela de símbolos
-        if ($1->tipo == NoAtribuicao) {
-            if ($1->esquerdo->tipo == NoVariavel) {
-                int resultado = avaliarArvore($1);
-                printf("Resultado da atribuição: %d\n", resultado);
-            }
-        }
-
         // Gera código Lua se habilitado
         if (gerar_codigo_lua && arquivo_lua) {
             gerarCodigoLua($1);
@@ -158,19 +141,20 @@ line:    expr NEWLINE {
             DesalocarArvore($1);
             $$ = NULL;
         }
-        | condicional NEWLINE {
+        
+        | funcao {
             imprimeArvore($1, 0);
-            // Avaliar a semântica do condicional
-            int resultado = avaliarArvore($1);
-            printf("Resultado do condicional: %d\n", resultado);
+            if (gerar_codigo_lua && arquivo_lua) {
+                gerarCodigoLua($1);
+            }
             DesalocarArvore($1);
             $$ = NULL;
         }
     | condicional {
             imprimeArvore($1, 0);
-            // Avaliar a semântica do condicional
-            int resultado = avaliarArvore($1);
-            printf("Resultado do condicional: %d\n", resultado);
+            if (gerar_codigo_lua && arquivo_lua) {
+            gerarCodigoLua($1);
+        }
             DesalocarArvore($1);
             $$ = NULL;
         }
@@ -199,6 +183,11 @@ line:    expr NEWLINE {
        ;
 
 expr:    INTEGER               { $$ = CriarNoInteiro($1); }  // Cria um nó de inteiro
+       | FLOAT                 { $$ = CriarNoFloat($1); }  // Cria um nó float
+       | TRUE                  { $$ = CriarNoBool($1); }  // Cria um nó bool true
+       | FALSE                 { $$ = CriarNoBool($1); }  // Cria um nó bool false
+       | STRING_DQ             { $$ = CriarNoString($1); }  // String com aspas duplas
+       | STRING_SQ             { $$ = CriarNoString($1); }  // String com aspas simples
        | IDENTIFIER            { 
                                Simbolo *s = buscarSimbolo($1);
                                if (s == NULL) {
@@ -241,33 +230,89 @@ expr:    INTEGER               { $$ = CriarNoInteiro($1); }  // Cria um nó de i
        ;
 
 declaracao:  IDENTIFIER ASSIGN expr { 
+            // Inserir variável na tabela se ainda não existir
+            if (!existeSimbolo($1)) {
+                inserirSimbolo($1, TIPO_INT);  // TODO: Detectar tipo correto da expressão
+            }
             $$ = CriaNoAtribuicao(CriarNoVariavel($1), $3);
 } 
        | IDENTIFIER PLUS_EQ expr { 
+            // Verificar se variável existe antes de usar
+            if (!existeSimbolo($1)) {
+                printf("[AVISO] Variável '%s' não declarada\n", $1);
+                inserirSimbolo($1, TIPO_INT);
+            }
             $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, '+'));
 } 
        | IDENTIFIER MINUS_EQ expr { 
+            // Verificar se variável existe antes de usar
+            if (!existeSimbolo($1)) {
+                printf("[AVISO] Variável '%s' não declarada\n", $1);
+                inserirSimbolo($1, TIPO_INT);
+            }
             $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, '-'));
 }  
        | IDENTIFIER MULT_EQ expr { 
+            // Verificar se variável existe antes de usar
+            if (!existeSimbolo($1)) {
+                printf("[AVISO] Variável '%s' não declarada\n", $1);
+                inserirSimbolo($1, TIPO_INT);
+            }
             $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, '*'));
 } 
        | IDENTIFIER DIV_EQ expr { 
+            // Verificar se variável existe antes de usar
+            if (!existeSimbolo($1)) {
+                printf("[AVISO] Variável '%s' não declarada\n", $1);
+                inserirSimbolo($1, TIPO_INT);
+            }
             $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, '/'));
 }  
        | IDENTIFIER MOD_EQ expr { 
+            // Verificar se variável existe antes de usar
+            if (!existeSimbolo($1)) {
+                printf("[AVISO] Variável '%s' não declarada\n", $1);
+                inserirSimbolo($1, TIPO_INT);
+            }
             $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, '%'));
 } 
        | IDENTIFIER FLOOR_EQ expr { 
+            // Verificar se variável existe antes de usar
+            if (!existeSimbolo($1)) {
+                printf("[AVISO] Variável '%s' não declarada\n", $1);
+                inserirSimbolo($1, TIPO_INT);
+            }
             $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, 'b'));
 }  
        | IDENTIFIER POW_EQ expr { 
+            // Verificar se variável existe antes de usar
+            if (!existeSimbolo($1)) {
+                printf("[AVISO] Variável '%s' não declarada\n", $1);
+                inserirSimbolo($1, TIPO_INT);
+            }
             $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, 'a'));
 } 
        | RETURN expr { $$ = CriarNoReturn($2); }
        ;
+
+//nao terminal pra processar blocos
+line_exec:
+      expr NEWLINE         { $$ = $1; }
+    | declaracao NEWLINE   { $$ = $1; }
+    | condicional          { $$ = $1; }
+    | expr                 { $$ = $1; }
+    | declaracao           { $$ = $1; }
+    ;
+
+//linhas podem ter 1 ou mais line_exec
+linhas:
+      linhas line_exec { $$ = AdicionarNoLista($1, $2); }
+    | line_exec       { $$ = AdicionarNoLista(NULL, $1); }
+    ;
+
+//é considerado bloco se tiver indentado corretamente
 bloco:
-      INDENT linhas DEDENT { $$ = $2; }
+      INDENT linhas DEDENT { $$ = CriarNoBloco($2); }
     
     ;
 
@@ -275,6 +320,10 @@ bloco:
 linhas:
       linhas line { $$ = AdicionarNoLista($1, $2); }
     | line { $$ = AdicionarNoLista(NULL, $1);}
+funcao:
+      DEF IDENTIFIER LPAREN RPAREN COLON NEWLINE bloco {
+          $$ = CriarNoFuncao($2, NULL, $7);
+      }
     ;
 funcao:
     DEF IDENTIFIER LPAREN parametros RPAREN COLON NEWLINE bloco {
@@ -307,10 +356,24 @@ lista_elementos:
 ;
 condicional:
       IF LPAREN expr RPAREN COLON NEWLINE bloco {
-          $$ = CriarNoIf($3, CriarNoBloco($7), NULL);
+          $$ = CriarNoIf($3, $7, NULL);
       }
+
+    |  IF expr COLON NEWLINE bloco {
+          $$ = CriarNoIf($2, $5, NULL);
+      }
+      
     | IF LPAREN expr RPAREN COLON NEWLINE bloco ELSE COLON NEWLINE bloco {
-          $$ = CriarNoIf($3, CriarNoBloco($7), CriarNoBloco($11));
+          $$ = CriarNoIf($3, $7, $11);
+      }
+    | IF expr COLON NEWLINE bloco ELSE COLON NEWLINE bloco{
+          $$ = CriarNoIf($2, $5, $9);
+      }
+    | WHILE expr COLON NEWLINE bloco {
+          $$ = CriarNoWhile($2, $5);
+      }
+    | WHILE LPAREN expr RPAREN COLON NEWLINE bloco {
+          $$ = CriarNoWhile($3, $7);
       }
     ;
 comando_while:

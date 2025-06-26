@@ -45,9 +45,21 @@ static void gerarExpressao(No* no) {
             fprintf(gerador.arquivo_saida, "%.6f", no->valor_float);
             break;
 
-        case NoString:
-            fprintf(gerador.arquivo_saida, "\"%s\"", no->valor_str ? no->valor_str : "");
+        case NoString: {
+            char* str = no->valor_str;
+            if (str && strlen(str) >= 2) {
+                int len = strlen(str);
+                if ((str[0] == '"' && str[len-1] == '"') || 
+                    (str[0] == '\'' && str[len-1] == '\'')) {
+                    fprintf(gerador.arquivo_saida, "%s", str);
+                } else {
+                    fprintf(gerador.arquivo_saida, "\"%s\"", str);
+                }
+            } else {
+                fprintf(gerador.arquivo_saida, "\"\"");
+            }
             break;
+        }
 
         case NoBool:
             fprintf(gerador.arquivo_saida, "%s", no->valor_bool ? "true" : "false");
@@ -59,33 +71,29 @@ static void gerarExpressao(No* no) {
 
         case NoOperacaoBinaria:
             fprintf(gerador.arquivo_saida, "(");
-            gerarExpressao(no->esquerdo);
+            gerarExpressao(no->esquerda);
             switch (no->op) {
                 case '+': fprintf(gerador.arquivo_saida, " + "); break;
                 case '-': fprintf(gerador.arquivo_saida, " - "); break;
                 case '*': fprintf(gerador.arquivo_saida, " * "); break;
                 case '/': fprintf(gerador.arquivo_saida, " / "); break;
                 case '%': fprintf(gerador.arquivo_saida, " %% "); break;
-                case 'a': fprintf(gerador.arquivo_saida, " ^ "); break;
-                case 'b': fprintf(gerador.arquivo_saida, " // "); break;
+                case 'p': fprintf(gerador.arquivo_saida, " ^ "); break;
+                case 'f': fprintf(gerador.arquivo_saida, " // "); break;
+                case '=': fprintf(gerador.arquivo_saida, " == "); break;
+                case '<': fprintf(gerador.arquivo_saida, " < "); break;
+                case '>': fprintf(gerador.arquivo_saida, " > "); break;
+                case 'l': fprintf(gerador.arquivo_saida, " <= "); break;
+                case 'g': fprintf(gerador.arquivo_saida, " >= "); break;
+                case 'n': fprintf(gerador.arquivo_saida, " ~= "); break;
+                case '&': fprintf(gerador.arquivo_saida, " & "); break;
+                case '|': fprintf(gerador.arquivo_saida, " | "); break;
+                case '^': fprintf(gerador.arquivo_saida, " ~ "); break;
+                case 's': fprintf(gerador.arquivo_saida, " << "); break;
+                case 'r': fprintf(gerador.arquivo_saida, " >> "); break;
                 default: fprintf(gerador.arquivo_saida, " ? "); break;
             }
-            gerarExpressao(no->direito);
-            fprintf(gerador.arquivo_saida, ")");
-            break;
-
-        case NoChamadaFuncao:
-            fprintf(gerador.arquivo_saida, "%s(", no->nome_funcao ? no->nome_funcao : "funcao");
-            if (no->argumentos) {
-                ListaNo* atual = no->argumentos;
-                while (atual) {
-                    gerarExpressao(atual->no);
-                    if (atual->prox) {
-                        fprintf(gerador.arquivo_saida, ", ");
-                    }
-                    atual = atual->prox;
-                }
-            }
+            gerarExpressao(no->direita);
             fprintf(gerador.arquivo_saida, ")");
             break;
 
@@ -95,15 +103,23 @@ static void gerarExpressao(No* no) {
     }
 }
 
+void gerarBlocoLua(ListaNo* lista) {
+    ListaNo* atual = lista;
+    while (atual) {
+        gerarCodigoLua(atual->no);
+        atual = atual->prox;
+    }
+}
+
 void gerarCodigoLua(No* no) {
     if (!no) return;
 
     switch (no->tipo) {
         case NoAtribuicao:
             indentar();
-            if (no->esquerdo && no->esquerdo->tipo == NoVariavel) {
-                fprintf(gerador.arquivo_saida, "local %s = ", no->esquerdo->var);
-                gerarExpressao(no->direito);
+            if (no->esquerda && no->esquerda->tipo == NoVariavel) {
+                fprintf(gerador.arquivo_saida, "local %s = ", no->esquerda->var);
+                gerarExpressao(no->direita);
                 fprintf(gerador.arquivo_saida, "\n");
             }
             break;
@@ -117,16 +133,21 @@ void gerarCodigoLua(No* no) {
         case NoIf:
             indentar();
             fprintf(gerador.arquivo_saida, "if ");
-            gerarExpressao(no->condicao);
+            gerarExpressao(no->esquerda);
             fprintf(gerador.arquivo_saida, " then\n");
             aumentarIndentacao();
-            gerarCodigoLua(no->corpo);
+            if (no->meio && no->meio->tipo == NoBloco) {
+                gerarBlocoLua(no->meio->lista);
+            } 
+            else if (no->meio) {
+                gerarCodigoLua(no->meio);
+        }
             diminuirIndentacao();
-            if (no->senao) {
+            if (no->direita) {
                 indentar();
                 fprintf(gerador.arquivo_saida, "else\n");
                 aumentarIndentacao();
-                gerarCodigoLua(no->senao);
+                gerarCodigoLua(no->direita);
                 diminuirIndentacao();
             }
             indentar();
@@ -136,10 +157,10 @@ void gerarCodigoLua(No* no) {
         case NoWhile:
             indentar();
             fprintf(gerador.arquivo_saida, "while ");
-            gerarExpressao(no->condicao);
+            gerarExpressao(no->esquerda);
             fprintf(gerador.arquivo_saida, " do\n");
             aumentarIndentacao();
-            gerarCodigoLua(no->corpo);
+            gerarCodigoLua(no->meio);
             diminuirIndentacao();
             indentar();
             fprintf(gerador.arquivo_saida, "end\n");
@@ -148,15 +169,15 @@ void gerarCodigoLua(No* no) {
         case NoFor:
             indentar();
             fprintf(gerador.arquivo_saida, "for ");
-            if (no->esquerdo && no->esquerdo->tipo == NoVariavel) {
-                fprintf(gerador.arquivo_saida, "%s = ", no->esquerdo->var);
-                gerarExpressao(no->direito);
+            if (no->esquerda && no->esquerda->tipo == NoVariavel) {
+                fprintf(gerador.arquivo_saida, "%s = ", no->esquerda->var);
+                gerarExpressao(no->direita);
                 fprintf(gerador.arquivo_saida, ", ");
-                gerarExpressao(no->condicao);
+                gerarExpressao(no->esquerda);
             }
             fprintf(gerador.arquivo_saida, " do\n");
             aumentarIndentacao();
-            gerarCodigoLua(no->corpo);
+            gerarCodigoLua(no->meio);
             diminuirIndentacao();
             indentar();
             fprintf(gerador.arquivo_saida, "end\n");
@@ -164,31 +185,14 @@ void gerarCodigoLua(No* no) {
 
         case NoFuncao:
             indentar();
-            fprintf(gerador.arquivo_saida, "function %s(", no->nome_funcao ? no->nome_funcao : "funcao");
-            if (no->parametros) {
-                ListaNo* atual = no->parametros;
-                while (atual) {
-                    if (atual->no && atual->no->tipo == NoVariavel) {
-                        fprintf(gerador.arquivo_saida, "%s", atual->no->var);
-                        if (atual->prox) {
-                            fprintf(gerador.arquivo_saida, ", ");
-                        }
-                    }
-                    atual = atual->prox;
-                }
-            }
-            fprintf(gerador.arquivo_saida, ")\n");
+            fprintf(gerador.arquivo_saida, "function %s()\n", no->var ? no->var : "anonima");
             aumentarIndentacao();
-            gerarCodigoLua(no->corpo);
+            if (no->lista) {
+                gerarBlocoLua(no->lista);
+            }
             diminuirIndentacao();
             indentar();
             fprintf(gerador.arquivo_saida, "end\n");
-            break;
-
-        case NoChamadaFuncao:
-            indentar();
-            gerarExpressao(no);
-            fprintf(gerador.arquivo_saida, "\n");
             break;
 
         default:
@@ -197,14 +201,6 @@ void gerarCodigoLua(No* no) {
             gerarExpressao(no);
             fprintf(gerador.arquivo_saida, "\n");
             break;
-    }
-}
-
-void gerarBlocoLua(ListaNo* lista) {
-    ListaNo* atual = lista;
-    while (atual) {
-        gerarCodigoLua(atual->no);
-        atual = atual->prox;
     }
 }
 

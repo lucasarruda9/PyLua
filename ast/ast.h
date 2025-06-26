@@ -28,23 +28,14 @@ typedef struct ListaNo {
 
 typedef struct Arvore{
     Tipo tipo;
-    struct Arvore *direito, *esquerdo;
+    struct Arvore *direita, *meio, *esquerda;
     int valor;
     float valor_float;
     char* valor_str;
     int valor_bool;
     char* var;
     char op;
-    // Para blocos e listas
-    ListaNo* lista;
-    // Para if/while/for
-    struct Arvore* condicao;
-    struct Arvore* corpo;
-    struct Arvore* senao;
-    // Para funções
-    char* nome_funcao;
-    ListaNo* parametros;
-    ListaNo* argumentos;
+    ListaNo *lista;
 }No;
 
 No* CriarNoInteiro(int valor);
@@ -59,7 +50,7 @@ No* CriarNoBool(int valor);
 No* CriarNoBloco(ListaNo* lista);
 No* CriarNoIf(No* condicao, No* corpo, No* senao);
 No* CriarNoWhile(No* condicao, No* corpo);
-No* CriarNoFor(No* var, No* inicio, No* fim, No* corpo);
+No* CriarNoFor(No* init, No* cond, No* inc, No* corpo);
 No* CriarNoFuncao(char* nome, ListaNo* parametros, No* corpo);
 No* CriarNoChamadaFuncao(char* nome, ListaNo* argumentos);
 No* CriarNoLista(ListaNo* elementos);
@@ -72,7 +63,5 @@ void DesalocarArvore(struct Arvore* no);
 void imprimeArvore(No *no, int nivel);
 void imprimeLista(ListaNo* lista, int nivel);
 
-// Nova função para avaliação da AST
-int avaliarArvore(No* no);
 
 #endif // AST_H

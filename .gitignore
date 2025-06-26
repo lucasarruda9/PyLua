@@ -22,9 +22,9 @@ temp/
 build/
 src/
 
-# Arquivos Lua gerados (opcional - descomente se não quiser versionar)
-# saidas_lua/
-# *.lua
+# Arquivos Lua gerados 
+saidas_lua/
+*.lua
 
 # Arquivos de teste temporários
 tmp_*_output.txt
