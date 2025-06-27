@@ -63,6 +63,36 @@ Não implementar um sistema robusto de verificação de tipos.
 - Positivo: Simplificação do processo de compilação
 - Negativo: Menor capacidade de detectar erros de tipo em tempo de compilação
 
+## Problema de Line Endings (CRLF vs LF)
+### Decisão
+Implementação de scripts para conversão automática entre line endings CRLF (Windows) e LF (Unix/Linux) para compatibilidade com WSL.
+
+### Justificativa
+1. O script `pylua.sh` não executava corretamente no WSL devido aos line endings CRLF (padrão Windows)
+2. Testes de validação falhavam na comparação de arquivos por diferenças de line endings
+3. Necessidade de manter compatibilidade tanto para desenvolvimento Windows quanto para execução em WSL
+4. Evitar conflitos no Git causados por conversões automáticas de line endings
+
+### Solução Implementada
+Criação de dois comandos para conversão manual conforme necessário:
+
+**Conversão para LF (para testes no WSL):**
+```bash
+find . -type f \( -name "*.txt" -o -name "*.sh" -o -name "*.py" -o -name "*.c" -o -name "*.h" -o -name "*.md" \) -exec dos2unix {} \;
+```
+
+**Conversão para CRLF (padrão Windows):**
+```bash
+find . -type f \( -name "*.txt" -o -name "*.sh" -o -name "*.py" -o -name "*.c" -o -name "*.h" -o -name "*.md" \) -exec unix2dos {} \;
+```
+
+### Impacto
+- Positivo: Scripts funcionam corretamente no WSL
+- Positivo: Testes de validação executam sem falhas
+- Positivo: Compatibilidade mantida para desenvolvedores Windows
+- Positivo: Controle manual evita conflitos automáticos no Git
+- Negativo: Necessidade de conversão manual antes de testar no WSL
+
 ## Referências Bibliográficas
 
 - COOPER, K.; TORCZON, L. *Engineering a Compiler*. 3rd Edition. Morgan Kaufmann, 2022. Disponível em: <https://www.elsevier.com/books/engineering-a-compiler/cooper/978-0-12-815412-0>
@@ -80,3 +110,4 @@ Não implementar um sistema robusto de verificação de tipos.
 | Versão | Descrição | Autor | Data | Revisor | Data Revisão |
 |--------|-----------|-------|------|---------|--------------|
 | 1.0 | Criação do documento e registro das decisões iniciais | [Artur Mendonça](https://github.com/ArtyMend07) | 15/06/2025 | [Lucas Mendonça](https://github.com/lucasarruda9) | 15/06/2025 |
+| 1.1 | Adição da seção sobre problema de line endings (CRLF vs LF) e solução implementada | [Artur Mendonça](https://github.com/ArtyMend07) | 27/06/2025 | [Lucas Mendonça](https://github.com/lucasarruda9) e [Gabriel Lopes](https://github.com/gabriellopes7) | 27/06/2025 |
