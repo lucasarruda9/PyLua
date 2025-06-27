@@ -1,0 +1,21 @@
+local x = (2 + (3 * 4))
+local y = ((10 - 5) + 1)
+local z = ((8 / 2) * 3)
+(5 + 3)
+(x * 2)
+if 1 then
+    local a = 10
+end
+if 0 then
+    local b = 20
+else
+    local c = 30
+end
+local resultado = ((((1 + 2) + 3) + 4) + 5)
+local multiplicacao = (((2 * 2) * 2) * 2)
+local comparacao1 = (5 > 3)
+local comparacao2 = (10 < 5)
+local comparacao3 = (7 == 7)
+print("Resultado:", resultado)
+print("Multiplicação:", multiplicacao)
+print("Comparações:", comparacao1, comparacao2, comparacao3)
