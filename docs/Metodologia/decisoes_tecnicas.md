@@ -110,4 +110,4 @@ find . -type f \( -name "*.txt" -o -name "*.sh" -o -name "*.py" -o -name "*.c" -
 | Versão | Descrição | Autor | Data | Revisor | Data Revisão |
 |--------|-----------|-------|------|---------|--------------|
 | 1.0 | Criação do documento e registro das decisões iniciais | [Artur Mendonça](https://github.com/ArtyMend07) | 15/06/2025 | [Lucas Mendonça](https://github.com/lucasarruda9) | 15/06/2025 |
-| 1.1 | Adição da seção sobre problema de line endings (CRLF vs LF) e solução implementada | [Artur Mendonça](https://github.com/ArtyMend07) | 27/06/2025 | [Gabriel Lopes](https://github.com/gabriellopes7) | 27/06/2025 |
+| 1.1 | Adição da seção sobre problema de line endings (CRLF vs LF) e solução implementada | [Artur Mendonça](https://github.com/ArtyMend07) | 27/06/2025 | [Lucas Mendonça](https://github.com/lucasarruda9) e [Gabriel Lopes](https://github.com/gabriellopes7) | 27/06/2025 |
