@@ -1,4 +1,4 @@
-# Ata da Sprint 1 - Preparação e Análise Léxica
+# Ata da Sprint 2 - Análise Sintática
 
 ### Local
 Reunião realizada presencialmente em sala de aula.
@@ -7,7 +7,7 @@ Reunião realizada presencialmente em sala de aula.
 
 |          | Data       | Início| Término |
 |----------|------------|-------|---------|
-| Previsto | 24/03/2025 | 20:00 | 21:00   |
+| Previsto | 10/04/2025 | 20:00 | 21:00   |
 | Realizado| 04/04/2025 | 20:04 | 21:15   |
 
 ### Participantes presentes:
@@ -19,14 +19,14 @@ Reunião realizada presencialmente em sala de aula.
 - [Samuel Alves](https://github.com/samuelalvess)
 
 ### Pauta:
-- Definir escopo do compilador.
-- Discutir a configuração do ambiente de desenvolvimento.
-- Revisar as tarefas da Sprint 1 e definir responsáveis.
+- Definir a gramática do subset Python.
+- Discutir a implementação do analisador sintático (Parser).
+- Preparar a documentação para o ponto de controle (P1).
 
 ### Decisões:
-- O escopo do compilador foi definido para incluir apenas um subset da linguagem Python, com foco nos principais tokens.
-- O repositório foi configurado corretamente, com todas as ferramentas necessárias instaladas.
-- O analisador léxico (Scanner) foi a primeira tarefa a ser implementada.
+- A gramática para o subset Python foi definida e um esboço inicial do parser foi desenvolvido.
+- O sistema de erros sintáticos foi implementado, permitindo uma mensagem de erro clara durante a análise.
+- A integração entre o módulo léxico e o sintático foi iniciada e deverá ser concluída até o final da sprint.
 
 ### Próxima Reunião 
 09/04/2025 às 20h
@@ -34,7 +34,4 @@ Reunião realizada presencialmente em sala de aula.
 ### Histórico de versão
 Versão  | Data | Descrição | Autor(es) | Revisor(es) | Data da Revisão
 -------- | ------ | -------- | ---------- | ----------- | ---------------
-1.0 | 05/04/2025 | Ata da Sprint 1 | [Samuel Alves](https://github.com/samuelalvess) | [Artur Mendonça](https://github.com/ArtyMend07) | 05/04/2025
-
-
-
+1.0 | 05/04/2025 | Ata da Sprint 2 | [Samuel Alves](https://github.com/samuelalvess) | [Artur Mendonça](https://github.com/ArtyMend07) | 05/04/2025
