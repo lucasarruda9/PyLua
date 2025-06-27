@@ -35,6 +35,7 @@ PARSER = $(PARSER_DIR)/parser.y
 AST = $(AST_DIR)/ast.c
 TABELA = $(TABELA_DIR)/tabela.c
 GERADOR = $(GERADOR_DIR)/gerador_codigo_final.c
+OTIMIZADOR = $(GERADOR_DIR)/otimizador.c
 CODIGO_INTER = $(CODIGO_INTER_DIR)/codigo_intermediario.c
 
 # Arquivos gerados (saída no diretório src)
@@ -72,7 +73,7 @@ release:
 debug:
 	@$(MAKE) MODE=debug
 
-$(TARGET): $(LEXER_C) $(PARSER_C) $(AST) $(TABELA) $(GERADOR) $(CODIGO_INTER)
+$(TARGET): $(LEXER_C) $(PARSER_C) $(AST) $(TABELA) $(GERADOR) $(OTIMIZADOR) $(CODIGO_INTER)
 	$(CC) $(CFLAGS) -o $@ $^ -lfl -lm
 	@echo "Compilação concluída: $@"
 
@@ -166,7 +167,7 @@ docs:
 verificar_sintaxe:
 	@echo "Verificando sintaxe do código fonte..."
 	@for file in $(AST_DIR)/*.c $(TABELA_DIR)/*.c $(GERADOR_DIR)/*.c $(CODIGO_INTER_DIR)/*.c; do \
-		$(CC) -fsyntax-only $$file && echo "✓ $$file"; \
+		$(CC) -I$(AST_DIR) -I$(TABELA_DIR) -I$(GERADOR_DIR) -fsyntax-only $$file && echo "✓ $$file"; \
 	done
 
 .PHONY: all clean distclean run setup verificar_deps debug release test test_parser test_lexer test_semantico atualizar_gabaritos test_gerador test_exemplos validar_lua clean_scripts gerar_exemplos docs verificar_sintaxe
