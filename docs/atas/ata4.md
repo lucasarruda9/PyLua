@@ -1,14 +1,14 @@
 # Ata da Sprint 4 - Análise Semântica e Geração de Código Intermediário
 
 ### Local
-Reunião realizada presencialmente em sala de aula.
+Reunião realizada remotamente (online).
 
 ### Horário da Reunião
 
 |          | Data       | Início| Término |
 |----------|------------|-------|---------|
 | Previsto | 15/05/2025 | 20:00 | 21:00   |
-| Realizado| 15/05/2025 | 20:04 | 21:10   |
+| Realizado| 15/05/2025 | 20:00 | 21:10   |
 
 ### Participantes presentes:
 - [Artur Mendonça](https://github.com/ArtyMend07)

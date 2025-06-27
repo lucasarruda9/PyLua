@@ -1,14 +1,14 @@
 # Ata da Sprint 2 - Análise Sintática
 
 ### Local
-Reunião realizada presencialmente em sala de aula.
+Reunião realizada remotamente (online).
 
 ### Horário da Reunião
 
 |          | Data       | Início| Término |
 |----------|------------|-------|---------|
-| Previsto | 10/04/2025 | 20:00 | 21:00   |
-| Realizado| 04/04/2025 | 20:04 | 21:15   |
+| Previsto | 04/04/2025 | 20:00 | 21:00   |
+| Realizado| 04/04/2025 | 20:15 | 21:32   |
 
 ### Participantes presentes:
 - [Artur Mendonça](https://github.com/ArtyMend07)

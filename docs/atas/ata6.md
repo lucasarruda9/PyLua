@@ -1,7 +1,7 @@
 # Ata da Sprint 6 - Refinamento e Testes
 
 ### Local
-Reunião realizada presencialmente em sala de aula.
+Reunião realizada remotamente (online).
 
 ### Horário da Reunião
 

@@ -1,7 +1,7 @@
 # Ata da Sprint 1 - Preparação e Análise Léxica
 
 ### Local
-Reunião realizada presencialmente em sala de aula.
+Reunião realizada remotamente (online).
 
 ### Horário da Reunião
 

@@ -1,7 +1,7 @@
 # Ata da Sprint 5 - Geração de Código Lua
 
 ### Local
-Reunião realizada presencialmente em sala de aula.
+Reunião realizada remotamente (online).
 
 ### Horário da Reunião
 

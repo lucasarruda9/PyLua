@@ -1,7 +1,7 @@
 # Ata da Sprint 7 - Apresentação e Fechamento
 
 ### Local
-Reunião realizada presencialmente em sala de aula.
+Reunião realizada remotamente (online).
 
 ### Horário da Reunião
 

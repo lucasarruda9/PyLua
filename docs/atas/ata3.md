@@ -1,14 +1,14 @@
 # Ata da Sprint 3 - Representação Interna
 
 ### Local
-Reunião realizada presencialmente em sala de aula.
+Reunião realizada remotamente (online).
 
 ### Horário da Reunião
 
 |          | Data       | Início| Término |
 |----------|------------|-------|---------|
 | Previsto | 01/05/2025 | 20:00 | 21:00   |
-| Realizado| 04/05/2025 | 20:04 | 21:15   |
+| Realizado| 04/05/2025 | 20:00 | 21:15   |
 
 ### Participantes presentes:
 - [Artur Mendonça](https://github.com/ArtyMend07)

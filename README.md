@@ -25,7 +25,7 @@ PyLua é um **Compilador** que converte código Python em código Lua equivalent
 - [Desenvolvimento](#-desenvolvimento)
 - [Equipe](#-equipe)
 
-## 🛠 Instalação e Uso
+## Instalação e Uso
 
 ### Pré-requisitos
 - **GCC** (versão 7.0+)
@@ -127,7 +127,7 @@ end
 local resultado = soma(10, 5)
 ```
 
-## 🏗 Arquitetura
+## Arquitetura
 
 O PyLua segue a arquitetura clássica de compiladores:
 
@@ -309,5 +309,5 @@ Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICE
 
 | Versão | Data | Descrição | Autor | Revisor |
 |--------|------|-----------|--------|----------|
-| 1.0 | 25/04/2025 | Estrutura inicial do README | [Artur Mendonça](https://github.com/ArtyMend07) | [Lucas Mendonça](https://github.com/lucasarruda9) |
+| 1.0 | 25/04/2025 | Estrutura inicial do README | [Gabriel Lopes](https://github.com/BrzGab) | [Lucas Mendonça](https://github.com/lucasarruda9) |
 | 2.0| 17/06/2025 | Atualização da estrutura do repositório | [Artur Mendonça](https://github.com/ArtyMend07) | [Lucas Mendonça](https://github.com/lucasarruda9) |
