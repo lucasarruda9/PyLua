@@ -4,6 +4,8 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
 NC='\033[0m'
 
 print_color() {
@@ -19,19 +21,15 @@ mostrar_ajuda() {
     echo "  init                  Inicializa o projeto"
     echo "  deps                  Verifica dependências"
     echo "  build                 Compila o projeto"
-    echo "  test                  Executa testes do parser"
     echo "  test-generator        Testa o gerador de código"
     echo "  clean                 Limpa arquivos gerados"
-    echo "  clean-scripts         Remove scripts externos desnecessários"
     echo ""
     echo "OPÇÕES DE BUILD:"
     echo "  --release             Compila em modo release"
     echo "  --debug               Compila em modo debug (padrão)"
     echo "  --run                 Executa após compilar"
     echo ""
-    echo "OPÇÕES DE TESTE:"
-    echo "  --update-gabaritos    Atualiza gabaritos dos testes"
-    echo "  --test [nome]         Executa teste específico"
+    echo "OPÇÕES DE TESTE DO GERADOR:"
     echo "  --completo            Testa todos os exemplos (test-generator)"
     echo "  --executar            Tenta executar códigos Lua gerados"
     echo "  --validar             Valida códigos comparando com gabaritos"
@@ -39,7 +37,6 @@ mostrar_ajuda() {
     echo "EXEMPLOS:"
     echo "  ./pylua.sh init"
     echo "  ./pylua.sh build --release --run"
-    echo "  ./pylua.sh test --test test3"
     echo "  ./pylua.sh test-generator"
     echo "  ./pylua.sh test-generator --completo"
     echo "  ./pylua.sh test-generator --completo --executar --validar"
@@ -76,9 +73,8 @@ verificar_deps() {
 
 compilar_projeto() {
     local modo="debug"
-    local limpar_antes=false
     local executar_depois=false
-    
+
     while [[ $# -gt 0 ]]; do
         case $1 in
             --release)
@@ -87,10 +83,6 @@ compilar_projeto() {
                 ;;
             --debug)
                 modo="debug"
-                shift
-                ;;
-            --clean)
-                limpar_antes=true
                 shift
                 ;;
             --run)
@@ -102,16 +94,11 @@ compilar_projeto() {
                 ;;
         esac
     done
-    
+
     verificar_deps
     if [ $? -ne 0 ]; then
         print_color $RED "Erro: Dependências faltando."
         return 1
-    fi
-    
-    if $limpar_antes; then
-        print_color $BLUE "Limpando arquivos anteriores..."
-        make clean
     fi
     
     print_color $BLUE "Compilando em modo $modo..."
@@ -148,7 +135,7 @@ inicializar_projeto() {
     fi
     
     print_color $BLUE "2. Criando diretórios..."
-    mkdir -p exemplos saidas_lua tests docs/gerados build temp
+    mkdir -p exemplos saidas_lua docs/gerados build temp
     print_color $GREEN "✓ Diretórios criados"
     
     print_color $BLUE "3. Compilando projeto..."
@@ -175,77 +162,7 @@ inicializar_projeto() {
     print_color $GREEN "=== Projeto inicializado com sucesso! ==="
 }
 
-executar_testes() {
-    local teste_especifico=""
-    local atualizar_gabaritos=false
-    
-    while [[ $# -gt 0 ]]; do
-        case $1 in
-            --update-gabaritos)
-                atualizar_gabaritos=true
-                shift
-                ;;
-            --test)
-                teste_especifico="$2"
-                shift 2
-                ;;
-            *)
-                shift
-                ;;
-        esac
-    done
-    
-    make > /dev/null 2>&1
-    
-    print_color $BLUE "Executando testes..."
-    
-    DIR_TESTES="tests/parser"
-    DIR_ESPERADOS="tests/expected_outputs"
-    PASSOU=0
-    FALHOU=0
-    TOTAL=0
-    TESTES_FALHOS=()
-    
-    for arquivo in $DIR_TESTES/*.txt; do
-        base=$(basename "$arquivo" .txt)
-        if [[ -n "$teste_especifico" && "$base" != "$teste_especifico" ]]; then
-            continue
-        fi
-        esperado="$DIR_ESPERADOS/${base}.txt"
-        saida="tmp_${base}_output.txt"
-        ./pylua_debug < "$arquivo" > "$saida"
-        if $atualizar_gabaritos || [ ! -f "$esperado" ]; then
-            cp "$saida" "$esperado"
-            print_color $YELLOW "[GABARITO] $base atualizado."
-        else
-            if diff -q "$saida" "$esperado" > /dev/null; then
-                print_color $GREEN "[PASSOU] $base"
-                PASSOU=$((PASSOU+1))
-            else
-                print_color $RED "[FALHOU] $base"
-                diff "$saida" "$esperado"
-                FALHOU=$((FALHOU+1))
-                TESTES_FALHOS+=("$base")
-            fi
-        fi
-        rm -f "$saida"
-        TOTAL=$((TOTAL+1))
-    done
-    
-    if ! $atualizar_gabaritos; then
-        print_color $BLUE "Resumo: $PASSOU passaram, $FALHOU falharam, $TOTAL total."
-        if [ $TOTAL -gt 0 ]; then
-            porcentagem=$(( 100 * PASSOU / TOTAL ))
-            print_color $BLUE "Porcentagem: $porcentagem%"
-        fi
-        if [ $FALHOU -gt 0 ]; then
-            print_color $RED "Testes que falharam: ${TESTES_FALHOS[*]}"
-            return 1
-        fi
-    fi
-    
-    make clean > /dev/null 2>&1
-}
+
 
 # função interna pra teste básico do gerador
 _teste_basico_gerador() {
@@ -257,28 +174,7 @@ _teste_basico_gerador() {
     local FALHOU=0
     local TOTAL=0
 
-    # testa arquivo básico primeiro
-    if [ -f "tests/teste_gerador.py" ]; then
-        print_color $YELLOW "Testando arquivo básico..."
-        echo "Conteúdo:"
-        cat tests/teste_gerador.py
-        echo ""
 
-        ./pylua_debug tests/teste_gerador.py --gerar-lua saidas_lua/teste_basico.lua 2>/dev/null
-
-        if [ -f "saidas_lua/teste_basico.lua" ] && [ -s "saidas_lua/teste_basico.lua" ]; then
-            print_color $GREEN "[OK] Arquivo básico gerado"
-            echo "Código Lua:"
-            cat saidas_lua/teste_basico.lua
-            echo ""
-            PASSOU=$((PASSOU+1))
-        else
-            print_color $RED "[ERRO] Falha no arquivo básico"
-            FALHOU=$((FALHOU+1))
-        fi
-        TOTAL=$((TOTAL+1))
-        echo "---"
-    fi
 
     # testa alguns exemplos principais
     for arquivo in exemplos/*.py; do
@@ -293,12 +189,10 @@ _teste_basico_gerador() {
                 print_color $GREEN "OK"
                 PASSOU=$((PASSOU+1))
 
-                # mostra prévia
+                # mostra prévia (3 primeiras linhas)
                 echo "  Prévia:"
                 head -3 "$saida" | sed 's/^/    /'
-                if [ $(wc -l < "$saida") -gt 3 ]; then
-                    echo "    ..."
-                fi
+                [ $(wc -l < "$saida") -gt 3 ] && echo "    ..."
             else
                 print_color $RED "FALHOU"
                 FALHOU=$((FALHOU+1))
@@ -327,7 +221,7 @@ _teste_completo_gerador() {
 
     mkdir -p saidas_lua temp logs
 
-    # arquivo de log que serve para especificar quais erros deram de maneira mais limpa
+    # arquivo de log para erros
     local DATA_LOG=$(date +"%d_%m_%Y_%H%M%S")
     local LOG_FILE="logs/teste_completo_${DATA_LOG}.log"
     echo "Log de testes completos - $(date '+%d/%m/%Y às %H:%M:%S')" > "$LOG_FILE"
@@ -350,9 +244,7 @@ _teste_completo_gerador() {
         # mostra código python
         echo "  Python:"
         head -3 "$arquivo" | sed 's/^/    /'
-        if [ $(wc -l < "$arquivo") -gt 3 ]; then
-            echo "    ... ($(wc -l < "$arquivo") linhas)"
-        fi
+        [ $(wc -l < "$arquivo") -gt 3 ] && echo "    ... ($(wc -l < "$arquivo") linhas)"
 
         # gera lua
         echo -n "  Gerando... "
@@ -364,21 +256,19 @@ _teste_completo_gerador() {
 
             echo "  Lua gerado:"
             head -3 "$saida" | sed 's/^/    /'
-            if [ $(wc -l < "$saida") -gt 3 ]; then
-                echo "    ... ($(wc -l < "$saida") linhas)"
-            fi
+            [ $(wc -l < "$saida") -gt 3 ] && echo "    ... ($(wc -l < "$saida") linhas)"
 
-            # testa se o codigo roda mesmo
+            # testa execução
             if $LUA_DISPONIVEL; then
                 echo -n "  Executando... "
-                # timeout de 5 segundos pra nao travar em loop infinito
+                # timeout de 5 segundos
                 if timeout 5s lua "$saida" > temp/out_${nome}.txt 2>&1; then
                     print_color $GREEN "RODA"
                     PASSOU_EXEC=$((PASSOU_EXEC+1))
                 elif [ $? -eq 124 ]; then
                     print_color $YELLOW "TIMEOUT"
                     FALHOU_EXEC=$((FALHOU_EXEC+1))
-                    echo "    (provavelmente loop infinito ou algo assim)"
+                    echo "    (timeout - possível loop infinito)"
                 else
                     print_color $RED "ERRO"
                     FALHOU_EXEC=$((FALHOU_EXEC+1))
@@ -393,11 +283,6 @@ _teste_completo_gerador() {
         echo ""
     }
 
-    # testa arquivo básico
-    if [ -f "tests/teste_gerador.py" ]; then
-        _testar_arquivo_completo "tests/teste_gerador.py"
-    fi
-
     # testa todos os exemplos
     for arquivo in exemplos/*.py; do
         if [ -f "$arquivo" ]; then
@@ -405,7 +290,7 @@ _teste_completo_gerador() {
         fi
     done
 
-    # resumo final das parada
+    # resumo final
     print_color $PURPLE "=== RESUMO FINAL ==="
     print_color $BLUE "Total testado: $TOTAL"
     print_color $GREEN "Gerou código: $PASSOU_GER"
@@ -508,8 +393,6 @@ _validar_lua() {
     return $FALHOU
 }
 
-
-
 # função principal do teste do gerador
 testar_gerador() {
     local modo="basico"
@@ -572,28 +455,6 @@ testar_gerador() {
         fi
     fi
 
-    # roda mais uns testes se o usuario pediu
-    if $executar_lua && command -v lua &> /dev/null; then
-        echo ""
-        print_color $BLUE "=== Rodando Mais Uns Testes ==="
-        for arquivo in saidas_lua/*.lua; do
-            if [ -f "$arquivo" ]; then
-                nome=$(basename "$arquivo")
-                echo -n "Executando $nome... "
-                # timeout de 5 segundos aqui tambem
-                if timeout 5s lua "$arquivo" > /dev/null 2>&1; then
-                    print_color $GREEN "OK"
-                elif [ $? -eq 124 ]; then
-                    print_color $YELLOW "TIMEOUT"
-                    resultado=1
-                else
-                    print_color $RED "ERRO"
-                    resultado=1
-                fi
-            fi
-        done
-    fi
-
     return $resultado
 }
 
@@ -614,10 +475,6 @@ main() {
             shift
             compilar_projeto "$@"
             ;;
-        test)
-            shift
-            executar_testes "$@"
-            ;;
         test-generator)
             shift
             testar_gerador "$@"
@@ -626,9 +483,6 @@ main() {
             print_color $BLUE "Limpando arquivos..."
             make clean
             print_color $GREEN "✓ Limpeza concluída"
-            ;;
-        clean-scripts)
-            limpar_scripts_externos
             ;;
         help|--help|-h)
             mostrar_ajuda
