@@ -34,4 +34,4 @@ Reunião realizada remotamente (online).
 ### Histórico de versão
 Versão  | Data | Descrição | Autor(es) | Revisor(es) | Data da Revisão
 -------- | ------ | -------- | ---------- | ----------- | ---------------
-1.0 | 20/06/2025 | Ata da Sprint 6 | [Samuel Alves](https://github.com/samuelalvess) | [Artur Mendonça](https://github.com/ArtyMend07) | 20/06/2025
+1.0 | 20/06/2025 | Ata da Sprint 6 | [Samuel Alves](https://github.com/samuelalvess) | [Artur Mendonça](https://github.com/ArtyMend07) | 27/06/2025
