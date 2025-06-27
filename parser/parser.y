@@ -4,6 +4,7 @@
 #include "../ast/ast.h"
 #include "../tabela/tabela.h"
 #include "../gerador_codigo_final/gerador_codigo_final.h"
+#include "../codigo_intermediario/codigo_intermediario.h"
 #include <string.h>
 
 int yylex();  // Declaração da função yylex que será chamada pelo parser
@@ -17,10 +18,32 @@ ListaNo* ast_global = NULL;
 // Variáveis globais para controle da geração de código
 FILE *arquivo_lua = NULL;
 int gerar_codigo_lua = 0;
+FILE *arquivo_tac = NULL;
+int gerar_codigo_tac = 0;
 
 void yyerror(const char *s) {
     fprintf(stderr, "[ERRO SINTATICO] %s na linha %d\n", s, line_num);
 }
+
+void verificarDeclaracao(No *no) {
+    if (no == NULL) return;
+
+    if (no->tipo == NoVariavel) {
+        Simbolo *s = buscarSimbolo(no->var);
+        if (s == NULL) {
+            printf("[AVISO] Variável '%s' usada mas não declarada na linha %d\n", no->var, line_num);
+        }
+    }
+}
+
+void DeclararVar(char *var){
+    Simbolo *s = buscarSimbolo(var);
+    if (s == NULL){
+        inserirSimbolo(var, TIPO_INT);
+    }
+}
+
+
 %}
 
 /* Declaração de tipos para os valores */
@@ -56,6 +79,7 @@ void yyerror(const char *s) {
 %token <string> STRING_DQ STRING_SQ TRIPLE_DQ TRIPLE_SQ
 %token COMMENT
 %token INDENT DEDENT
+%token PRINT
 
 /* Precedência de operadores */
 %left BITOR
@@ -79,6 +103,8 @@ void yyerror(const char *s) {
 %type <lista> linhas
 %type <no> line_exec
 %type <no> funcao
+%type <lista> print_args
+%type <no> print
 
 
 %%
@@ -105,6 +131,11 @@ line:    expr NEWLINE {
             gerarCodigoLua($1);
         }
 
+        // gera o código de três endereços
+        if (gerar_codigo_tac && arquivo_tac) {
+            gerarCodigoTAC($1);
+        }
+
         DesalocarArvore($1);
         $$ = NULL;
 }
@@ -116,6 +147,11 @@ line:    expr NEWLINE {
             gerarCodigoLua($1);
         }
 
+        //gera código TAC se habilitado
+        if (gerar_codigo_tac && arquivo_tac) {
+            gerarCodigoTAC($1);
+        }
+
         DesalocarArvore($1);
         $$ = NULL;
 }
@@ -124,6 +160,11 @@ line:    expr NEWLINE {
         // Gera código Lua se habilitado
         if (gerar_codigo_lua && arquivo_lua) {
             gerarCodigoLua($1);
+        }
+
+        //gera o código de três endereços (TAC)
+        if (gerar_codigo_tac && arquivo_tac) {
+            gerarCodigoTAC($1);
         }
 
         DesalocarArvore($1);
@@ -151,6 +192,22 @@ line:    expr NEWLINE {
                     yyerrok;
                     $$ = NULL;
                 }
+       | print NEWLINE {
+            imprimeArvore($1, 0);
+            if (gerar_codigo_lua && arquivo_lua){
+                gerarCodigoLua($1);
+            }
+            DesalocarArvore($1);
+            $$ = NULL;
+       }
+       | print {
+            imprimeArvore($1, 0);
+            if (gerar_codigo_lua && arquivo_lua){
+                gerarCodigoLua($1);
+            }
+            DesalocarArvore($1);
+            $$ = NULL;
+       }
        ;
 
 expr:    INTEGER               { $$ = CriarNoInteiro($1); }  // Cria um nó de inteiro
@@ -159,14 +216,7 @@ expr:    INTEGER               { $$ = CriarNoInteiro($1); }  // Cria um nó de i
        | FALSE                 { $$ = CriarNoBool($1); }  // Cria um nó bool false
        | STRING_DQ             { $$ = CriarNoString($1); }  // String com aspas duplas
        | STRING_SQ             { $$ = CriarNoString($1); }  // String com aspas simples
-       | IDENTIFIER            { 
-                               Simbolo *s = buscarSimbolo($1);
-                               if (s == NULL) {
-                                   printf("[AVISO] Variável '%s' não declarada\n", $1);
-                                   inserirSimbolo($1, TIPO_INT);
-                               }
-                               $$ = CriarNoVariavel($1); 
-                              }
+       | IDENTIFIER            { $$ = CriarNoVariavel($1);}
        | LPAREN expr RPAREN    { $$ = $2; }  // Expressão entre parênteses
        | expr PLUS expr        { $$ = CriarNoOperador($1, $3, '+'); }  // Soma
        | expr MINUS expr       { $$ = CriarNoOperador($1, $3, '-'); }  // Subtração
@@ -199,66 +249,45 @@ expr:    INTEGER               { $$ = CriarNoInteiro($1); }  // Cria um nó de i
        ;
 
 declaracao:  IDENTIFIER ASSIGN expr { 
-            // Inserir variável na tabela se ainda não existir
-            if (!existeSimbolo($1)) {
-                inserirSimbolo($1, TIPO_INT);  // TODO: Detectar tipo correto da expressão
-            }
+ 
+        Simbolo *sim = buscarSimbolo($1);
+        if (sim == NULL) {
+            inserirSimbolo($1, TIPO_INT);
             $$ = CriaNoAtribuicao(CriarNoVariavel($1), $3);
+            $$->declarada = true;  // primeira vez declarando
+        } else {
+            $$ = CriaNoAtribuicao(CriarNoVariavel($1), $3);
+            $$->declarada = false;  // já declarada
+        }
+        verificarDeclaracao($3);
+    
 } 
        | IDENTIFIER PLUS_EQ expr { 
-            // Verificar se variável existe antes de usar
-            if (!existeSimbolo($1)) {
-                printf("[AVISO] Variável '%s' não declarada\n", $1);
-                inserirSimbolo($1, TIPO_INT);
-            }
+
             $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, '+'));
 } 
        | IDENTIFIER MINUS_EQ expr { 
-            // Verificar se variável existe antes de usar
-            if (!existeSimbolo($1)) {
-                printf("[AVISO] Variável '%s' não declarada\n", $1);
-                inserirSimbolo($1, TIPO_INT);
-            }
+           
             $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, '-'));
 }  
        | IDENTIFIER MULT_EQ expr { 
-            // Verificar se variável existe antes de usar
-            if (!existeSimbolo($1)) {
-                printf("[AVISO] Variável '%s' não declarada\n", $1);
-                inserirSimbolo($1, TIPO_INT);
-            }
+        
             $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, '*'));
 } 
        | IDENTIFIER DIV_EQ expr { 
-            // Verificar se variável existe antes de usar
-            if (!existeSimbolo($1)) {
-                printf("[AVISO] Variável '%s' não declarada\n", $1);
-                inserirSimbolo($1, TIPO_INT);
-            }
+
             $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, '/'));
 }  
        | IDENTIFIER MOD_EQ expr { 
-            // Verificar se variável existe antes de usar
-            if (!existeSimbolo($1)) {
-                printf("[AVISO] Variável '%s' não declarada\n", $1);
-                inserirSimbolo($1, TIPO_INT);
-            }
+  
             $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, '%'));
 } 
        | IDENTIFIER FLOOR_EQ expr { 
-            // Verificar se variável existe antes de usar
-            if (!existeSimbolo($1)) {
-                printf("[AVISO] Variável '%s' não declarada\n", $1);
-                inserirSimbolo($1, TIPO_INT);
-            }
+ 
             $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, 'b'));
 }  
        | IDENTIFIER POW_EQ expr { 
-            // Verificar se variável existe antes de usar
-            if (!existeSimbolo($1)) {
-                printf("[AVISO] Variável '%s' não declarada\n", $1);
-                inserirSimbolo($1, TIPO_INT);
-            }
+ 
             $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, 'a'));
 } 
        ;
@@ -280,8 +309,10 @@ linhas:
 
 //é considerado bloco se tiver indentado corretamente
 bloco:
-      INDENT linhas DEDENT { $$ = CriarNoBloco($2); }
-    
+      INDENT { entrarEscopo(); } linhas DEDENT {
+          sairEscopo();
+          $$ = CriarNoBloco($3);
+      }
     ;
 
 funcao:
@@ -289,6 +320,10 @@ funcao:
           $$ = CriarNoFuncao($2, NULL, $7);
       }
     ;
+
+funcao_args:
+        IDENTIFIER {}
+        | funcao_args COMMA IDENTIFIER
 
 condicional:
       IF LPAREN expr RPAREN COLON NEWLINE bloco {
@@ -312,6 +347,14 @@ condicional:
           $$ = CriarNoWhile($3, $7);
       }
     ;
+
+print:  
+     PRINT LPAREN print_args RPAREN {$$ = CriarNoPrint($3); }
+
+print_args:
+    expr              {$$ = AdicionarNoLista(NULL, $1); }
+    | print_args COMMA expr {$$ = AdicionarNoLista($1, $3); }
+
 %%
 
 /* Função principal para executar o parser */
@@ -325,12 +368,21 @@ int main(int argc, char **argv) {
     /* Processa argumentos da linha de comando */
     char *arquivo_entrada = NULL;
     char *arquivo_saida_lua = NULL;
+    char *arquivo_saida_tac = NULL;
 
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--gerar-lua") == 0 && i + 1 < argc) {
             arquivo_saida_lua = argv[i + 1];
             gerar_codigo_lua = 1;
             i++; // Pula o próximo argumento
+        } else if (strcmp(argv[i], "--gerar-tac") == 0 && i + 1 < argc) {
+            arquivo_saida_tac = argv[i + 1];
+            gerar_codigo_tac = 1;
+            i++; // Pula o próximo argumento
+        } else if (strcmp(argv[i], "--gerar-lua") == 0) {
+            gerar_codigo_lua = 1;
+        } else if (strcmp(argv[i], "--gerar-tac") == 0) {
+            gerar_codigo_tac = 1;
         } else if (argv[i][0] != '-') {
             arquivo_entrada = argv[i];
         }
@@ -384,6 +436,42 @@ int main(int argc, char **argv) {
         }
     }
 
+    /* configura o gerador de código intermediario se necessário */
+    if (gerar_codigo_tac) {
+        if (arquivo_saida_tac) {
+            // Se o caminho não contém diretório, salva na pasta saidas_tac
+            char caminho_completo_tac[512];
+            if (strchr(arquivo_saida_tac, '/') == NULL && strchr(arquivo_saida_tac, '\\') == NULL) {
+                snprintf(caminho_completo_tac, sizeof(caminho_completo_tac), "saidas_tac/%s", arquivo_saida_tac);
+                arquivo_saida_tac = caminho_completo_tac;
+            }
+
+            arquivo_tac = fopen(arquivo_saida_tac, "w");
+            if (arquivo_tac == NULL) {
+                printf("Erro ao criar arquivo de saída TAC: %s\n", arquivo_saida_tac);
+                printf("Tentando criar diretório saidas_tac...\n");
+                system("mkdir -p saidas_tac");
+                arquivo_tac = fopen(arquivo_saida_tac, "w");
+                if (arquivo_tac == NULL) {
+                    printf("Erro persistente ao criar arquivo TAC. Usando stdout.\n");
+                    arquivo_tac = stdout;
+                }
+            }
+
+            if (arquivo_tac != stdout) {
+                inicializarGeradorTAC(arquivo_tac);
+                printf("Gerando código TAC em: %s\n", arquivo_saida_tac);
+            } else {
+                inicializarGeradorTAC(arquivo_tac);
+                printf("=== CÓDIGO TAC GERADO ===\n");
+            }
+        } else {
+            arquivo_tac = stdout;
+            inicializarGeradorTAC(arquivo_tac);
+            printf("=== CÓDIGO TAC GERADO ===\n");
+        }
+    }
+
     /* Executa o parser */
     yyparse();
 
@@ -394,6 +482,16 @@ int main(int argc, char **argv) {
             printf("Código Lua gerado com sucesso!\n");
         } else {
             printf("=== FIM DO CÓDIGO LUA ===\n");
+        }
+    }
+
+    /* Finaliza o gerador de código de três endereços se necessário */
+    if (gerar_codigo_tac) {
+        finalizarGeradorTAC();
+        if (arquivo_saida_tac) {
+            printf("Código TAC gerado com sucesso!\n");
+        } else {
+            printf("=== FIM DO CÓDIGO TAC ===\n");
         }
     }
 

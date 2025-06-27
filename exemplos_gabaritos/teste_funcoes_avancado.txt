@@ -1,0 +1,17 @@
+function somar(a, b)
+    return a + b
+end
+
+function calcular_media(lista)
+    local total = 0
+    for item in ipairs(lista) do
+        total = total + item
+    end
+    return total / #lista
+end
+
+local resultado1 = somar(10, 20)
+local numeros = {1, 2, 3, 4, 5}
+local media = calcular_media(numeros)
+print("Resultado:", resultado1)
+print("Média:", media)

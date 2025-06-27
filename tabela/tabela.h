@@ -14,10 +14,7 @@ typedef enum {
 typedef struct simbolo {
     char nome[32];
     TipoSimbolo tipo;
-    int valor;           // Para armazenar valores inteiros
-    float valorFloat;    // Para armazenar valores float
-    char* valorString;   // Para armazenar strings
-    int inicializada;    // Flag para verificar se a variável foi inicializada
+    int escopo;          // Nível do escopo onde foi declarada
     struct simbolo *proximo;
 } Simbolo;
 
@@ -28,16 +25,14 @@ Simbolo *buscarSimbolo(char *nome);
 void imprimirTabela();
 void liberarTabela();
 
+// Funções de controle de escopo
+void entrarEscopo();
+void sairEscopo();
+int obterEscopoAtual();
+
 // Novas funções para melhorar a funcionalidade
 bool existeSimbolo(char *nome);
-void definirValorInteiro(char *nome, int valor);
-void definirValorFloat(char *nome, float valor);
-void definirValorString(char *nome, char *valor);
-void definirValorBool(char *nome, bool valor);
-int obterValorInteiro(char *nome);
-float obterValorFloat(char *nome);
-char* obterValorString(char *nome);
-bool obterValorBool(char *nome);
+
 TipoSimbolo obterTipo(char *nome);
 
 #endif

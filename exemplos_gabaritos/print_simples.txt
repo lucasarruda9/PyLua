@@ -1,0 +1,8 @@
+local x = 10
+print(x)
+local y = "Olá Mundo"
+print(y)
+local z = 5.300000
+print(z)
+print("oi")
+print("Alô")

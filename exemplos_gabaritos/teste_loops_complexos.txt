@@ -1,0 +1,27 @@
+local contador = 0
+while contador < 3 do
+    print("Contador:", contador)
+    contador = contador + 1
+end
+
+for i = 0, 2 do
+    for j = 0, 1 do
+        local produto = i * j
+        if produto > 0 then
+            print("i:", i, "j:", j, "produto:", produto)
+        end
+    end
+end
+
+local x = 0
+while x < 10 do
+    x = x + 1
+    if x == 5 then
+        goto continue
+    end
+    if x == 8 then
+        break
+    end
+    print("x =", x)
+    ::continue::
+end

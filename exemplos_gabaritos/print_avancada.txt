@@ -1,0 +1,5 @@
+local x = "João"
+local y = 19
+local z = 1.830000
+print("Olá, meu nome é", x, "tenho", y, "anos e tenho", z, "de altura")
+print(x)

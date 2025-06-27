@@ -13,6 +13,7 @@ No *CriarNo(Tipo t, No *esquerda, No *direita){
     raiz->var = NULL;
     raiz->op = 0;
     raiz->tipo = t;
+    raiz->declarada = false;
     return raiz;
 }
 
@@ -106,6 +107,12 @@ void DesalocarArvore(No *raiz){
     DesalocarArvore(raiz->direita);
     DesalocarArvore(raiz->meio);
     free(raiz);
+}
+
+No* CriarNoPrint(ListaNo* argumentos){
+    No *raiz = CriarNo(NoPrint, NULL, NULL);
+    raiz->lista = argumentos;
+    return raiz;
 }
 
 void imprimeLista(ListaNo* lista, int nivel) {
@@ -221,6 +228,9 @@ void imprimeArvore(No *no, int nivel) {
                 printf("Argumentos:\n");
                 imprimeLista(no->lista, nivel + 2);
             }
+            break;
+        case NoPrint:
+            printf("Print identificado\n");
             break;
         default:
             printf("[Tipo de nó desconhecido]\n");

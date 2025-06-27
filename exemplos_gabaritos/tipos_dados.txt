@@ -1,0 +1,15 @@
+local idade = 25
+local ano = 2024
+local contador = 0
+local pi = 3.141590
+local temperatura = 36.500000
+local preco = 19.990000
+local nome = "PyLua"
+local versao = "1.0"
+local mensagem = "Compilador Python para Lua"
+local ativo = true
+local concluido = false
+local debug = true
+local total = (idade + temperatura)
+local descricao = ((nome + " ") + versao)
+local resultado_logico = ativo
