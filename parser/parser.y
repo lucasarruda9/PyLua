@@ -24,6 +24,26 @@ int gerar_codigo_tac = 0;
 void yyerror(const char *s) {
     fprintf(stderr, "[ERRO SINTATICO] %s na linha %d\n", s, line_num);
 }
+
+void verificarDeclaracao(No *no) {
+    if (no == NULL) return;
+
+    if (no->tipo == NoVariavel) {
+        Simbolo *s = buscarSimbolo(no->var);
+        if (s == NULL) {
+            printf("[AVISO] Variável '%s' usada mas não declarada na linha %d\n", no->var, line_num);
+        }
+    }
+}
+
+void DeclararVar(char *var){
+    Simbolo *s = buscarSimbolo(var);
+    if (s == NULL){
+        inserirSimbolo(var, TIPO_INT);
+    }
+}
+
+
 %}
 
 /* Declaração de tipos para os valores */
@@ -196,14 +216,7 @@ expr:    INTEGER               { $$ = CriarNoInteiro($1); }  // Cria um nó de i
        | FALSE                 { $$ = CriarNoBool($1); }  // Cria um nó bool false
        | STRING_DQ             { $$ = CriarNoString($1); }  // String com aspas duplas
        | STRING_SQ             { $$ = CriarNoString($1); }  // String com aspas simples
-       | IDENTIFIER            { 
-                               Simbolo *s = buscarSimbolo($1);
-                               if (s == NULL) {
-                                   printf("[AVISO] Variável '%s' não declarada\n", $1);
-                                   inserirSimbolo($1, TIPO_INT);
-                               }
-                               $$ = CriarNoVariavel($1); 
-                              }
+       | IDENTIFIER            { $$ = CriarNoVariavel($1);}
        | LPAREN expr RPAREN    { $$ = $2; }  // Expressão entre parênteses
        | expr PLUS expr        { $$ = CriarNoOperador($1, $3, '+'); }  // Soma
        | expr MINUS expr       { $$ = CriarNoOperador($1, $3, '-'); }  // Subtração
@@ -236,66 +249,45 @@ expr:    INTEGER               { $$ = CriarNoInteiro($1); }  // Cria um nó de i
        ;
 
 declaracao:  IDENTIFIER ASSIGN expr { 
-            // Inserir variável na tabela se ainda não existir
-            if (!existeSimbolo($1)) {
-                inserirSimbolo($1, TIPO_INT);  // TODO: Detectar tipo correto da expressão
-            }
+ 
+        Simbolo *sim = buscarSimbolo($1);
+        if (sim == NULL) {
+            inserirSimbolo($1, TIPO_INT);
             $$ = CriaNoAtribuicao(CriarNoVariavel($1), $3);
+            $$->declarada = true;  // primeira vez declarando
+        } else {
+            $$ = CriaNoAtribuicao(CriarNoVariavel($1), $3);
+            $$->declarada = false;  // já declarada
+        }
+        verificarDeclaracao($3);
+    
 } 
        | IDENTIFIER PLUS_EQ expr { 
-            // Verificar se variável existe antes de usar
-            if (!existeSimbolo($1)) {
-                printf("[AVISO] Variável '%s' não declarada\n", $1);
-                inserirSimbolo($1, TIPO_INT);
-            }
+
             $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, '+'));
 } 
        | IDENTIFIER MINUS_EQ expr { 
-            // Verificar se variável existe antes de usar
-            if (!existeSimbolo($1)) {
-                printf("[AVISO] Variável '%s' não declarada\n", $1);
-                inserirSimbolo($1, TIPO_INT);
-            }
+           
             $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, '-'));
 }  
        | IDENTIFIER MULT_EQ expr { 
-            // Verificar se variável existe antes de usar
-            if (!existeSimbolo($1)) {
-                printf("[AVISO] Variável '%s' não declarada\n", $1);
-                inserirSimbolo($1, TIPO_INT);
-            }
+        
             $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, '*'));
 } 
        | IDENTIFIER DIV_EQ expr { 
-            // Verificar se variável existe antes de usar
-            if (!existeSimbolo($1)) {
-                printf("[AVISO] Variável '%s' não declarada\n", $1);
-                inserirSimbolo($1, TIPO_INT);
-            }
+
             $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, '/'));
 }  
        | IDENTIFIER MOD_EQ expr { 
-            // Verificar se variável existe antes de usar
-            if (!existeSimbolo($1)) {
-                printf("[AVISO] Variável '%s' não declarada\n", $1);
-                inserirSimbolo($1, TIPO_INT);
-            }
+  
             $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, '%'));
 } 
        | IDENTIFIER FLOOR_EQ expr { 
-            // Verificar se variável existe antes de usar
-            if (!existeSimbolo($1)) {
-                printf("[AVISO] Variável '%s' não declarada\n", $1);
-                inserirSimbolo($1, TIPO_INT);
-            }
+ 
             $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, 'b'));
 }  
        | IDENTIFIER POW_EQ expr { 
-            // Verificar se variável existe antes de usar
-            if (!existeSimbolo($1)) {
-                printf("[AVISO] Variável '%s' não declarada\n", $1);
-                inserirSimbolo($1, TIPO_INT);
-            }
+ 
             $$ = CriaNoAtribuicao(CriarNoVariavel($1), CriarNoOperador(CriarNoVariavel($1), $3, 'a'));
 } 
        ;

@@ -35,6 +35,7 @@ typedef struct Arvore{
     int valor_bool;
     char* var;
     char op;
+    bool declarada;
     ListaNo *lista;
 }No;
 

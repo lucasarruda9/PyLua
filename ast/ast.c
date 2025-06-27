@@ -13,6 +13,7 @@ No *CriarNo(Tipo t, No *esquerda, No *direita){
     raiz->var = NULL;
     raiz->op = 0;
     raiz->tipo = t;
+    raiz->declarada = false;
     return raiz;
 }
 

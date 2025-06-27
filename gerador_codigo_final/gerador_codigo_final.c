@@ -129,11 +129,13 @@ void gerarCodigoLua(No* no) {
     switch (no->tipo) {
         case NoAtribuicao:
             indentar();
-            if (no->esquerda && no->esquerda->tipo == NoVariavel) {
+            if (no->declarada == true) {
                 fprintf(gerador.arquivo_saida, "local %s = ", no->esquerda->var);
-                gerarExpressao(no->direita);
-                fprintf(gerador.arquivo_saida, "\n");
+            } else {
+                fprintf(gerador.arquivo_saida, "%s = ", no->esquerda->var);
             }
+            gerarExpressao(no->direita);
+            fprintf(gerador.arquivo_saida, "\n");
             break;
 
         case NoBloco:
