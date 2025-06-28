@@ -43,9 +43,6 @@ chmod +x verificar_deps.sh
 ```bash
 # Compilação completa
 make clean && make
-
-# Ou usando o script
-./compilar.sh
 ```
 
 ### Uso Básico
@@ -60,7 +57,7 @@ make clean && make
 ./pylua_debug
 ```
 
-#### Gerar código para stdout
+#### Gerar Ast pelo terminal
 ```bash
 ./pylua_debug arquivo.py --gerar-lua
 ```
@@ -78,10 +75,10 @@ print(resultado)
 
 **Comando**:
 ```bash
-./pylua_debug exemplo.py --gerar-lua
+./pylua_debug exemplo.py --gerar-lua saida.lua
 ```
 
-**Saída Lua**:
+**Saída Lua (`saida.lua`)**:
 ```lua
 local x = 10
 local y = 20
@@ -109,23 +106,6 @@ else
 end
 ```
 
-### Exemplo 3: Funções
-**Entrada Python**:
-```python
-def soma(a, b):
-    return a + b
-
-resultado = soma(10, 5)
-```
-
-**Saída Lua**:
-```lua
-function soma(a, b)
-    return (a + b)
-end
-
-local resultado = soma(10, 5)
-```
 
 ## Arquitetura
 
@@ -143,35 +123,32 @@ Código Python → Lexer → Parser → AST → Gerador → Código Lua
 | **Parser** | `parser/parser.y` | Análise sintática e construção da AST |
 | **AST** | `ast/ast.{h,c}` | Representação da estrutura do programa |
 | **Tabela de Símbolos** | `tabela/tabela.{h,c}` | Gerenciamento de variáveis |
+| **Código intermediário** | `tabela/tabela.{h,c}` | Ajuda na compilação de futuras otimizações|
 | **Gerador** | `gerador_codigo_final/` | Geração de código Lua |
 
 ## Funcionalidades
 
 ### Implementado
 - **Tipos de Dados**: `int`, `float`, `str`, `bool`
-- **Operadores**: Aritméticos, comparação, bitwise, atribuição
-- **Estruturas de Controle**: `if-else`, `while`, `for`
+- **Operadores**: Aritméticos, comparação, atribuição
+- **Estruturas de Controle**: `if-else`, `while`
 - **Funções**: Definição e chamada
 - **Expressões**: Complexas com precedência correta
-- **Recuperação de Erros**: Parser robusto com recuperação
+- **Recuperação de Erros**: Parser com recuperação de erros sintáticos e declarações indevidas
 
 ### Em Desenvolvimento
 - Estruturas de dados (listas, dicionários)
 - Classes e herança
 - Módulos e imports
-- Tratamento de exceções
 
 ## Documentação Técnica
 
 ### Documentação Detalhada
-- **[Arquitetura do Compilador](docs/arquitetura.md)**: Visão geral da arquitetura
-- **[Analisador Léxico](docs/analisador_lexico.md)**: Documentação do lexer
-- **[Analisador Sintático](docs/analisador_sintatico.md)**: Documentação do parser
-- **[AST](docs/ast_documentacao.md)**: Estrutura da árvore sintática
-- **[Gerador de Código](docs/gerador_codigo.md)**: Transpilação Python→Lua
-- **[Guia de Desenvolvimento](docs/guia_desenvolvimento.md)**: Para contribuidores
-- **[Metodologia](docs/Metodologia/metodologia.md)**: Processo de desenvolvimento
-- **[Testes](docs/testes.md)**: Guia de testes automatizados
+- **[Atas](docs/atas)**: Atas de reuniões onlines (whatsapp)
+- **[Compilador](docs/compilador)**: Documentação sobre esturturas(léxico, parser...), arquitetura, e testes
+- **[Diagrama](docs/Diagramas)**: Documentação do contendo a idealização da ast (diagrama)
+- **[Metodologia](docs/analisador_sintatico.md)**: Divisão da equipe, como metodologia e decisões
+- **[Planejamento](docs/planejamento)**: Planejamento inicial do projeto
 
 ### Estrutura do Projeto
 ```
@@ -183,6 +160,9 @@ PyLua/
 ├── ast/                # Árvore sintática abstrata
 │   ├── ast.h           # Definições de tipos
 │   └── ast.c           # Implementação
+|── codigo_intermediario/ # Código intermediário
+│   ├── codigo_intermediario.c           # Implementação do coódigo intermediário
+│   └── codigo_intermediario.h          # Definição
 ├── tabela/             # Tabela de símbolos
 │   ├── tabela.h        # Interface
 │   └── tabela.c        # Implementação
@@ -191,51 +171,17 @@ PyLua/
 │   └── gerador_codigo_final.c
 ├── src/                # Arquivos gerados (temporários)
 ├── build/              # Executáveis de teste
-├── tests/              # Testes automatizados
+├── exemplos_gabaritos/ # Comparação para testes automatizadas
 ├── exemplos/           # Exemplos de código Python
 └── docs/               # Documentação
 ```
 
 ## Testes
 
-### Executar Todos os Testes
+### Executar Todos os Testes verificando arquivos gerados, não gerados e que não passaram nos testes
 ```bash
-make test
+./pylua.sh test-generator --completo --validar
 ```
-
-### Testes Específicos
-```bash
-# Testar AST
-make test_ast
-
-# Testar gerador de código
-./testar_gerador.sh
-
-# Gerar exemplos
-make gerar_exemplos
-```
-
-### Validação com Valgrind
-```bash
-make valgrind
-```
-
-### Comandos Úteis
-```bash
-# Verificar dependências
-./verificar_deps.sh
-
-# Compilar em modo debug
-make debug
-
-# Executar com debugging
-gdb ./pylua_debug
-
-# Verificar vazamentos de memória
-valgrind --leak-check=full ./pylua_debug arquivo.py
-```
-
-Consulte o **[Guia de Desenvolvimento](docs/guia_desenvolvimento.md)** para informações detalhadas.
 
 ## Licença
 

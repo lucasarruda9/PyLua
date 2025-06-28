@@ -80,24 +80,6 @@ Impacto
 
 ---
 
-## Otimização de Código Final
-
-### Decisão  
-A equipe optou por aplicar otimizações diretamente na fase de geração de código final (Lua), após a produção do código intermediário. as if que elimina dead code, constant foldin e constant propagation
-
-### Justificativa  
-
-1. Reduz o tamanho e melhora a eficiência do código gerado  
-2. Elimina instruções redundantes ou desnecessárias no código Lua como variáveis nunca utilizadas (dead code)  
-
-### Impacto  
-
-- **Positivo:** Geração de código final mais limpo
-- **Positivo:** Redução de custos computacionais na execução  
-- **Negativo:** Aumenta a complexidade da etapa final do compilador  
-
----
-
 ## Sistema de Verificação de Tipos
 ### Decisão
 Não implementar um sistema robusto de verificação de tipos.
