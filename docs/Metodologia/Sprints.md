@@ -75,12 +75,12 @@
 
 | Tarefa | Descrição | Responsável | Prazo | Status |
 |--------|-----------|-------------|-------|--------|
-| Design da AST | Estruturar classes para AST | [Gabriel Lopes](https://github.com/BrzGab), [Guilherme Meister](https://github.com/gmeister18), [Matheus Ferreira](https://github.com/matferreira1) | 05/05 | 🔄  |
-| Implementação da AST | Código para construção da AST | [Artur Mendonça](https://github.com/ArtyMend07), [Lucas Mendonça](https://github.com/lucasarruda9), [Samuel Alves](https://github.com/samuelalvess) | 09/05 | 🔄  |
-| Tabela de Símbolos | Implementação da tabela de símbolos | [Samuel Alves](https://github.com/samuelalvess), [Gabriel Lopes](https://github.com/BrzGab), [Matheus Ferreira](https://github.com/matferreira1) | 09/05 | 🔄  |
-| Visualização da AST | Ferramenta para visualizar a AST gerada | [Matheus Ferreira](https://github.com/matferreira1), [Artur Mendonça](https://github.com/ArtyMend07), [Guilherme Meister](https://github.com/gmeister18) | 12/05 | 🔄  |
-| Integração Parser-AST | Conectar parser à geração de AST | [Gabriel Lopes](https://github.com/BrzGab), [Guilherme Meister](https://github.com/gmeister18), [Lucas Mendonça](https://github.com/lucasarruda9) | 14/05 | 🔄  |
-| Documentação | Documentar estruturas de dados | [Artur Mendonça](https://github.com/ArtyMend07), [Samuel Alves](https://github.com/samuelalvess), [Lucas Mendonça](https://github.com/lucasarruda9) | 14/05 | 🔄  |
+| Design da AST | Estruturar classes para AST | [Gabriel Lopes](https://github.com/BrzGab) | 05/05 | ✅  |
+| Implementação da AST | Código para construção da AST | [Artur Mendonça](https://github.com/ArtyMend07), [Lucas Mendonça](https://github.com/lucasarruda9), [Guilherme Meister](https://github.com/gmeister18) | 09/05 | ✅  |
+| Tabela de Símbolos | Implementação da tabela de símbolos | [Artur Mendonça](https://github.com/ArtyMend07), [Gabriel Lopes](https://github.com/BrzGab) | 09/05 | ✅  |
+| Visualização da AST | Ferramenta para visualizar a AST gerada | [Lucas Mendonça](https://github.com/lucasarruda9) | 12/05 | ✅  |
+| Integração Parser-AST | Conectar parser à geração de AST | [Lucas Mendonça](https://github.com/lucasarruda9), [Guilherme Meister](https://github.com/gmeister18) | 14/05 | ✅  |
+| Documentação | Documentar estruturas de dados | [Artur Mendonça](https://github.com/ArtyMend07) | 14/05 | ✅  |
 
 **Entregável:** Representação interna (AST) e tabela de símbolos funcionais  
 **Critério de Aceitação:**
@@ -114,8 +114,7 @@
 | Mapeamento Python-Lua | Definir equivalências entre linguagens | [Artur Mendonça](https://github.com/ArtyMend07), [Lucas Mendonça](https://github.com/lucasarruda9), [Samuel Alves](https://github.com/samuelalvess) | 09/06 | 🟡 |
 | Gerador de Código | Implementação do gerador de código Lua | [Gabriel Lopes](https://github.com/BrzGab), [Matheus Ferreira](https://github.com/matferreira1), [Guilherme Meister](https://github.com/gmeister18) | 12/06 | 🟡 |
 | Biblioteca de Runtime | Funções auxiliares para executar código gerado | [Samuel Alves](https://github.com/samuelalvess), [Artur Mendonça](https://github.com/ArtyMend07), [Gabriel Lopes](https://github.com/BrzGab) | 12/06 | 🟡 |
-| Disponibilização GitHub | Garantir acesso ao professor | [Lucas Mendonça](https://github.com/lucasarruda9), [Matheus Ferreira](https://github.com/matferreira1), [Guilherme Meister](https://github.com/gmeister18) | 11/06 | 🟡 |
-| Otimizações Básicas | Implementação de otimizações simples | [Artur Mendonça](https://github.com/ArtyMend07), [Guilherme Meister](https://github.com/gmeister18), [Samuel Alves](https://github.com/samuelalvess) | 16/06 | 🟡 |
+| Disponibilização GitHub | Garantir acesso ao professor | [Lucas Mendonça](https://github.com/lucasarruda9), [Matheus Ferreira](https://github.com/matferreira1), [Guilherme Meister](https://github.com/gmeister18) | 11/06 | ✅ |
 | Testes de Integração | Testes end-to-end do compilador | [Matheus Ferreira](https://github.com/matferreira1), [Lucas Mendonça](https://github.com/lucasarruda9), [Gabriel Lopes](https://github.com/BrzGab) | 18/06 | 🟡 |
 
 **Entregável:** Gerador de código Lua funcional  
@@ -219,7 +218,6 @@
 ## Histórico de versões
 
 | Versão | Descrição | Autor(es) | Data | Revisor(es) | Data de Revisão |
-| :----: | --------- | --------- | ---- | ----------- | :-------------: |
-| 1.0 | Criação da documentação das sprints | [Gabriel Lopes](https://github.com/BrzGab) | 20/04/2025 | [Lucas Mendonça](https://github.com/lucasarruda9) | 20/04/2025 |
-| 2.0 | Atualização do status das sprints e responsáveis | [Gabriel Lopes](https://github.com/BrzGab) | 22/04/2025 | [Lucas Mendonça](https://github.com/lucasarruda9) | 22/04/2025 |
-| 3.0 | Redistribuição de responsabilidades para incluir 3 membros por tarefa | [Gabriel Lopes](https://github.com/BrzGab) | 07/05/2025 |  [Lucas Mendonça](https://github.com/lucasarruda9) | 07/05/2025 |
+|--------|-----------|-----------|------|-------------|------------------|
+| 1.0 | Criação e edição do documento do gerador de código Lua | [Artur Mendonça](https://github.com/ArtyMend07) | 17/06/2025 | [Lucas Mendonça](https://github.com/lucasarruda9) | 17/06/2025 |
+| 2.0 | Criação e edição do documento do gerador de código Lua | [Lucas Mendonça](https://github.com/lucasarruda9) | 27/06/2025 |  | 27/06/2025 | [Artur Mendonça](https://github.com/ArtyMend07) | 27/06/2025 |

@@ -40,6 +40,7 @@ Para manter a qualidade e a rastreabilidade dos artefatos, adotamos as seguintes
   - **Pull Requests (PRs):** Alterações são submetidas via PRs para permitir a revisão colaborativa e garantir a integração contínua das modificações.
   - **Issues:** Utilizadas para reportar e gerenciar tarefas, bugs e solicitações de melhorias, contendo descrições detalhadas e critérios de aceitação.
   - **Branches:** Nomeadas conforme o padrão `<tipo>/<descricao-breve>`, por exemplo, `feat/lexer` ou `fix/parser`.
+  - **Milestones:** Define o tempo de cada entrega do compilador, da entrega 1 até a final.
   - **Histórico de Versões:** Atualizado de forma padronizada para documentar as mudanças realizadas, bem como os responsáveis por elas.
 
 - **Tipos de Branches – Padrões Comuns**
@@ -75,8 +76,6 @@ Fonte: Tabela elaborada pelo autor – Artur, 2025.
   - **question:** Para dúvidas ou solicitações de esclarecimento sobre algum aspecto do projeto.
   - **wontfix:** Indicada para issues que, por decisão da equipe, não serão corrigidas.
   - **ata:** Utilizada para issues relacionadas às atas de reuniões.
-  - **ponto de controle:** Para issues relacionadas aos pontos de controle do projeto.
-  - **inspeção:** Utilizada para issues que representam inspeções realizadas em artefatos.
 
 ## Gestão de Issues e Pull Requests
 
@@ -109,11 +108,6 @@ Para facilitar a organização e o acompanhamento das atividades, implementamos 
    - São vinculadas à issue mãe correspondente.
    - Exemplo: "Implementar reconhecimento de números".
 
-3. **Issues de Atas**:
-   - Para cada reunião, será criada uma issue específica para a ata.
-   - As atas individuais serão vinculadas à issue mãe do ponto de controle correspondente.
-   - Serão identificadas com a label `ata`.
-   - Uma issue mãe de "Atas do Ponto de Controle X" conterá todas as atas individuais daquele período.
 
 ### Pull Requests (PRs)
 
@@ -126,21 +120,6 @@ Todos os pull requests devem seguir o template disponível em `.github/PULL_REQU
 5. **Incluir testes**: Quando aplicável, para demonstrar o funcionamento das alterações.
 6. **Ter testes passando**: Se houver testes automatizados no projeto.
 
-### Atas de Reunião vs. Inspeções
-
-É importante diferenciar entre atas de reunião e inspeções:
-
-- **Atas de Reunião**: 
-  - Documentam as decisões, discussões e encaminhamentos das reuniões regulares da equipe.
-  - São categorizadas com a label `ata`.
-  - Seguem um formato padronizado que inclui data, participantes, pauta, decisões e próximos passos.
-
-- **Inspeções**: 
-  - **Não são atas**, mas sim avaliações técnicas de artefatos do compilador.
-  - São categorizadas com a label `inspeção`.
-  - Podem ser realizadas pelo próprio grupo ou por grupos externos.
-  - Documentam a análise crítica de um artefato (lexer, parser, etc), identificando pontos fortes, deficiências e sugestões de melhoria.
-  - Servem como base para ações corretivas e aprimoramento dos artefatos.
 
 ## Referências Bibliográficas
 
@@ -156,3 +135,4 @@ Todos os pull requests devem seguir o template disponível em `.github/PULL_REQU
 | Versão | Descrição | Autor(es) | Data | Revisor(es) | Data de Revisão |
 |--------|-----------|-----------|------|-------------|-----------------|
 | 1.0 | Criação da documentação da metodologia | [Artur Mendonça](https://github.com/ArtyMend07) | 27/04/2025 | [Lucas Mendonça](https://github.com/lucasarruda9) | 27/04/2025 |
+| 2.0 | Ajustando metodologia |  [Lucas Mendonça](https://github.com/lucasarruda9)  | 27/06/2025 | [Artur Mendonça](https://github.com/ArtyMend07) | 27/06/2025 |

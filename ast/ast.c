@@ -88,7 +88,14 @@ No* CriarNoFuncao(char* nome, ListaNo* parametros, No* corpo) {
     No *raiz = CriarNo(NoFuncao, NULL, NULL);
     raiz->var = nome;
     raiz->lista = AdicionarNoLista(NULL, corpo);
-    // TODO: tratar parâmetros
+
+    // Criar um nó auxiliar para armazenar os parâmetros
+    if (parametros) {
+        No *no_parametros = CriarNo(NoBloco, NULL, NULL);
+        no_parametros->lista = parametros;
+        raiz->meio = no_parametros;
+    }
+
     return raiz;
 }
 
@@ -112,6 +119,11 @@ void DesalocarArvore(No *raiz){
 No* CriarNoPrint(ListaNo* argumentos){
     No *raiz = CriarNo(NoPrint, NULL, NULL);
     raiz->lista = argumentos;
+    return raiz;
+}
+
+No* CriarNoReturn(No* expressao){
+    No *raiz = CriarNo(NoReturn, expressao, NULL);
     return raiz;
 }
 
@@ -231,6 +243,14 @@ void imprimeArvore(No *no, int nivel) {
             break;
         case NoPrint:
             printf("Print identificado\n");
+            break;
+        case NoReturn:
+            printf("Return:\n");
+            if (no->esquerda) {
+                for (i = 0; i < nivel + 1; i++) printf("    ");
+                printf("Expressao:\n");
+                imprimeArvore(no->esquerda, nivel + 2);
+            }
             break;
         default:
             printf("[Tipo de nó desconhecido]\n");

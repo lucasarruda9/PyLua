@@ -41,8 +41,7 @@ AST → Análise de Nós → Mapeamento Python→Lua → Geração de Código �
 | `*` | `*` | Multiplicação |
 | `/` | `/` | Divisão |
 | `%` | `%` | Módulo |
-| `**` | `^` | Potenciação |
-| `//` | `math.floor(a/b)` | Divisão inteira |
+
 
 ### Operadores de Comparação
 
@@ -54,18 +53,9 @@ AST → Análise de Nós → Mapeamento Python→Lua → Geração de Código �
 | `>=` | `>=` | Maior ou igual |
 | `==` | `==` | Igual |
 | `!=` | `~=` | Diferente |
-| `<>` | `~=` | Diferente (alternativo) |
-
-### Operadores Bitwise
-
-| Python | Lua | Implementação |
-|--------|-----|---------------|
-| `&` | `bit.band(a,b)` | AND bitwise |
-| `\|` | `bit.bor(a,b)` | OR bitwise |
-| `^` | `bit.bxor(a,b)` | XOR bitwise |
-| `~` | `bit.bnot(a)` | NOT bitwise |
-| `<<` | `bit.lshift(a,b)` | Shift left |
-| `>>` | `bit.rshift(a,b)` | Shift right |
+| `and` | `and` | E lógico |
+| `or` | `or` | OU lógico |
+| `not` | `not` | NÃO lógico |
 
 ### Estruturas de Controle
 
@@ -101,19 +91,6 @@ while condicao do
 end
 ```
 
-#### Loops For
-**Python**:
-```python
-for i in range(inicio, fim):
-    comando
-```
-
-**Lua**:
-```lua
-for i = inicio, fim-1 do
-    comando
-end
-```
 
 ### Funções
 
@@ -146,8 +123,7 @@ local resultado = funcao(10, 20)
 
 ### Compilação
 ```bash
-make clean
-make
+make clean && make
 ```
 
 ### Uso Básico
@@ -165,6 +141,11 @@ make
 #### 3. Modo interativo com geração de código
 ```bash
 ./pylua_debug --gerar-lua
+```
+
+### 4. Gerar código lua para testes 
+```bash
+./pylua.sh 
 ```
 
 ### Exemplos
@@ -188,8 +169,10 @@ local resultado = (z * 2)
 ## Implementação Técnica
 
 ### Arquivos Principais
-- **`gerador_codigo_final/gerador_codigo_final.h`**: Interface e definições
+
 - **`gerador_codigo_final/gerador_codigo_final.c`**: Implementação principal
+- **`ast/ast.c`**: Definições das estruturas da AST utilizando nós para a construção do código final
+- **`tabela/tabela.c`**: Utilizado para buscar simbolos na tabela e gerar o código com base nisso
 - **`parser/parser.y`**: Integração com o parser
 
 ### Funções Principais
@@ -263,6 +246,31 @@ static void indentar() {
     }
 }
 ```
+#### 3.  Argumentos de print
+```c
+//como se fosse gerarBlocoLua mas imprime com vírgula (para print)
+void gerarListaArgumentosPrint(ListaNo* lista) {
+    ListaNo* atual = lista;
+    while (atual) {
+        gerarExpressao(atual->no);  // imprime argumento
+        if (atual->prox) {
+            fprintf(gerador.arquivo_saida, ", ");
+        }
+        atual = atual->prox;
+    }
+}
+```
+#### 4.  Argumentos de print
+```c
+//usado para converter listas em código lua
+void gerarBlocoLua(ListaNo* lista) {
+    ListaNo* atual = lista;
+    while (atual) {
+        gerarCodigoLua(atual->no);
+        atual = atual->prox;
+    }
+}
+```
 
 ## Exemplos Detalhados de Transformação
 
@@ -328,98 +336,15 @@ while (i < 10) do
 end
 ```
 
-### Exemplo 4: Função com Múltiplos Parâmetros
-**Entrada Python**:
-```python
-def calcular(a, b, c):
-    return a * b + c
-```
-
-**Saída Lua**:
-```lua
-function calcular(a, b, c)
-    return ((a * b) + c)
-end
-```
-
-## Características Técnicas Avançadas
-
-### Sistema de Indentação
-```c
-static GeradorCodigo gerador = {NULL, 0, 0};
-
-void aumentarIndentacao() {
-    gerador.nivel_indentacao++;
-}
-
-void diminuirIndentacao() {
-    if (gerador.nivel_indentacao > 0) {
-        gerador.nivel_indentacao--;
-    }
-}
-
-static void indentar() {
-    for (int i = 0; i < gerador.nivel_indentacao; i++) {
-        fprintf(gerador.arquivo_saida, "    "); // 4 espaços
-    }
-}
-```
-
-### Geração de Variáveis Temporárias
-```c
-char* obterVariavelTemporaria() {
-    static char buffer[32];
-    snprintf(buffer, sizeof(buffer), "temp_%d",
-             gerador.contador_variaveis_temp++);
-    return buffer;
-}
-```
-
-### Tratamento de Operadores Especiais
-```c
-// Mapeamento de operadores Python para Lua
-switch (no->op) {
-    case 'd': // != em Python
-        fprintf(arquivo, " ~= ");
-        break;
-    case 'n': // <> em Python
-        fprintf(arquivo, " ~= ");
-        break;
-    case 'p': // ** em Python
-        fprintf(arquivo, " ^ ");
-        break;
-    // ... outros mapeamentos
-}
-```
-
-## Integração com o Compilador
-
-### Ativação no Parser
-```c
-// No parser.y
-if (gerar_codigo_lua && arquivo_lua) {
-    gerarCodigoLua($1);
-}
-```
-
-### Configuração via Linha de Comando
-```bash
-# Gerar para arquivo específico
-./pylua arquivo.py --gerar-lua saida.lua
-
-# Gerar para stdout
-./pylua arquivo.py --gerar-lua
-
-# Modo interativo
-./pylua --gerar-lua
-```
-
 ### Fluxo de Execução
 1. **Inicialização**: `inicializarGerador(arquivo_saida)`
 2. **Processamento**: Para cada nó da AST, chama `gerarCodigoLua(no)`
 3. **Finalização**: `finalizarGerador()` fecha arquivos e limpa estado
 
 ## Otimizações Implementadas
+
+- As-if (elimina dead codes)
+- Propagação
 
 ### Parentização Inteligente
 - Adiciona parênteses apenas quando necessário para preservar precedência
@@ -435,58 +360,50 @@ if (gerar_codigo_lua && arquivo_lua) {
 
 ## Testes e Validação
 
-### Scripts de Teste
+### Script de Testes geral
 ```bash
-# Teste básico do gerador
-chmod +x testar_gerador.sh
-./testar_gerador.sh
-
-# Gerar exemplos completos
-make gerar_exemplos
+./pylua.sh test-generator --completo --validar
 ```
 
 ### Casos de Teste Cobertos
-1. **Expressões aritméticas**: Todas as operações básicas
+1. **Expressões aritméticas**: Maioria das operações básicas
 2. **Atribuições**: Simples e compostas
 3. **Condicionais**: If-else simples e aninhados
-4. **Loops**: While e for básicos
+4. **Loops**: While básico
 5. **Funções**: Definição e chamada
 6. **Tipos de dados**: Inteiros, floats, strings, booleanos
 
 ### Validação de Saída
 ```bash
-# Compilar Python para Lua
+# Compilar um único arquivo Python para Lua 
 ./pylua exemplo.py --gerar-lua exemplo.lua
 
-# Executar código Lua gerado
-lua exemplo.lua
-
-# Comparar resultados
-python exemplo.py
 ```
 
 ## Limitações e Trabalhos Futuros
 
 ### Limitações Atuais
-1. **Escopo Global**: Todas as variáveis são `local`
-2. **Estruturas de Dados**: Sem suporte a listas/dicionários
-3. **Classes**: Orientação a objetos não implementada
-4. **Módulos**: Sem sistema de imports
-5. **Exceções**: Tratamento de erros limitado
-6. **Tipos Dinâmicos**: Sem verificação de tipos
+1. **Estruturas de Dados**: Sem suporte a listas/dicionários
+2. **Classes**: Orientação a objetos não implementada
+3. **Módulos**: Sem sistema de imports
+4. **Exceções**: Tratamento de erros limitado
+
 
 ### Melhorias Planejadas
-1. **Sistema de Escopo**: Implementar escopo global/local correto
-2. **Estruturas Complexas**: Suporte a listas e dicionários Python
-3. **Otimizações**: Eliminação de código morto, constant folding
-4. **Análise Semântica**: Verificação de tipos mais robusta
-5. **Debugging**: Preservar informações de linha/coluna
-6. **Compatibilidade**: Suporte a mais construções Python
+
+1. **Estruturas Complexas**: Suporte a listas e dicionários Python
+2. **Análise Semântica**: Verificação de tipos mais robusta
+3. **Compatibilidade**: Suporte a mais construções Python
+
+# Melhorias feitas
+1. **Escopo Global**: Todas as declarações de variáveis são `local` a não ser que seja definida global
+2. **Tipos Dinâmicos**: verificação de tipos na tabela de símbolos
+## Histórico de Versões
+3. **Debugging**: Preservar informações de linha do erro sintático
 
 ## Histórico de Versões
 
-## Histórico de Versões
-
-| Versão | Data | Descrição | Autor | Revisor |
-|--------|------|-----------|--------|----------|
-| 1.0 | 17/06/2025 | Criação e edição do documento do gerador de código lua | [Artur Mendonça](https://github.com/ArtyMend07) | [Lucas Mendonça](https://github.com/lucasarruda9) |
+| Versão | Descrição | Autor | Data | Revisor | Data Revisão |
+|--------|-----------|-------|------|---------|--------------|
+| 1.0 | Criação do documento de codigo lua| [Artur Mendonça](https://github.com/ArtyMend07) | 17/06/2025 | [Lucas Mendonça](https://github.com/lucasarruda9) | 17/06/2025 |
+| 2.0 | ajuste da documentação | [Lucas Mendonça](https://github.com/lucasarruda9) | 27/06/2025 | [Artur Mendonça](https://github.com/ArtyMend07) | 27/06/2025 |

@@ -49,14 +49,15 @@ Código Python → Análise Léxica → Análise Sintática → AST → Geraçã
   - Verificação de tipos
   - Detecção de variáveis não declaradas
 
-### 5. Gerador de Código Lua
-- **Arquivos**: `gerador_codigo_final/gerador_codigo_final.h`, `gerador_codigo_final/gerador_codigo_final.c`
-- **Responsabilidade**: Converter a AST em código Lua
+### 5. Gerador de Código Intermediário (TAC)
+- **Arquivos**: `codigo_intermediario/codigo_intermediario.c`, `codigo_intermediario/codigo_intermediario.h`
+- **Responsabilidade**: Converter a AST em código intermediário
 - **Características**:
-  - Mapeamento direto Python → Lua
-  - Controle de indentação Lua
-  - Geração de código otimizado
-  - Suporte a diferentes construções Python
+  - Representação abstrata entre a análise e o código final
+  - Geração de temporários e labels automáticos
+  - Suporte a operações aritméticas, condicionais e controle de fluxo
+  - Facilita otimizações como propagação de constantes e eliminação de redundâncias
+
 
 ## Fluxo de Dados
 
@@ -78,7 +79,7 @@ Stream de Tokens → Parser (Bison) → AST + Tabela de Símbolos
 - Popula a tabela de símbolos durante a análise
 - Realiza verificações semânticas básicas
 
-### Fase 3: Geração de Código
+### Fase 3: Geração de Código intermediário
 ```
 AST + Tabela de Símbolos → Gerador → Código Lua
 ```
@@ -96,8 +97,8 @@ AST + Tabela de Símbolos → Gerador → Código Lua
 
 ### Parser ↔ AST
 - Parser cria nós da AST usando funções como `CriarNoInteiro()`
-- AST é construída bottom-up durante parsing
-- Nós são avaliados e/ou convertidos para Lua
+- AST é construída durante parsing
+- Nós são avaliados e convertidos para Lua
 
 ### Parser ↔ Tabela de Símbolos
 - Inserção automática de variáveis durante atribuições
@@ -119,12 +120,6 @@ AST + Tabela de Símbolos → Gerador → Código Lua
   - Execução de testes
   - Limpeza de arquivos temporários
 
-### Scripts de Automação
-- `compilar.sh`: Script principal de compilação
-- `run_tests.sh`: Execução de testes automatizados
-- `verificar_deps.sh`: Verificação de dependências
-- `testar_gerador.sh`: Teste específico do gerador
-
 ## Estrutura de Diretórios
 
 ```
@@ -136,6 +131,9 @@ PyLua/
 ├── ast/                # Árvore sintática abstrata
 │   ├── ast.h           # Definições de tipos
 │   └── ast.c           # Implementação
+|── codigo_intermediario/ # Código intermediário
+│   ├── codigo_intermediario.c           # Implementação do coódigo intermediário
+│   └── codigo_intermediario.h          # Definição
 ├── tabela/             # Tabela de símbolos
 │   ├── tabela.h        # Interface
 │   └── tabela.c        # Implementação
@@ -144,7 +142,7 @@ PyLua/
 │   └── gerador_codigo_final.c
 ├── src/                # Arquivos gerados (temporários)
 ├── build/              # Executáveis de teste
-├── tests/              # Testes automatizados
+├── exemplos_gabaritos/ # Comparação para testes automatizadas
 ├── exemplos/           # Exemplos de código Python
 └── docs/               # Documentação
 ```
@@ -173,12 +171,12 @@ PyLua/
 
 - Suporte limitado a estruturas de dados complexas (listas, dicionários)
 - Sem suporte a classes e herança
-- Análise semântica básica
-- Geração de código não otimizada
+- Geração de código muito básica
 - Tratamento de erros pode ser melhorado
 
 ## Histórico de Versões
 
-| Versão | Data | Descrição | Autor | Revisor |
-|--------|------|-----------|--------|----------|
-| 1.0 | 17/06/2025 | Criação e edição do documento de arquitetura | [Artur Mendonça](https://github.com/ArtyMend07) | [Lucas Mendonça](https://github.com/lucasarruda9) |
+| Versão | Descrição | Autor | Data | Revisor | Data Revisão |
+|--------|-----------|-------|------|---------|--------------|
+| 1.0 | Criação da documento de arquitetura| [Artur Mendonça](https://github.com/ArtyMend07) | 17/06/2025 | [Lucas Mendonça](https://github.com/lucasarruda9) | 17/06/2025 |
+| 2.0 | ajuste da documentação | [Lucas Mendonça](https://github.com/lucasarruda9) | 27/06/2025 | [Artur Mendonça](https://github.com/ArtyMend07) | 27/06/2025 |

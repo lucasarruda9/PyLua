@@ -9,8 +9,7 @@ O analisador sintático (parser) do PyLua é implementado usando **Bison/Yacc** 
 - **Ferramenta**: Bison (GNU Yacc)
 - **Arquivo fonte**: `parser/parser.y`
 - **Arquivo gerado**: `src/parser.tab.c` e `src/parser.tab.h`
-- **Tipo**: Parser LALR(1)
-- **Integração**: AST, Tabela de Símbolos, Gerador de Código Lua
+- **Integração**: AST, Tabela de Símbolos, Gerador de Código Lua, Gerador de código intermediário
 
 ## Estrutura do Arquivo
 
@@ -42,9 +41,7 @@ O analisador sintático (parser) do PyLua é implementado usando **Bison/Yacc** 
 ```yacc
 %token <intval> INTEGER          // Números inteiros
 %token <string> IDENTIFIER       // Identificadores
-%token <string> KEYWORD          // Palavras-chave
-%token <string> FLOAT HEX OCT BIN // Números em diferentes bases
-%token <string> STRING_DQ STRING_SQ TRIPLE_DQ TRIPLE_SQ // Strings
+
 ```
 
 ### Tokens de Operadores
@@ -52,16 +49,14 @@ O analisador sintático (parser) do PyLua é implementado usando **Bison/Yacc** 
 %token PLUS MINUS MULTIPLY DIVIDE MODULO POWER FLOOR_DIV
 %token LT GT LE GE EQ NE NE2
 %token ASSIGN PLUS_EQ MINUS_EQ MULT_EQ DIV_EQ FLOOR_EQ POW_EQ MOD_EQ
-%token BITAND BITOR BITXOR BITNOT SHIFTL SHIFTR
-%token AND_EQ OR_EQ XOR_EQ SHIFTR_EQ SHIFTL_EQ
 ```
 
 ### Tokens de Estrutura
 ```yacc
 %token LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE
-%token COMMA COLON DOT DECORATOR ARROW
-%token IF ELIF ELSE MATCH CASE FOR WHILE
-%token INDENT DEDENT NEWLINE COMMENT ERROR
+%token COMMA COLON
+%token IF ELIF ELSE WHILE
+%token INDENT DEDENT NEWLINE ERROR
 ```
 
 ## Precedência de Operadores
@@ -69,17 +64,12 @@ O analisador sintático (parser) do PyLua é implementado usando **Bison/Yacc** 
 A precedência segue a hierarquia padrão do Python:
 
 ```yacc
-%left BITOR                    // | (menor precedência)
-%left BITXOR                   // ^
-%left BITAND                   // &
 %left EQ NE NE2               // ==, !=, <>
 %left LT GT LE GE             // <, >, <=, >=
-%left SHIFTL SHIFTR           // <<, >>
 %left PLUS MINUS              // +, -
 %left MULTIPLY DIVIDE MODULO FLOOR_DIV  // *, /, %, //
 %right POWER                  // ** (maior precedência)
-%precedence NEG               // Menos unário
-%precedence BITNOT            // ~ (NOT bitwise)
+
 ```
 
 ## Tipos de Não-Terminais
@@ -307,20 +297,20 @@ expr: expr DIVIDE expr {
 1. **Análise**: Parser consome tokens do lexer
 2. **Construção**: Cria nós da AST para cada construção
 3. **Verificação**: Consulta/atualiza tabela de símbolos
-4. **Avaliação**: Calcula resultados de expressões
-5. **Geração**: Produz código Lua equivalente (se habilitado)
-6. **Limpeza**: Desaloca memória da AST
+4. **Geração**: Produz código Lua equivalente se habilitado
+5. **Limpeza**: Desaloca memória da AST
 
 ## Limitações Atuais
 
 - Suporte limitado a estruturas de dados complexas
 - Sem suporte a classes e métodos
-- Loops `for` e `while` parcialmente implementados
-- Funções em desenvolvimento
-- Tratamento de exceções não implementado
+- Loops `for` parcialmente implementado
+- Tratamento de exceções básicas
 
 ## Histórico de Versões
 
 | Versão | Data | Descrição | Autor | Revisor |
 |--------|------|-----------|--------|----------|
 | 1.0 | 17/06/2025 | Criação e edição do documento do analisador sintático | [Artur Mendonça](https://github.com/ArtyMend07) | [Lucas Mendonça](https://github.com/lucasarruda9) |
+| 2.0 | ajuste da documentação | [Lucas Mendonça](https://github.com/lucasarruda9) | 27/06/2025 | [Artur Mendonça](https://github.com/ArtyMend07) | 27/06/2025 |
+

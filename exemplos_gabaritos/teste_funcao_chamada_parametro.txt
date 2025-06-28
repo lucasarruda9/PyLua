@@ -1,0 +1,7 @@
+function somar(x, y)
+    local z = x + y
+    return z
+end
+
+local x = 5
+local s = somar(x, 3)

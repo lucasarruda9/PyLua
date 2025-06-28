@@ -30,39 +30,9 @@ O estudo comparativo foi realizado através de:
 | int, float | number | Lua não diferencia inteiros de ponto flutuante |
 | str | string | Ambas suportam Unicode |
 | bool | boolean | Python: True/False, Lua: true/false |
-| None | nil | Representação de valor nulo |
 
-#### Estruturas de Controle de Fluxo
 
-Python:
-```python
-if condition:
-    # código
-elif other_condition:
-    # código
-else:
-    # código
-```
-
-Lua:
-```lua
-if condition then
-    -- código
-elseif other_condition then
-    -- código
-else
-    -- código
-end
-```
-
-### Diferenças Críticas
-
-1. **Indexação**
-   - Python: Inicia em 0
-   - Lua: Inicia em 1
-   - Impacto: Necessário ajuste em todas as operações de indexação
-
-2. **Sistema de Tipos**
+1. **Sistema de Tipos**
    - Python: Tipagem dinâmica forte
    - Lua: Tipagem dinâmica fraca
    - Desafio: Garantir type safety na tradução
@@ -79,38 +49,6 @@ end
 - Lua: Sistema simples de módulos, biblioteca mínima
 - Desafio: Emular funcionalidades padrão do Python
 
-## Desafios de Implementação
-
-### 1. Estruturas de Dados
-```python
-# Python - List Comprehension
-result = [x*2 for x in range(10)]
-```
-```lua
--- Lua - Equivalente
-local result = {}
-for i=0,9 do
-    table.insert(result, i*2)
-end
-```
-
-### 2. Orientação a Objetos
-```python
-# Python - Classes
-class Example:
-    def __init__(self):
-        self.value = 0
-```
-```lua
--- Lua - Metatables
-Example = {}
-Example.__index = Example
-function Example.new()
-    local self = setmetatable({}, Example)
-    self.value = 0
-    return self
-end
-```
 
 ## Estratégias de Tradução
 
@@ -130,14 +68,12 @@ end
 
 1. **Prioridades de Implementação**
    - Focar primeiro em estruturas básicas compartilhadas
-   - Desenvolver camada de compatibilidade para diferenças críticas
    - Implementar gradualmente recursos avançados
 
 2. **Pontos de Atenção**
    - Diferenças de indexação
    - Sistema de tipos
    - Gerenciamento de escopo
-   - Orientação a objetos
 
 ## Referências Bibliográficas
 
@@ -157,20 +93,8 @@ end
 
 8. Costa, M. C., & Silva, J. R. (2023). "Bridging Python and Lua: Compilation Strategies and Runtime Considerations." Brazilian Symposium on Programming Languages.
 
-## Apêndices
-
-### A. Tabela Comparativa de Recursos
-
-| Recurso | Python | Lua | Estratégia de Tradução |
-|---------|--------|-----|------------------------|
-| List Comprehension | Nativo | Manual | Converter para loops |
-| Decorators | Sim | Via metatables | Implementar wrapper |
-| Generators | Sim | Coroutines | Adaptar para coroutines |
-| Exception Handling | try/except | pcall/error | Emular com pcall |
-
-
 ## Histórico de Versões
 
 | Versão | Descrição | Autor(es) | Data | Revisor(es) | Data de Revisão |
 |--------|-----------|-----------|------|-------------|-----------------|
-| 1.0 | Criação do documento de estudo comparativo | [Artur Mendonça](https://github.com/ArtyMend07) | 05/05/2024 | [Gabriel Lopes](https://github.com/BrzGab) | 05/05/2024 |
+| 1.0 | Criação do documento de estudo comparativo | [Samuel Alves](https://github.com/samuelalv) | 05/05/2024 | [Gabriel Lopes](https://github.com/BrzGab) | 05/05/2024 |

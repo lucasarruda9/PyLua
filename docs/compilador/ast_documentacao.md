@@ -15,47 +15,37 @@ A Árvore Sintática Abstrata (AST) do PyLua é uma estrutura de dados em árvor
 ### Enumeração de Tipos de Nós
 ```c
 typedef enum {
-    NoLiteral,          // Literais inteiros
-    NoVariavel,         // Identificadores/variáveis
-    NoOperacaoBinaria,  // Operações binárias
-    NoAtribuicao,       // Atribuições
-    NoFloat,            // Literais de ponto flutuante
-    NoString,           // Literais de string
-    NoBool,             // Literais booleanos
-    NoBloco,            // Blocos de código
-    NoIf,               // Estruturas condicionais
-    NoWhile,            // Loops while
-    NoFor,              // Loops for
-    NoFuncao,           // Definições de função
-    NoChamadaFuncao     // Chamadas de função
+    NoLiteral,
+    NoVariavel,
+    NoOperacaoBinaria,
+    NoAtribuicao,
+    NoFloat,
+    NoString,
+    NoBool,
+    NoBloco,
+    NoIf,
+    NoWhile,
+    NoFor,
+    NoFuncao,
+    NoChamadaFuncao,
+    NoPrint
 } Tipo;
 ```
 
 ### Estrutura Principal do Nó
 ```c
-typedef struct Arvore {
-    Tipo tipo;                      // Tipo do nó
-    struct Arvore *direito, *esquerdo; // Filhos da árvore
-    
-    // Valores para diferentes tipos
-    int valor;                      // Para inteiros
-    float valor_float;              // Para floats
-    char* valor_str;                // Para strings
-    int valor_bool;                 // Para booleanos
-    char* var;                      // Para variáveis
-    char op;                        // Para operadores
-    
-    // Para estruturas complexas
-    ListaNo* lista;                 // Para blocos
-    struct Arvore* condicao;        // Para if/while/for
-    struct Arvore* corpo;           // Para if/while/for/função
-    struct Arvore* senao;           // Para if-else
-    
-    // Para funções
-    char* nome_funcao;              // Nome da função
-    ListaNo* parametros;            // Parâmetros da função
-    ListaNo* argumentos;            // Argumentos de chamada
-} No;
+typedef struct Arvore{
+    Tipo tipo;
+    struct Arvore *direita, *meio, *esquerda;
+    int valor;
+    float valor_float;
+    char* valor_str;
+    int valor_bool;
+    char* var;
+    char op;
+    bool declarada;
+    ListaNo *lista;
+}No;
 ```
 
 ### Lista de Nós
@@ -88,7 +78,6 @@ No* CriaNoAtribuicao(No *var, No *exp);         // Atribuição
 No* CriarNoBloco(ListaNo* lista);   // Bloco de comandos
 No* CriarNoIf(No* cond, No* corpo, No* senao);  // Condicional
 No* CriarNoWhile(No* cond, No* corpo);          // Loop while
-No* CriarNoFor(No* var, No* inicio, No* fim, No* corpo); // Loop for
 ```
 
 ### Funções
@@ -101,37 +90,6 @@ No* CriarNoChamadaFuncao(char* nome, ListaNo* args);
 ```c
 ListaNo* AdicionarNoLista(ListaNo* lista, No* no);
 ```
-
-## Operadores Suportados
-
-### Aritméticos
-- `+` : Soma
-- `-` : Subtração (binária e unária)
-- `*` : Multiplicação
-- `/` : Divisão
-- `%` : Módulo
-- `p` : Potência (**)
-- `f` : Divisão inteira (//)
-
-### Comparação
-- `<` : Menor que
-- `>` : Maior que
-- `l` : Menor ou igual (<=)
-- `g` : Maior ou igual (>=)
-- `e` : Igual (==)
-- `d` : Diferente (!=)
-- `n` : Diferente (<>)
-
-### Bitwise
-- `&` : AND bitwise
-- `|` : OR bitwise
-- `^` : XOR bitwise
-- `~` : NOT bitwise (unário)
-- `s` : Shift left (<<)
-- `r` : Shift right (>>)
-
-### Atribuição Composta
-- `a` : Usado internamente para operações compostas (+=, -=, etc.)
 
 ## Funções de Manipulação
 
@@ -149,18 +107,6 @@ Atribuicao
         Literal: 10
         Literal: 5
 ```
-
-### Avaliação da Árvore
-```c
-int avaliarArvore(No* no);
-```
-
-A função `avaliarArvore` percorre a AST e calcula o resultado das expressões:
-- **Literais**: Retorna o valor direto
-- **Variáveis**: Busca na tabela de símbolos
-- **Operações**: Calcula recursivamente os operandos
-- **Atribuições**: Atualiza a tabela de símbolos
-
 ### Desalocação de Memória
 ```c
 void DesalocarArvore(struct Arvore* no);
@@ -215,53 +161,17 @@ No* corpo_else = CriaNoAtribuicao(CriarNoVariavel("y"), CriarNoInteiro(0));
 No* if_node = CriarNoIf(condicao, corpo_if, corpo_else);
 ```
 
-### Exemplo 3: Função
-**Código Python**:
-```python
-def soma(a, b):
-    return a + b
-```
-
-**Construção da AST**:
-```c
-ListaNo* params = NULL;
-params = AdicionarNoLista(params, CriarNoVariavel("a"));
-params = AdicionarNoLista(params, CriarNoVariavel("b"));
-
-No* corpo = CriarNoOperador(CriarNoVariavel("a"), CriarNoVariavel("b"), '+');
-No* funcao = CriarNoFuncao("soma", params, corpo);
-```
-
 ## Integração com Outros Componentes
 
 ### Com o Parser
 - O parser cria nós da AST durante a análise sintática
 - Cada regra gramatical corresponde a uma função de criação
-- A AST é construída bottom-up
 
-### Com a Tabela de Símbolos
-- `avaliarArvore` consulta a tabela para resolver variáveis
-- Atribuições atualizam a tabela de símbolos
-- Verificação de variáveis não declaradas
 
 ### Com o Gerador de Código
 - O gerador percorre a AST para produzir código Lua
 - Cada tipo de nó tem sua estratégia de geração
 - Mantém contexto de indentação e escopo
-
-## Testes Automatizados
-
-### Teste de Novos Nós (`test_novos_nos.c`)
-```bash
-gcc -I./ast -I./tabela ./ast/ast.c ./tabela/tabela.c ./tests/ast/test_novos_nos.c -o ./build/test_novos_nos -lm
-./build/test_novos_nos
-```
-
-### Teste de Estruturas de Controle (`test_controle.c`)
-```bash
-gcc -I./ast -I./tabela ./ast/ast.c ./tabela/tabela.c ./tests/ast/test_controle.c -o ./build/test_controle -lm
-./build/test_controle
-```
 
 ## Limitações e Melhorias Futuras
 
@@ -279,6 +189,7 @@ gcc -I./ast -I./tabela ./ast/ast.c ./tabela/tabela.c ./tests/ast/test_controle.c
 
 ## Histórico de Versões
 
-| Versão | Data | Descrição | Autor | Revisor |
-|--------|------|-----------|--------|----------|
-| 1.0 | 17/06/2025 | Criação e edição da documentação da ast | [Artur Mendonça](https://github.com/ArtyMend07) | [Lucas Mendonça](https://github.com/lucasarruda9) |
+| Versão | Descrição | Autor | Data | Revisor | Data Revisão |
+|--------|-----------|-------|------|---------|--------------|
+| 1.0 | Criação da documento de ast| [Artur Mendonça](https://github.com/ArtyMend07) | 17/06/2025 | [Lucas Mendonça](https://github.com/lucasarruda9) | 17/06/2025 |
+| 2.0 | ajuste da documentação | [Lucas Mendonça](https://github.com/lucasarruda9) | 27/06/2025 | [Artur Mendonça](https://github.com/ArtyMend07) | 27/06/2025 |
