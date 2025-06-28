@@ -22,6 +22,9 @@ FILE *arquivo_tac = NULL;
 int gerar_codigo_tac = 0;
 int total_erros = 0;
 
+// Variável global para parâmetros de função em processamento
+ListaNo* parametros_funcao_atual = NULL;
+
 void yyerror(const char *s) {
     fprintf(stderr, "[ERRO SINTATICO] %s na linha %d\n", s, line_num);
     total_erros++;
@@ -47,6 +50,34 @@ void DeclararVar(char *var){
     Simbolo *s = buscarSimbolo(var);
     if (s == NULL){
         inserirSimbolo(var, TIPO_INT);
+    }
+}
+
+// Função para determinar o tipo baseado no nó da AST
+TipoSimbolo determinarTipo(No *no) {
+    if (no == NULL) return TIPO_INT;
+    
+    switch (no->tipo) {
+        case NoLiteral:
+            // Verifica se é um float (se valor_float está sendo usado)
+            if (no->valor_float != 0.0) {
+                return TIPO_FLOAT;
+            }
+            return TIPO_INT;
+        case NoFloat:  // Tipo específico para floats
+            return TIPO_FLOAT;
+        case NoString:
+            return TIPO_STRING;
+        case NoBool:
+            return TIPO_BOOL;
+        case NoVariavel:
+            // Para variáveis, consulta o tipo na tabela
+            {
+                Simbolo *s = buscarSimbolo(no->var);
+                return s ? s->tipo : TIPO_INT;
+            }
+        default:
+            return TIPO_INT;
     }
 }
 
@@ -282,7 +313,8 @@ declaracao:  IDENTIFIER ASSIGN expr {
  
         Simbolo *sim = buscarSimbolo($1);
         if (sim == NULL) {
-            inserirSimbolo($1, TIPO_INT);
+            TipoSimbolo tipo = determinarTipo($3);
+            inserirSimbolo($1, tipo);
             $$ = CriaNoAtribuicao(CriarNoVariavel($1), $3);
             $$->declarada = true;  // primeira vez declarando
         } else {
@@ -349,11 +381,24 @@ linhas:
 
 //é considerado bloco se tiver indentado corretamente
 bloco:
-      INDENT { entrarEscopo(); } linhas DEDENT {
+      INDENT { 
+          entrarEscopo(); 
+          
+          // Se há parâmetros de função esperando, insere eles no escopo atual
+          if (parametros_funcao_atual != NULL) {
+              ListaNo *param = parametros_funcao_atual;
+              while (param) {
+                  inserirSimbolo(param->no->var, TIPO_INT);  // Assume tipo int por padrão
+                  param = param->prox;
+              }
+          }
+      } linhas DEDENT {
           sairEscopo();
           $$ = CriarNoBloco($3);
       }
     ;
+
+
 
 funcao:
       DEF IDENTIFIER LPAREN RPAREN COLON NEWLINE bloco {
@@ -362,14 +407,9 @@ funcao:
       }
     | DEF IDENTIFIER LPAREN funcao_args RPAREN COLON NEWLINE {
           inserirSimbolo($2, TIPO_FUNCAO);
-
-          // Registrar parâmetros na tabela de símbolos antes de processar o bloco
-          ListaNo *param = $4;
-          while (param) {
-              inserirSimbolo(param->no->var, TIPO_INT);  // Assume tipo int por padrão
-              param = param->prox;
-          }
+          parametros_funcao_atual = $4;  // Salva os parâmetros para uso no bloco
       } bloco {
+          parametros_funcao_atual = NULL;  // Limpa os parâmetros
           $$ = CriarNoFuncao($2, $4, $9);
       }
     ;

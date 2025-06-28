@@ -51,6 +51,19 @@ Simbolo *buscarSimbolo(char *nome) {
     return NULL;
 }
 
+// Função auxiliar para converter tipo enum para string
+const char* tipoParaString(TipoSimbolo tipo) {
+    switch (tipo) {
+        case TIPO_INT: return "INT";
+        case TIPO_FLOAT: return "FLOAT";
+        case TIPO_STRING: return "STRING";
+        case TIPO_BOOL: return "BOOL";
+        case TIPO_NONE: return "NONE";
+        case TIPO_FUNCAO: return "FUNCAO";
+        default: return "DESCONHECIDO";
+    }
+}
+
 // Imprime o conteúdo da tabela de símbolos
 void imprimirTabela() {
     printf("\n=== Tabela de Símbolos ===\n");
@@ -64,10 +77,10 @@ void imprimirTabela() {
             for (Simbolo *s = tabela[i]; s; s = s->proximo) {
                 if (s->escopo == escopo) {
                     if (!tem_simbolos) {
-                        printf("\nEscopo nível %d\n", escopo);
+                        printf("\nEscopo nível %d:\n", escopo);
                         tem_simbolos = true;
                     }
-                    printf("Nome: %s Tipo: %d\n", s->nome, s->tipo);
+                    printf("  Nome: %-15s Tipo: %s\n", s->nome, tipoParaString(s->tipo));
                 }
             }
         }
