@@ -22,7 +22,6 @@ TABELA_DIR = tabela
 GERADOR_DIR = gerador_codigo_final
 CODIGO_INTER_DIR = codigo_intermediario
 BUILD_DIR = build
-TEST_DIR = tests
 TEMP_DIR = temp
 EXEMPLOS_DIR = exemplos
 SAIDA_LUA_DIR = saidas_lua
@@ -104,28 +103,7 @@ distclean: clean
 run: all
 	./$(TARGET)
 
-# Regra para executar todos os testes
-test: $(TARGET)
-	@chmod +x ./run_tests.sh
-	@bash ./run_tests.sh
 
-# Regras para testes específicos
-test_parser: $(TARGET)
-	@chmod +x ./run_tests.sh
-	@bash ./run_tests.sh --test parser
-
-test_lexer: $(TARGET)
-	@chmod +x ./run_tests.sh
-	@bash ./run_tests.sh --test lexer
-
-test_semantico: $(TARGET)
-	@chmod +x ./run_tests.sh
-	@bash ./run_tests.sh --test semantico
-
-# Atualizar gabaritos de testes
-atualizar_gabaritos: $(TARGET)
-	@chmod +x ./run_tests.sh
-	@bash ./run_tests.sh --update-gabaritos
 
 # Testar gerador de código
 test_gerador: $(TARGET)
@@ -169,11 +147,10 @@ gerar_exemplos: $(TARGET)
 		fi \
 	done
 
-# Gerar documentação
+# Gerar documentação (placeholder)
 docs:
-	@echo "Gerando documentação..."
+	@echo "Documentação não implementada ainda"
 	@mkdir -p docs/gerados
-	# Adicione comandos para gerar documentação aqui
 
 # Verificar sintaxe do código fonte
 verificar_sintaxe:
@@ -181,5 +158,6 @@ verificar_sintaxe:
 	@for file in $(AST_DIR)/*.c $(TABELA_DIR)/*.c $(GERADOR_DIR)/*.c $(CODIGO_INTER_DIR)/*.c; do \
 		$(CC) -I$(AST_DIR) -I$(TABELA_DIR) -I$(GERADOR_DIR) -fsyntax-only $$file && echo "✓ $$file"; \
 	done
+
 
 .PHONY: all clean distclean run setup verificar_deps debug release test test_parser test_lexer test_semantico atualizar_gabaritos test_gerador test_exemplos validar_lua otimizar_lua test_otimizacao clean_scripts gerar_exemplos docs verificar_sintaxe
