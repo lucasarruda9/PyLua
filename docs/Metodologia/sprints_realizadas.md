@@ -132,7 +132,7 @@
 | Preparação para Entrevista | [Artur Mendonça](https://github.com/ArtyMend07), [Gabriel Lopes](https://github.com/BrzGab), [Lucas Mendonça](https://github.com/lucasarruda9) | ✅ Concluída | Revisão do código e slides |
 | Entrevista Técnica | [Artur Mendonça](https://github.com/ArtyMend07), [Gabriel Lopes](https://github.com/BrzGab), [Guilherme Meister](https://github.com/gmeister18), [Lucas Mendonça](https://github.com/lucasarruda9), [Matheus Ferreira](https://github.com/matferreira1), [Samuel Alves](https://github.com/samuelalvess) | ✅ Concluída | Apresentação para o professor |
 | Correções Pós-feedback | [Gabriel Lopes](https://github.com/BrzGab), [Lucas Mendonça](https://github.com/lucasarruda9), [Matheus Ferreira](https://github.com/matferreira1) | ✅ Concluída | Ajustes baseados no feedback |
-| Fechamento | [Artur Mendonça](https://github.com/ArtyMend07), [Guilherme Meister](https://github.com/gmeister18), [Samuel Alves](https://github.com/samuelalvess) | ✅ Concluída | Documentação de lições aprendidas |
+| Fechamento | [Artur Mendonça](https://github.com/ArtyMend07), [Guilherme Meister](https://github.com/gmeister18), [Samuel Alves](https://github.com/samuelalvess) | ✅ Concluída | Documentação de lições aprendidass |
 
 ### Entregáveis
 - ✅ Apresentação final realizada
