@@ -24,8 +24,13 @@ void inicializa_pilha() {
 %x IDENT
 /* Definição de tokens */
 
+/* Operadores lógicos */
+AND         "and"
+OR          "or"
+NOT         "not"
+
 /* Palavras-chave do Python */
-KEYWORD     and|as|assert|break|class|continue|del|except|finally|from|global|import|in|is|lambda|None|nonlocal|not|or|pass|raise|return|try|with|yield
+KEYWORD     as|assert|break|class|continue|del|except|finally|from|global|import|in|is|lambda|None|nonlocal|pass|raise|try|with|yield
 
 /* Booleanos */
 TRUE        "True"
@@ -127,6 +132,9 @@ COMMENT     #.*
 {DEF}       { return DEF; }
 {RETURN}    { return RETURN; }
 {PRINT}     { return PRINT; }
+{AND}       { return AND; }
+{OR}        { return OR; }
+{NOT}       { return NOT; }
 {KEYWORD}   { yylval.string = strdup(yytext); return KEYWORD; }
 
 {IF}        { return IF; }

@@ -72,8 +72,9 @@ O projeto **PyLua** é um compilador que converte código **Python** em **Lua**.
 
 ## Histórico de Versão
 
-| Versão | Data       | Descrição                       |
-|--------|------------|---------------------------------|
-| 1.0    | 28/04/2025 | Versão inicial com as ferramentas configuradas e documentadas: GCC, Flex, Bison, Make, Git, WhatsApp e VSCode. Inclui configurações detalhadas e instruções de instalação para cada ferramenta, além de orientações sobre como compilar e rodar o projeto PyLua.|
+| Versão | Data | Descrição | Autor | Revisor |
+|--------|------|-----------|--------|----------|
+| 1.0 | 17/06/2025 | Criação e edição do documento do analisador sintático |  | [Artur Mendonça](https://github.com/ArtMendy07) |
+| 2.0 | ajuste da documentação | [Lucas Mendonça](https://github.com/lucasarruda9) | 27/06/2025 | [Artur Mendonça](https://github.com/ArtyMend07) | 27/06/2025 |
 
 

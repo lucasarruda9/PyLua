@@ -8,7 +8,8 @@ typedef enum {
     TIPO_FLOAT,
     TIPO_STRING,
     TIPO_BOOL,
-    TIPO_NONE
+    TIPO_NONE,
+    TIPO_FUNCAO
 } TipoSimbolo;
 
 typedef struct simbolo {

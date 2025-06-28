@@ -17,7 +17,8 @@ typedef enum {
     NoFor,
     NoFuncao,
     NoChamadaFuncao,
-    NoPrint
+    NoPrint,
+    NoReturn
 } Tipo;
 
 // Lista de nós (para blocos, argumentos, parâmetros, etc)
@@ -55,6 +56,7 @@ No* CriarNoFor(No* init, No* cond, No* inc, No* corpo);
 No* CriarNoFuncao(char* nome, ListaNo* parametros, No* corpo);
 No* CriarNoChamadaFuncao(char* nome, ListaNo* argumentos);
 No* CriarNoPrint(ListaNo *lista);
+No* CriarNoReturn(No* expressao);
 ListaNo* AdicionarNoLista(ListaNo* lista, No* no);
 
 void DesalocarArvore(struct Arvore* no);

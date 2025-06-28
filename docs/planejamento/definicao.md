@@ -18,8 +18,6 @@ O compilador Python para Lua implementará as seguintes funcionalidades:
 
 - **Gerador de Código Lua**: A partir da AST gerada, o compilador será responsável por converter a estrutura do código Python em código Lua equivalente.
 
-- **Execução**: O código Lua gerado será executado para verificar se ele se comporta de maneira semelhante ao código Python original.
-
 - **Tratamento de Erros**: O compilador deve fornecer mensagens de erro detalhadas para problemas léxicos, sintáticos e semânticos encontrados durante a tradução e execução.
 
 ## Requisitos Funcionais
@@ -106,7 +104,6 @@ O compilador Python para Lua implementará as seguintes funcionalidades:
     print(soma(3, 4))
     ```
 
-5. **Execução**: O código Lua gerado é executado e imprime `7`.
 
 ## Etapas para Implementação
 
