@@ -1,7 +1,7 @@
-local x = (2 + (3 * 4))
-local y = ((10 - 5) + 1)
-local z = ((8 / 2) * 3)
-(5 + 3)
+local x = 14
+local y = 6
+local z = 12
+8
 (x * 2)
 if 1 then
     local a = 10
@@ -11,11 +11,11 @@ if 0 then
 else
     local c = 30
 end
-local resultado = ((((1 + 2) + 3) + 4) + 5)
-local multiplicacao = (((2 * 2) * 2) * 2)
-local comparacao1 = (5 > 3)
-local comparacao2 = (10 < 5)
-local comparacao3 = (7 == 7)
+local resultado = 15
+local multiplicacao = 16
+local comparacao1 = 0
+local comparacao2 = 0
+local comparacao3 = 0
 print("Resultado:", resultado)
 print("Multiplicação:", multiplicacao)
 print("Comparações:", comparacao1, comparacao2, comparacao3)

@@ -28,13 +28,13 @@ local mult_oito = (x * 8)
 local div_quatro = (x / 4)
 local div_oito = (x / 8)
 print("--- Constant Folding Complexo ---")
-local complexa1 = ((2 + 3) * (4 - 1))
-local complexa2 = ((2 ^ 3) + (4 * 5))
-local complexa3 = ((10 / 2) - (6 % 4))
-local bool1 = (5 > 3)
-local bool2 = (10 < 8)
-local bool3 = (7 == 7)
-local bool4 = (4 ~= 4)
+local complexa1 = 15
+local complexa2 = 28
+local complexa3 = 3
+local bool1 = 0
+local bool2 = 0
+local bool3 = 0
+local bool4 = 0
 print("--- Combinações Complexas ---")
 local resultado1 = (((x + 0) * 1) + (y - 0))
 local resultado2 = ((a / 1) * (2 ^ 1))

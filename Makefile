@@ -145,6 +145,18 @@ validar_lua:
 	@chmod +x ./pylua.sh
 	@./pylua.sh test-generator --validar
 
+# otimiza os códigos lua usando TAC
+otimizar_lua: $(TARGET)
+	@echo "Otimizando códigos Lua..."
+	@chmod +x ./pylua.sh
+	@./pylua.sh test-generator --completo --otimizar
+
+# teste completo com otimização
+test_otimizacao: $(TARGET)
+	@echo "Testando gerador com otimizações..."
+	@chmod +x ./pylua.sh
+	@./pylua.sh test-generator --completo --otimizar --validar
+
 # Gerar exemplos Lua
 gerar_exemplos: $(TARGET)
 	@echo "Gerando exemplos de código Lua..."
@@ -170,4 +182,4 @@ verificar_sintaxe:
 		$(CC) -I$(AST_DIR) -I$(TABELA_DIR) -I$(GERADOR_DIR) -fsyntax-only $$file && echo "✓ $$file"; \
 	done
 
-.PHONY: all clean distclean run setup verificar_deps debug release test test_parser test_lexer test_semantico atualizar_gabaritos test_gerador test_exemplos validar_lua clean_scripts gerar_exemplos docs verificar_sintaxe
+.PHONY: all clean distclean run setup verificar_deps debug release test test_parser test_lexer test_semantico atualizar_gabaritos test_gerador test_exemplos validar_lua otimizar_lua test_otimizacao clean_scripts gerar_exemplos docs verificar_sintaxe

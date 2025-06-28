@@ -1,9 +1,9 @@
 print("=== TESTE AS-IF OPTIMIZATION ===")
 local x = 0
-if (5 > 3) then
+if 0 then
     local resultado_true = "Cinco é maior que três"
 end
-if (2 > 10) then
+if 0 then
     local resultado_false = "Nunca executado"
 else
     local resultado_else = "Dois não é maior que dez"

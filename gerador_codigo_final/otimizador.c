@@ -132,7 +132,9 @@ int calcularOperacaoInteira(int left, int right, char op) {
         case '-': return left - right;
         case '*': return left * right;
         case '/': return (right != 0) ? left / right : 0;
+        case 'f': return (right != 0) ? left / right : 0;  // Divisão inteira
         case '%': return (right != 0) ? left % right : 0;
+        case 'p': return (int)pow(left, right);  // Potência
         case '&': return left & right;
         case '|': return left | right;
         case '^': return left ^ right;
@@ -148,6 +150,7 @@ float calcularOperacaoFloat(float left, float right, char op) {
         case '-': return left - right;
         case '*': return left * right;
         case '/': return (right != 0.0f) ? left / right : 0.0f;
+        case 'f': return (right != 0.0f) ? floorf(left / right) : 0.0f;  // Divisão inteira
         case 'p': return powf(left, right);
         default: return 0.0f;
     }
