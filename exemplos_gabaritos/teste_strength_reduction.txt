@@ -1,0 +1,12 @@
+print("=== TESTE STRENGTH REDUCTION ===")
+local x = 10
+local mult_dois = (x * 2)
+local mult_quatro = (x * 4)
+local mult_oito = (x * 8)
+local div_dois = (x / 2)
+local div_quatro = (x / 4)
+local quad = (x * x)
+local dobro = (x + x)
+print("Multiplicações:", mult_dois, mult_quatro, mult_oito)
+print("Divisões:", div_dois, div_quatro)
+print("Outros:", quad, dobro)

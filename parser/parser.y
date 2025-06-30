@@ -18,6 +18,7 @@ ListaNo* ast_global = NULL;
 // Variáveis globais para controle da geração de código
 FILE *arquivo_lua = NULL;
 int gerar_codigo_lua = 0;
+int gerar_codigo_lua_otimizado = 0;
 FILE *arquivo_tac = NULL;
 int gerar_codigo_tac = 0;
 int total_erros = 0;
@@ -161,7 +162,11 @@ input:   /* Produção vazia */
 line:    expr NEWLINE {
         imprimeArvore($1, 0);
         if (gerar_codigo_lua && arquivo_lua && $1->tipo != NoIf) {
-            gerarCodigoLua($1);
+            if (gerar_codigo_lua_otimizado) {
+                gerarCodigoLuaOtimizado($1);
+            } else {
+                gerarCodigoLua($1);
+            }
         }
 
         DesalocarArvore($1);
@@ -172,7 +177,11 @@ line:    expr NEWLINE {
 
         // Gera código Lua se habilitado
         if (gerar_codigo_lua && arquivo_lua) {
-            gerarCodigoLua($1);
+            if (gerar_codigo_lua_otimizado) {
+                gerarCodigoLuaOtimizado($1);
+            } else {
+                gerarCodigoLua($1);
+            }
         }
 
         // gera o código de três endereços
@@ -188,7 +197,11 @@ line:    expr NEWLINE {
 
         // Gera código Lua se habilitado
         if (gerar_codigo_lua && arquivo_lua) {
-            gerarCodigoLua($1);
+            if (gerar_codigo_lua_otimizado) {
+                gerarCodigoLuaOtimizado($1);
+            } else {
+                gerarCodigoLua($1);
+            }
         }
 
         //gera código TAC se habilitado
@@ -203,7 +216,11 @@ line:    expr NEWLINE {
         imprimeArvore($1, 0);
         // Gera código Lua se habilitado
         if (gerar_codigo_lua && arquivo_lua) {
-            gerarCodigoLua($1);
+            if (gerar_codigo_lua_otimizado) {
+                gerarCodigoLuaOtimizado($1);
+            } else {
+                gerarCodigoLua($1);
+            }
         }
 
         //gera o código de três endereços (TAC)
@@ -217,7 +234,11 @@ line:    expr NEWLINE {
     | funcao {
             imprimeArvore($1, 0);
             if (gerar_codigo_lua && arquivo_lua) {
-                gerarCodigoLua($1);
+                if (gerar_codigo_lua_otimizado) {
+                    gerarCodigoLuaOtimizado($1);
+                } else {
+                    gerarCodigoLua($1);
+                }
             }
             DesalocarArvore($1);
             $$ = NULL;
@@ -225,8 +246,12 @@ line:    expr NEWLINE {
     | condicional {
             imprimeArvore($1, 0);
             if (gerar_codigo_lua && arquivo_lua) {
-            gerarCodigoLua($1);
-        }
+                if (gerar_codigo_lua_otimizado) {
+                    gerarCodigoLuaOtimizado($1);
+                } else {
+                    gerarCodigoLua($1);
+                }
+            }
             DesalocarArvore($1);
             $$ = NULL;
         }
@@ -239,7 +264,11 @@ line:    expr NEWLINE {
        | print NEWLINE {
             imprimeArvore($1, 0);
             if (gerar_codigo_lua && arquivo_lua){
-                gerarCodigoLua($1);
+                if (gerar_codigo_lua_otimizado) {
+                    gerarCodigoLuaOtimizado($1);
+                } else {
+                    gerarCodigoLua($1);
+                }
             }
             DesalocarArvore($1);
             $$ = NULL;
@@ -247,7 +276,11 @@ line:    expr NEWLINE {
        | print {
             imprimeArvore($1, 0);
             if (gerar_codigo_lua && arquivo_lua){
-                gerarCodigoLua($1);
+                if (gerar_codigo_lua_otimizado) {
+                    gerarCodigoLuaOtimizado($1);
+                } else {
+                    gerarCodigoLua($1);
+                }
             }
             DesalocarArvore($1);
             $$ = NULL;
@@ -475,12 +508,22 @@ int main(int argc, char **argv) {
             arquivo_saida_lua = argv[i + 1];
             gerar_codigo_lua = 1;
             i++; // Pula o próximo argumento
+        } else if (strcmp(argv[i], "--gerar-lua-otimizado") == 0 && i + 1 < argc) {
+            arquivo_saida_lua = argv[i + 1];
+            gerar_codigo_lua = 1;
+            gerar_codigo_lua_otimizado = 1;
+            i++; // Pula o próximo argumento
         } else if (strcmp(argv[i], "--gerar-tac") == 0 && i + 1 < argc) {
             arquivo_saida_tac = argv[i + 1];
             gerar_codigo_tac = 1;
             i++; // Pula o próximo argumento
         } else if (strcmp(argv[i], "--gerar-lua") == 0) {
             gerar_codigo_lua = 1;
+        } else if (strcmp(argv[i], "--gerar-lua-otimizado") == 0) {
+            gerar_codigo_lua = 1;
+            gerar_codigo_lua_otimizado = 1;
+        } else if (strcmp(argv[i], "--otimizar") == 0) {
+            gerar_codigo_lua_otimizado = 1;
         } else if (strcmp(argv[i], "--gerar-tac") == 0) {
             gerar_codigo_tac = 1;
         } else if (argv[i][0] != '-') {

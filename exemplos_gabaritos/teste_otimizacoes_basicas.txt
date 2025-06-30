@@ -1,0 +1,15 @@
+print("=== TESTE BÁSICO DE OTIMIZAÇÕES ===")
+local a = 5
+local b = 50
+local c = 4
+local d = 8
+local e = 2
+local f = 20
+local g = 14
+local h = 23
+local bool1 = 0
+local bool2 = 0
+local bool3 = 0
+print("Resultados:", a, b, c, d, e)
+print("Complexas:", f, g, h)
+print("Lógicas:", bool1, bool2, bool3)

@@ -34,6 +34,7 @@ PARSER = $(PARSER_DIR)/parser.y
 AST = $(AST_DIR)/ast.c
 TABELA = $(TABELA_DIR)/tabela.c
 GERADOR = $(GERADOR_DIR)/gerador_codigo_final.c
+OTIMIZADOR = $(GERADOR_DIR)/otimizador.c
 CODIGO_INTER = $(CODIGO_INTER_DIR)/codigo_intermediario.c
 
 # Arquivos gerados (saída no diretório src)
@@ -71,7 +72,7 @@ release:
 debug:
 	@$(MAKE) MODE=debug
 
-$(TARGET): $(LEXER_C) $(PARSER_C) $(AST) $(TABELA) $(GERADOR) $(CODIGO_INTER)
+$(TARGET): $(LEXER_C) $(PARSER_C) $(AST) $(TABELA) $(GERADOR) $(OTIMIZADOR) $(CODIGO_INTER)
 	$(CC) $(CFLAGS) -o $@ $^ -lfl -lm
 	@echo "Compilação concluída: $@"
 
@@ -122,6 +123,18 @@ validar_lua:
 	@chmod +x ./pylua.sh
 	@./pylua.sh test-generator --validar
 
+# otimiza os códigos lua usando TAC
+otimizar_lua: $(TARGET)
+	@echo "Otimizando códigos Lua..."
+	@chmod +x ./pylua.sh
+	@./pylua.sh test-generator --completo --otimizar
+
+# teste completo com otimização
+test_otimizacao: $(TARGET)
+	@echo "Testando gerador com otimizações..."
+	@chmod +x ./pylua.sh
+	@./pylua.sh test-generator --completo --otimizar --validar
+
 # Gerar exemplos Lua
 gerar_exemplos: $(TARGET)
 	@echo "Gerando exemplos de código Lua..."
@@ -143,7 +156,8 @@ docs:
 verificar_sintaxe:
 	@echo "Verificando sintaxe do código fonte..."
 	@for file in $(AST_DIR)/*.c $(TABELA_DIR)/*.c $(GERADOR_DIR)/*.c $(CODIGO_INTER_DIR)/*.c; do \
-		$(CC) -fsyntax-only $$file && echo "✓ $$file"; \
+		$(CC) -I$(AST_DIR) -I$(TABELA_DIR) -I$(GERADOR_DIR) -fsyntax-only $$file && echo "✓ $$file"; \
 	done
 
-.PHONY: all clean distclean run setup verificar_deps debug release test_gerador test_exemplos validar_lua gerar_exemplos docs verificar_sintaxe
+
+.PHONY: all clean distclean run setup verificar_deps debug release test test_parser test_lexer test_semantico atualizar_gabaritos test_gerador test_exemplos validar_lua otimizar_lua test_otimizacao clean_scripts gerar_exemplos docs verificar_sintaxe

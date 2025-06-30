@@ -1,0 +1,15 @@
+print("=== TESTE COPY PROPAGATION ===")
+local x = 42
+local y = x
+local z = y
+local resultado1 = (z + 10)
+local resultado2 = (y * 2)
+local a = 100
+local b = a
+local c = b
+local d = (c + 5)
+local temp = x
+local final = (temp + 1)
+print("Originais:", x, a)
+print("Cópias:", y, z, b, c)
+print("Resultados:", resultado1, resultado2, d, final)

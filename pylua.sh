@@ -33,6 +33,7 @@ mostrar_ajuda() {
     echo "  --completo            Testa todos os exemplos (test-generator)"
     echo "  --executar            Tenta executar códigos Lua gerados"
     echo "  --validar             Valida códigos comparando com gabaritos"
+    echo "  --otimizar            Aplica otimizações nos códigos Lua gerados"
     echo ""
     echo "EXEMPLOS:"
     echo "  ./pylua.sh init"
@@ -40,6 +41,7 @@ mostrar_ajuda() {
     echo "  ./pylua.sh test-generator"
     echo "  ./pylua.sh test-generator --completo"
     echo "  ./pylua.sh test-generator --completo --executar --validar"
+    echo "  ./pylua.sh test-generator --completo --otimizar --validar"
 }
 
 verificar_deps() {
@@ -316,6 +318,106 @@ _teste_completo_gerador() {
     return $FALHOU_GER
 }
 
+# função para otimizar códigos Lua já gerados
+_otimizar_lua() {
+    print_color $BLUE "=== Otimizando Códigos Lua ==="
+
+    if [ ! -d "saidas_lua" ]; then
+        print_color $RED "Pasta saidas_lua não encontrada! Execute a geração primeiro."
+        return 1
+    fi
+
+    # cria pasta de logs se não existir
+    mkdir -p logs saidas_tac
+
+    # arquivo de log para otimizações
+    local DATA_LOG=$(date +"%d_%m_%Y_%H%M%S")
+    local LOG_FILE="logs/otimizacao_${DATA_LOG}.log"
+    echo "Log de otimizações - $(date '+%d/%m/%Y às %H:%M:%S')" > "$LOG_FILE"
+
+    local OTIMIZADOS=0
+    local FALHAS=0
+    local TOTAL=0
+
+    # otimiza arquivos Lua já existentes
+    for arquivo_lua in saidas_lua/*.lua; do
+        if [ -f "$arquivo_lua" ]; then
+            local nome=$(basename "$arquivo_lua" .lua)
+            local arquivo_py="exemplos/${nome}.py"
+            local arquivo_tac="saidas_tac/${nome}.tac"
+
+            echo -n "Otimizando $nome... "
+
+            # verifica se existe arquivo Python correspondente
+            if [ ! -f "$arquivo_py" ]; then
+                print_color $YELLOW "PULADO (sem .py)"
+                continue
+            fi
+
+            # salva versão original para comparação
+            local arquivo_original_temp="/tmp/${nome}_original.lua"
+            cp "$arquivo_lua" "$arquivo_original_temp"
+
+            # gera TAC primeiro (para log)
+            ./pylua_debug "$arquivo_py" --gerar-tac "$arquivo_tac" 2>>"$LOG_FILE"
+
+            # regera o arquivo Lua com otimizações (substitui o original)
+            ./pylua_debug "$arquivo_py" --gerar-lua-otimizado "$arquivo_lua" 2>>"$LOG_FILE"
+
+            if [ -f "$arquivo_lua" ] && [ -s "$arquivo_lua" ]; then
+                print_color $GREEN "OK"
+                OTIMIZADOS=$((OTIMIZADOS+1))
+
+                # mostra estatísticas de otimização
+                local linhas_original=$(wc -l < "$arquivo_original_temp")
+                local linhas_otimizado=$(wc -l < "$arquivo_lua")
+                local reducao=$((linhas_original - linhas_otimizado))
+
+                if [ $reducao -gt 0 ]; then
+                    echo "    Redução: $reducao linhas ($linhas_original → $linhas_otimizado)"
+                elif [ $reducao -lt 0 ]; then
+                    echo "    Expansão: $((-reducao)) linhas ($linhas_original → $linhas_otimizado)"
+                else
+                    echo "    Otimizações aplicadas ($linhas_original linhas)"
+                fi
+
+                echo "=== $nome ===" >> "$LOG_FILE"
+                echo "Original: $linhas_original linhas" >> "$LOG_FILE"
+                echo "Otimizado: $linhas_otimizado linhas" >> "$LOG_FILE"
+                echo "Diferença: $reducao linhas" >> "$LOG_FILE"
+                echo "" >> "$LOG_FILE"
+
+                rm -f "$arquivo_original_temp"
+            else
+                print_color $RED "FALHOU"
+                FALHAS=$((FALHAS+1))
+                echo "Erro na otimização de $nome" >> "$LOG_FILE"
+                # restaura arquivo original se falhou
+                if [ -f "$arquivo_original_temp" ]; then
+                    cp "$arquivo_original_temp" "$arquivo_lua"
+                    rm -f "$arquivo_original_temp"
+                fi
+            fi
+            TOTAL=$((TOTAL+1))
+        fi
+    done
+
+    echo ""
+    print_color $BLUE "Resumo da otimização:"
+    print_color $GREEN "Otimizados: $OTIMIZADOS"
+    print_color $RED "Falhas: $FALHAS"
+    print_color $BLUE "Total: $TOTAL"
+
+    if [ $TOTAL -gt 0 ]; then
+        local taxa=$(( 100 * OTIMIZADOS / TOTAL ))
+        print_color $BLUE "Taxa de sucesso: $taxa%"
+    fi
+
+    print_color $BLUE "Log salvo em: $LOG_FILE"
+
+    return $FALHAS
+}
+
 # função pra validar comparando com gabaritos (sem usar luac)
 _validar_lua() {
     print_color $BLUE "=== Validando Códigos Lua (comparação de texto) ==="
@@ -398,6 +500,7 @@ testar_gerador() {
     local modo="basico"
     local executar_lua=false
     local validar=false
+    local otimizar=false
 
     # processa argumentos
     while [[ $# -gt 0 ]]; do
@@ -412,6 +515,10 @@ testar_gerador() {
                 ;;
             --validar)
                 validar=true
+                shift
+                ;;
+            --otimizar)
+                otimizar=true
                 shift
                 ;;
             *)
@@ -443,6 +550,16 @@ testar_gerador() {
     else
         _teste_basico_gerador
         resultado=$?
+    fi
+
+    # otimização adicional
+    if $otimizar; then
+        echo ""
+        _otimizar_lua
+        local opt_result=$?
+        if [ $opt_result -gt 0 ]; then
+            resultado=$opt_result
+        fi
     fi
 
     # validação adicional

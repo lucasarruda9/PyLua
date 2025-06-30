@@ -1,0 +1,12 @@
+print("=== TESTE AS-IF OPTIMIZATION ===")
+local x = 0
+if 0 then
+    local resultado_true = "Cinco é maior que três"
+end
+if 0 then
+    local resultado_false = "Nunca executado"
+else
+    local resultado_else = "Dois não é maior que dez"
+end
+print("Resultados:", a, c)
+print("Condições:", resultado_true, resultado_else)

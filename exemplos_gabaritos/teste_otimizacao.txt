@@ -1,0 +1,21 @@
+local x = 14
+local y = 6
+local z = 12
+8
+(x * 2)
+if 1 then
+    local a = 10
+end
+if 0 then
+    local b = 20
+else
+    local c = 30
+end
+local resultado = 15
+local multiplicacao = 16
+local comparacao1 = 0
+local comparacao2 = 0
+local comparacao3 = 0
+print("Resultado:", resultado)
+print("Multiplicação:", multiplicacao)
+print("Comparações:", comparacao1, comparacao2, comparacao3)

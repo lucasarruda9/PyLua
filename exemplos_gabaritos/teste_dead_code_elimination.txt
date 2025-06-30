@@ -1,0 +1,6 @@
+print("=== TESTE DEAD CODE ELIMINATION ===")
+local x = 10
+8
+(x * 2)
+local variavel_nao_usada = 999
+print("Código vivo:", codigo_vivo, x)

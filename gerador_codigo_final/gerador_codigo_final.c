@@ -3,13 +3,51 @@
 #include <stdlib.h>
 #include <string.h>
 
-static GeradorCodigo gerador = {NULL, 0, 0};
+static GeradorCodigo gerador = {NULL, 0, 0, {0}};
 
 void inicializarGerador(FILE* arquivo_saida) {
     gerador.arquivo_saida = arquivo_saida;
     gerador.nivel_indentacao = 0;
     gerador.contador_variaveis_temp = 0;
+    // Inicializar opções de otimização com valores padrão
+    inicializarOpcoes(&gerador.opcoes_otimizacao);
 }
+
+// ===== NOVAS FUNÇÕES DE OTIMIZAÇÃO =====
+
+void gerarCodigoLuaOtimizado(No* no) {
+    if (!no) return;
+    
+    // Aplicar otimizações antes de gerar o código
+    No* no_otimizado = aplicarOtimizacoes(no, &gerador.opcoes_otimizacao);
+    
+    // Gerar código para o nó otimizado
+    gerarCodigoLua(no_otimizado);
+    
+    // Imprimir estatísticas se houver otimizações aplicadas
+    if (gerador.opcoes_otimizacao.num_optimizations_applied > 0) {
+        fprintf(stderr, "=== OTIMIZAÇÕES APLICADAS ===\n");
+        fprintf(stderr, "Total: %d otimizações\n", gerador.opcoes_otimizacao.num_optimizations_applied);
+        fprintf(stderr, "=============================\n");
+    }
+}
+
+void configurarOtimizacoes(bool dce, bool cf, bool asif, bool cse) {
+    gerador.opcoes_otimizacao.dead_code_elimination = dce;
+    gerador.opcoes_otimizacao.constant_folding = cf;
+    gerador.opcoes_otimizacao.as_if_optimization = asif;
+    gerador.opcoes_otimizacao.common_subexpression_elimination = cse;
+}
+
+void habilitarTodasOtimizacoes() {
+    configurarOtimizacoes(true, true, true, true);
+}
+
+void desabilitarTodasOtimizacoes() {
+    configurarOtimizacoes(false, false, false, false);
+}
+
+// ===== FUNÇÕES EXISTENTES (sem alteração) =====
 
 void aumentarIndentacao() {
     gerador.nivel_indentacao++;
